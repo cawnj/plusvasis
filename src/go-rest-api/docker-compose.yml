@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    image: continens-api:latest
+    container_name: continens-api
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.continens.entrypoints=https"
+      - "traefik.http.routers.continens.rule=Host(`api.local.continens.xyz`)"
+      - "traefik.http.services.continens.loadbalancer.server.port=8080"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+
