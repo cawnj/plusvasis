@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"os"
 
-	"continens/routes"
+	"continens/internal/routes"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -21,6 +21,7 @@ func main() {
 		return c.HTML(http.StatusOK, "Hello, Docker! <3")
 	})
 	routes.Health(e)
+	routes.NomadJobs(e)
 
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
