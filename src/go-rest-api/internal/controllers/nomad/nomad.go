@@ -3,6 +3,7 @@ package nomad
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -101,4 +102,35 @@ func CreateJob(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, res)
+}
+
+func ReadJob(c echo.Context) error {
+	id := c.Param("id")
+	url := fmt.Sprintf("https://nomad.local.cawnj.dev/v1/job/%s", id)
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Println("[nomad/ReadJob]", err)
+		return err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("[nomad/ReadJob]", err)
+		return err
+	}
+	var data interface{}
+	err = json.Unmarshal(body, &data)
+	if data != nil {
+		if err != nil {
+			log.Println("[nomad/ReadJob]", err)
+			return err
+		}
+	}
+	if data == nil {
+		encodedJSON := []byte(`{
+			"Response" : "Job Not Found"
+		}`)
+
+		return c.JSONBlob(http.StatusBadRequest, encodedJSON)
+	}
+	return c.JSON(http.StatusOK, data)
 }
