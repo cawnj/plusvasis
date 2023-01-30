@@ -1,0 +1,12 @@
+node:
+  trigger:
+    include: src/svelte-app/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - changes: [src/svelte-app/*]
+go:
+  trigger:
+    include: src/go-rest-api/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - changes: [src/go-rest-api/*]
