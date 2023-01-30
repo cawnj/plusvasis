@@ -10,4 +10,5 @@ func NomadJobs(e *echo.Echo) {
 
 	e.GET("/list-jobs", nomad.GetJobs)
 	e.POST("/create-job", nomad.CreateJob)
+	e.GET("/read-job/:id", nomad.ReadJob)
 }
