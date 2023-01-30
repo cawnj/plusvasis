@@ -1,0 +1,17 @@
+image: node:latest
+
+cache:
+  paths:
+    - src/svelte-app/node_modules/
+
+before_script:
+  - cd src/svelte-app
+  - npm install
+
+lint:
+  stage: test
+  script: npm run lint
+
+test:
+  stage: test
+  script: npm run test:unit run

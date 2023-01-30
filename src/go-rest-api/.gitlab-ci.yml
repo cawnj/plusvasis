@@ -1,0 +1,7 @@
+image: golang:1.19
+
+before_script: cd src/go-rest-api
+
+test:
+  stage: test
+  script: go test -v ./...
