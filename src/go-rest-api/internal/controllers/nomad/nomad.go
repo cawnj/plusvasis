@@ -33,7 +33,7 @@ func GetJobs(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
-func CreateJob(c echo.Context) error {
+func GenerateJobObject() *bytes.Buffer {
 
 	data := []byte(`{
 		"Job": {
@@ -81,11 +81,13 @@ func CreateJob(c echo.Context) error {
 				}
 			]
 		}
-	  }`)
+	}`)
+	return bytes.NewBuffer(data)
+}
 
-	resp, err := http.Post("https://nomad.local.cawnj.dev/v1/jobs", "application/json",
-		bytes.NewBuffer(data))
+func CreateJob(c echo.Context) error {
 
+	resp, err := http.Post("https://nomad.local.cawnj.dev/v1/jobs", "application/json", GenerateJobObject())
 	if err != nil {
 		log.Println("[nomad/CreateJob]", err)
 		return err
@@ -100,6 +102,30 @@ func CreateJob(c echo.Context) error {
 	err = json.Unmarshal(body, &res)
 	if err != nil {
 		log.Println("[nomad/CreateJob]", err)
+		return err
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+func UpdateJob(c echo.Context) error {
+
+	id := c.Param("id")
+	url := fmt.Sprintf("https://nomad.local.cawnj.dev/v1/job/%s", id)
+	resp, err := http.Post(url, "application/json", GenerateJobObject())
+	if err != nil {
+		log.Println("[nomad/UpdateJob]", err)
+		return err
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("[nomad/UpdateJob]", err)
+		return err
+	}
+	var res interface{}
+	err = json.Unmarshal(body, &res)
+	if err != nil {
+		log.Println("[nomad/UpdateJob]", err)
 		return err
 	}
 	return c.JSON(http.StatusOK, res)
