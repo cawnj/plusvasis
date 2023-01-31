@@ -8,7 +8,8 @@ import (
 
 func NomadJobs(e *echo.Echo) {
 
-	e.GET("/list-jobs", nomad.GetJobs)
-	e.POST("/create-job", nomad.CreateJob)
-	e.GET("/read-job/:id", nomad.ReadJob)
+	e.GET("/jobs", nomad.GetJobs)
+	e.POST("/jobs", nomad.CreateJob)
+	e.GET("/job/:id", nomad.ReadJob)
+	e.DELETE("job/:id", nomad.StopJob)
 }

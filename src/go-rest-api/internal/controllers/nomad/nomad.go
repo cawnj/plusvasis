@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -132,5 +133,43 @@ func ReadJob(c echo.Context) error {
 
 		return c.JSONBlob(http.StatusBadRequest, encodedJSON)
 	}
+	return c.JSON(http.StatusOK, data)
+}
+
+func StopJob(c echo.Context) error {
+	id := c.Param("id")
+	url := fmt.Sprintf("https://nomad.local.cawnj.dev/v1/job/%s", id)
+
+	// Create client
+	client := &http.Client{}
+
+	// Create request
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		log.Println("[nomad/StopJob]", err)
+		return err
+	}
+
+	// Fetch Request
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("[nomad/StopJob]", err)
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Read Response Body
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("[nomad/StopJob]", err)
+		panic(err.Error())
+	}
+	var data interface{}
+	err = json.Unmarshal(respBody, &data)
+	if err != nil {
+		log.Println("[nomad/StopJob]", err)
+		return err
+	}
+
 	return c.JSON(http.StatusOK, data)
 }
