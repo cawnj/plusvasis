@@ -3,10 +3,10 @@ node:
     include: src/svelte-app/.gitlab-ci.yml
     strategy: depend
   rules:
-    - changes: [src/svelte-app/*]
+    - when: always
 go:
   trigger:
     include: src/go-rest-api/.gitlab-ci.yml
     strategy: depend
   rules:
-    - changes: [src/go-rest-api/*]
+    - when: always
