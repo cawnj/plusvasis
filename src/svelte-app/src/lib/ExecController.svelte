@@ -4,31 +4,34 @@
 	import * as xterm from 'xterm';
 	import * as fit from 'xterm-addon-fit';
 
+	import { ExecSocketAdapter } from './ExecSocketAdapter';
+
+	let terminal: xterm.Terminal;
 	let terminalElement: HTMLElement;
-	let terminalController: xterm.Terminal;
 	let termFit: fit.FitAddon;
-	$: {
-		if (terminalController) {
-			// ...
-		}
-	}
+	let execSocketAdapter: ExecSocketAdapter;
+
 	function initalizeXterm() {
-		terminalController = new xterm.Terminal({
-			convertEol: true
+		terminal = new xterm.Terminal({
+			fontFamily: 'monospace',
+			fontWeight: '400',
 		});
 		termFit = new fit.FitAddon();
-		terminalController.loadAddon(termFit);
-		terminalController.open(terminalElement);
+		terminal.loadAddon(termFit);
+		terminal.open(terminalElement);
 		termFit.fit();
-		terminalController.onData((e) => {
-			console.log(e);
-		});
+	}
+	export function connectTerm(url: string) {
+		execSocketAdapter = new ExecSocketAdapter(
+			terminal,
+			url,
+		)
 	}
 	onMount(async () => {
 		initalizeXterm();
 	});
 	export function write(content: string) {
-		terminalController.write(content);
+		terminal.write(content);
 	}
 </script>
 

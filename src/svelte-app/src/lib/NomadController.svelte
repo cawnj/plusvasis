@@ -8,6 +8,7 @@
 
 	export function startContainer() {
 		execControllerComponent.write('Starting container...');
+		execControllerComponent.connectTerm("wss://nomad.local.cawnj.dev/v1/client/allocation/522a7c7f-ce72-642a-3b43-29e2086bd3c2/exec?task=server&tty=true&ws_handshake=true&command=%5B%22%2Fbin%2Fbash%22%5D");
 	}
 
 	export function getContainers() {
