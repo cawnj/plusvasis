@@ -1,7 +1,7 @@
 export const load = async () => {
 	console.log('Running async load func');
 
-	async function fetchData() {
+	async function fetchJobs() {
 		const res = await fetch('http://localhost:8080/jobs');
 		const data = await res.json();
 
@@ -13,6 +13,6 @@ export const load = async () => {
 	}
 
 	return {
-		jobs: fetchData()
+		jobs: fetchJobs()
 	};
 };
