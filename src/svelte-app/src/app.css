@@ -20,3 +20,12 @@
 .btn-purple:focus {
 	@apply outline-none ring-4 ring-purple-300 dark:ring-purple-900;
 }
+.btn-red {
+	@apply text-white bg-red-700 dark:bg-red-600 font-medium rounded-lg text-sm px-5 py-2.5 mb-2;
+}
+.btn-red:hover {
+	@apply bg-red-800 dark:bg-red-700;
+}
+.btn-red:focus {
+	@apply outline-none ring-4 ring-red-300 dark:ring-red-900;
+}
