@@ -1,6 +1,7 @@
 <script>
 	import '../app.css';
-	//import App from './fb';
+	/* eslint-disable @typescript-eslint/no-unused-vars */
+	import App from './fb';
 	import { onMount } from 'svelte';
 	import { getAuth, onAuthStateChanged } from 'firebase/auth';
 	import { goto } from '$app/navigation';
