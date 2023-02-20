@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	import logo from '$lib/assets/logo.png';
 	import {
 		getAuth,
 		signInWithEmailAndPassword,
@@ -41,59 +42,60 @@
 </script>
 
 <div class="login">
-	<div class="card">
+	<div
+		class="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700"
+	>
 		<div class="card-body login-form">
-			<h5 class="card-title">{title}</h5>
+			<img alt="The project logo" src={logo} class="mr-3 h-6 sm:h-9 float-left" />
+			<h5 class="text-xl font-medium text-gray-900 dark:text-white">Continens {title}</h5>
 			<form on:submit|preventDefault={login}>
-				<div class="mb-3">
-					<label for="emailInput" class="form-label">Email address</label>
+				<div class="mb-3 mt-3">
+					<label
+						for="emailInput"
+						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+						>Email address</label
+					>
 					<input
 						type="email"
-						class="form-control"
+						class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
 						id="emailInput"
 						aria-describedby="emailHelp"
 						placeholder="Email Address"
 					/>
-					{#if title != 'Login'}
-						<div id="emailHelp" class="form-text">
-							We'll never share your email with anyone else.
-						</div>
-					{/if}
 				</div>
 				<div class="mb-3">
-					<label for="passInput" class="form-label">Password</label>
-					<input type="password" class="form-control" id="passInput" placeholder="Password" />
+					<label
+						for="passInput"
+						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label
+					>
+					<input
+						type="password"
+						class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+						id="passInput"
+						placeholder="Password"
+					/>
 				</div>
-				<button type="submit" class="btn btn-primary">Submit</button>
+				<button
+					type="submit"
+					class="mb-4 mt-4 w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+					>Login to your account</button
+				>
 			</form>
 			{#if title == 'Login'}
-				<p class="float-end mt-3">
-					Not a user? <a href="/signup" class="card-link">Sign Up</a>
-				</p>
+				<div class="text-sm font-medium text-gray-500 dark:text-gray-300">
+					Not registered? <a href="/signup" class="text-blue-700 hover:underline dark:text-blue-500"
+						>Create account</a
+					>
+				</div>
+			{/if}
+			<div id="emailHelp" class="mt-2 text-sm font-medium text-gray-500 dark:text-gray-300">
+				We'll never share your details with anyone else.
+			</div>
+			{#if title != 'Login'}
+				<div class="text-sm font-medium text-gray-500 dark:text-gray-300">
+					<a href="/login" class="mt-2 text-blue-700 hover:underline dark:text-blue-500">Back</a>
+				</div>
 			{/if}
 		</div>
 	</div>
 </div>
-
-<style>
-	.card {
-		width: 50%;
-		margin: 0 auto;
-	}
-	.login {
-		margin-top: 50px;
-		margin-bottom: 50px;
-	}
-	.login-form {
-		width: 60%;
-		margin: 0 auto;
-	}
-	@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
-		.login-form {
-			width: 90%;
-		}
-		.card {
-			width: 90%;
-		}
-	}
-</style>
