@@ -1,1 +1,5 @@
-<h1>Signup</h1>
+<script>
+	import Login from '$lib/LoginForm.svelte';
+</script>
+
+<Login title="Sign Up" />
