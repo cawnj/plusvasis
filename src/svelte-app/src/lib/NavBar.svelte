@@ -1,5 +1,20 @@
 <script>
 	import logo from '$lib/assets/logo.png';
+	import { goto } from '$app/navigation';
+	import { getAuth, signOut } from 'firebase/auth';
+	import { isLoggedIn } from '../stores/authStore';
+
+	const auth = getAuth();
+	function logout() {
+		signOut(auth)
+			.then(() => {
+				localStorage.removeItem('uid');
+				goto('/login');
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}
 </script>
 
 <div>
@@ -19,6 +34,14 @@
 			>
 				<a class="text-white hover:text-blue-400" href="/">Home</a>
 				<a class="text-white hover:text-blue-400" href="/">About</a>
+				{#if $isLoggedIn}
+					<a
+						class="text-white hover:text-blue-400"
+						on:click|preventDefault={logout}
+						target="_blank"
+						href="/">Sign Out</a
+					>
+				{/if}
 			</div>
 		</nav>
 	</div>
