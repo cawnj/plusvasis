@@ -63,7 +63,12 @@
 					<label for="passInput" class="txt-input-label">Password</label>
 					<input type="password" class="txt-input" id="passInput" placeholder="Password" />
 				</div>
-				<button type="submit" class="btn-blue-submit">Login to your account</button>
+				{#if title == 'Login'}
+					<button type="submit" class="btn-blue-submit">Login to your account</button>
+				{/if}
+				{#if title != 'Login'}
+					<button type="submit" class="btn-blue-submit">Create your account</button>
+				{/if}
 			</form>
 			{#if title == 'Login'}
 				<div class="div-txt">
