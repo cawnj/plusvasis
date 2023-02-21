@@ -14,7 +14,7 @@
 	function initalizeXterm() {
 		terminal = new xterm.Terminal({
 			fontFamily: 'monospace',
-			fontWeight: '400',
+			fontWeight: '400'
 		});
 		termFit = new fit.FitAddon();
 		terminal.loadAddon(termFit);
@@ -22,10 +22,7 @@
 		termFit.fit();
 	}
 	export function connectTerm(url: string) {
-		execSocketAdapter = new ExecSocketAdapter(
-			terminal,
-			url,
-		)
+		execSocketAdapter = new ExecSocketAdapter(terminal, url);
 	}
 	onMount(async () => {
 		initalizeXterm();
