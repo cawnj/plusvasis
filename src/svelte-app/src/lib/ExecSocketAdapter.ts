@@ -17,6 +17,7 @@ export class ExecSocketAdapter {
             this.sendTtySize();
             this.startHeartbeat();
 
+            this.terminal.clear()
             this.terminal.onData((data) => {
                 this.handleData(data);
             })
