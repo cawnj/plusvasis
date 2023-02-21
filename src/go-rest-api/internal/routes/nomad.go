@@ -13,4 +13,5 @@ func NomadJobs(e *echo.Echo) {
 	e.GET("/job/:id", nomad.ReadJob)
 	e.DELETE("job/:id", nomad.StopJob)
 	e.POST("/job/:id", nomad.UpdateJob)
+	e.GET("/job/:id/allocations", nomad.ReadJobAllocs)
 }

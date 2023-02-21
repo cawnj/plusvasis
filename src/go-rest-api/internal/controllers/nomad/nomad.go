@@ -199,3 +199,34 @@ func StopJob(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, data)
 }
+
+func ReadJobAllocs(c echo.Context) error {
+	id := c.Param("id")
+	url := fmt.Sprintf("https://nomad.local.cawnj.dev/v1/job/%s/allocations", id)
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Println("[nomad/ReadJobAllocs]", err)
+		return err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("[nomad/ReadJobAllocs]", err)
+		return err
+	}
+	var data interface{}
+	err = json.Unmarshal(body, &data)
+	if data != nil {
+		if err != nil {
+			log.Println("[nomad/ReadJobAllocs]", err)
+			return err
+		}
+	}
+	if data == nil {
+		encodedJSON := []byte(`{
+			"Response" : "Job Not Found"
+		}`)
+
+		return c.JSONBlob(http.StatusBadRequest, encodedJSON)
+	}
+	return c.JSON(http.StatusOK, data)
+}
