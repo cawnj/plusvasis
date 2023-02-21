@@ -36,6 +36,7 @@
 	"dependencies": {
 		"base64-js": "^1.5.1",
 		"text-encoder-lite": "^2.0.0",
+		"firebase": "^9.17.1",
 		"xterm": "^5.1.0",
 		"xterm-addon-fit": "^0.7.0"
 	}
