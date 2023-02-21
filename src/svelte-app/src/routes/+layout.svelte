@@ -1,7 +1,7 @@
 <script>
 	import '../app.css';
 	/* eslint-disable @typescript-eslint/no-unused-vars */
-	import App from './fb';
+	import App from '$lib/fb';
 	import { isLoggedIn } from '../stores/authStore';
 	import { onMount } from 'svelte';
 	import { getAuth, onAuthStateChanged } from 'firebase/auth';
