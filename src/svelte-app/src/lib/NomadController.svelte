@@ -15,6 +15,17 @@
 	}
 
 	export async function fetchJobId(jobId: string) {
+		const url = `http://localhost:8080/job/${jobId}`;
+		const res = await fetch(url);
+
+		if (res.ok) {
+			execControllerComponent.write('Starting container ' + jobId);
+		} else {
+			execControllerComponent.write('Error starting container ' + jobId);
+		}
+	}
+
+	export async function fetchJobIdAllocations(jobId: string) {
 		containerRunning = true;
 		job = jobId;
 		const url = `http://localhost:8080/job/${jobId}/allocations`;

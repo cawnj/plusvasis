@@ -23,7 +23,7 @@
 			<button
 				type="button"
 				class="btn-purple"
-				on:click={() => nomadControllerComponent.fetchJobId(job.ID)}>{job.ID}</button
+				on:click={() => nomadControllerComponent.fetchJobIdAllocations(job.ID)}>{job.ID}</button
 			>
 		</ul>
 	{/each}
