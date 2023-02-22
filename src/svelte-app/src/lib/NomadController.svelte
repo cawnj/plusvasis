@@ -1,14 +1,10 @@
 <script lang="ts">
 	import ExecController from '$lib/ExecController.svelte';
+	import { nomadAllocExecEndpoint, nomadAllocExecQueryParams, job } from '../stores/nomadStore';
 
 	let execControllerComponent: ExecController;
 	export let getContainerClicked = false;
 	export let containerRunning = false;
-	export let job = '';
-
-	let nomadAllocExecEndpoint = 'wss://nomad.local.cawnj.dev/v1/client/allocation/';
-	let nomadAllocExecQueryParams =
-		'/exec?task=server&tty=true&ws_handshake=true&command=%5B%22%2Fbin%2Fbash%22%5D';
 
 	export function getContainers() {
 		getContainerClicked = true;
@@ -27,7 +23,7 @@
 
 	export async function fetchJobIdAllocations(jobId: string) {
 		containerRunning = true;
-		job = jobId;
+		job.update(() => jobId);
 		const url = `http://localhost:8080/job/${jobId}/allocations`;
 		const res = await fetch(url);
 		const json = await res.json();

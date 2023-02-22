@@ -4,7 +4,6 @@
 
 	let getContainerClicked: boolean;
 	let containerRunning: boolean;
-	let job: string;
 
 	export let data;
 	const { jobs } = data;
@@ -40,5 +39,4 @@
 	bind:this={nomadControllerComponent}
 	bind:getContainerClicked
 	bind:containerRunning
-	bind:job
 />
