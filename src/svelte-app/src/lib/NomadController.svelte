@@ -1,23 +1,17 @@
 <script lang="ts">
 	import ExecController from '$lib/ExecController.svelte';
+	import { nomadAllocExecEndpoint, nomadAllocExecQueryParams, job } from '../stores/nomadStore';
 
 	let execControllerComponent: ExecController;
 	export let getContainerClicked = false;
 	export let containerRunning = false;
-	export let job = '';
-
-	export function startContainer() {
-		execControllerComponent.write('Starting container...');
-	}
 
 	export function getContainers() {
 		getContainerClicked = true;
 	}
 
 	export async function fetchJobId(jobId: string) {
-		containerRunning = true;
-		job = jobId;
-		const url = 'http://localhost:8080/job/' + jobId;
+		const url = `http://localhost:8080/job/${jobId}`;
 		const res = await fetch(url);
 
 		if (res.ok) {
@@ -27,8 +21,26 @@
 		}
 	}
 
+	export async function fetchJobIdAllocations(jobId: string) {
+		containerRunning = true;
+		job.update(() => jobId);
+		const url = `http://localhost:8080/job/${jobId}/allocations`;
+		const res = await fetch(url);
+		const json = await res.json();
+		const allocId = json[0]['ID'];
+
+		if (res.ok) {
+			execControllerComponent.write('Starting container ' + jobId);
+			execControllerComponent.connectTerm(
+				nomadAllocExecEndpoint + allocId + nomadAllocExecQueryParams
+			);
+		} else {
+			execControllerComponent.write('Error starting container ' + jobId);
+		}
+	}
+
 	export async function fetchJobIdDelete(jobId: string) {
-		const url = 'http://localhost:8080/job/' + jobId;
+		const url = `http://localhost:8080/job/${jobId}`;
 		const res = await fetch(url, {
 			method: 'DELETE'
 		});
