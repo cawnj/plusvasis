@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ExecController from '$lib/ExecController.svelte';
 	import { nomadAllocExecEndpoint, nomadAllocExecQueryParams, job } from '../stores/nomadStore';
-	import { hostname } from '../stores/environment';
+	import { hostname } from '../stores/environmentStore';
 
 	let execControllerComponent: ExecController;
 	export let getContainerClicked = false;

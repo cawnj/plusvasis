@@ -1,4 +1,4 @@
-import { hostname } from '../stores/environment';
+import { hostname } from '../stores/environmentStore';
 
 export const load = async () => {
 	console.log('Running async load func');
