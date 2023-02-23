@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -185,7 +184,7 @@ func StopJob(c echo.Context) error {
 	defer resp.Body.Close()
 
 	// Read Response Body
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("[nomad/StopJob]", err)
 		panic(err.Error())
