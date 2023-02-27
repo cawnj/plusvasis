@@ -4,10 +4,15 @@
 
 	let execControllerComponent: ExecController;
 	export let getContainerClicked = false;
+	export let getContainerCreatedClicked = false;
 	export let containerRunning = false;
 
 	export function getContainers() {
 		getContainerClicked = true;
+	}
+
+	export function getContainerCreated() {
+		getContainerCreatedClicked = true;
 	}
 
 	export async function fetchJobId(jobId: string) {
@@ -51,6 +56,24 @@
 			execControllerComponent.write('Error stopping container ' + jobId);
 		}
 		containerRunning = false;
+	}
+
+	export async function fetchJobCreate() {
+		const url = `http://localhost:8080/jobs`;
+		const res = await fetch(url, {
+			method: 'POST',
+			body: JSON.stringify({
+				containerName: document.getElementById('containerNameInput').value,
+				dockerImage: document.getElementById('dockerImageInput').value
+			})
+		});
+
+		if (res.ok) {
+			console.log('Container Created');
+		} else {
+			console.log('Error');
+		}
+		getContainerCreatedClicked = false;
 	}
 </script>
 
