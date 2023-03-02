@@ -64,7 +64,9 @@
 			method: 'POST',
 			body: JSON.stringify({
 				containerName: document.getElementById('containerNameInput').value,
-				dockerImage: document.getElementById('dockerImageInput').value
+				dockerImage: document.getElementById('dockerImageInput').value,
+				ports: document.getElementById('portsInput').value,
+				email: localStorage.getItem('email')
 			})
 		});
 

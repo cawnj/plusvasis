@@ -9,6 +9,7 @@
 		signOut(auth)
 			.then(() => {
 				localStorage.removeItem('uid');
+				localStorage.removeItem('email');
 				goto('/login');
 			})
 			.catch((error) => {

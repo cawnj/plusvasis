@@ -17,6 +17,7 @@
 					// Signed in
 					const user = userCredential.user;
 					localStorage.setItem('uid', user.uid);
+					localStorage.setItem('email', user.email);
 					localStorage.setItem('isLoggedIn', true);
 					goto('/');
 				})
