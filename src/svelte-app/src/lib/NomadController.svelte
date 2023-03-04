@@ -7,6 +7,11 @@
 	export let getContainerClicked = false;
 	export let getContainerCreatedClicked = false;
 	export let containerRunning = false;
+	export let containerName = '';
+	export let dockerImage = '';
+	export let ports = '';
+
+	let jsonData;
 
 	export function getContainers() {
 		getContainerClicked = true;
@@ -59,16 +64,26 @@
 		containerRunning = false;
 	}
 
+	export function createJobJson() {
+		containerName = document.getElementById('containerNameInput').value;
+		dockerImage = document.getElementById('dockerImageInput').value;
+		ports = document.getElementById('portsInput').value;
+		jsonData = {
+			containerName: containerName,
+			dockerImage: dockerImage,
+			ports: ports,
+			email: localStorage.getItem('email')
+		};
+
+		return jsonData;
+	}
+
 	export async function fetchJobCreate() {
 		const url = `http://localhost:8080/jobs`;
+		const json = createJobJson();
 		const res = await fetch(url, {
 			method: 'POST',
-			body: JSON.stringify({
-				containerName: document.getElementById('containerNameInput').value,
-				dockerImage: document.getElementById('dockerImageInput').value,
-				ports: document.getElementById('portsInput').value,
-				email: localStorage.getItem('email')
-			})
+			body: JSON.stringify(json)
 		});
 
 		if (res.ok) {

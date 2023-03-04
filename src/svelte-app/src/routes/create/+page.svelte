@@ -25,7 +25,7 @@
 	/>
 </div>
 <div class="mb-3">
-	<label for="imageInput" class="txt-input-label">Ports</label>
+	<label for="portsInput" class="txt-input-label">Ports</label>
 	<input
 		type="ports"
 		class="txt-input"
