@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import ExecController from '$lib/ExecController.svelte';
 	import { nomadAllocExecEndpoint, nomadAllocExecQueryParams, job } from '../stores/nomadStore';
 
@@ -76,6 +77,7 @@
 			console.log('Error');
 		}
 		getContainerCreatedClicked = false;
+		goto('/');
 	}
 </script>
 
