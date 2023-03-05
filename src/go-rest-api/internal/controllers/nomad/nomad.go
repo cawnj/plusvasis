@@ -33,26 +33,25 @@ func GetJobs(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
-func GenerateJobObject() *bytes.Buffer {
-
-	data := []byte(`{
+func GenerateJobObject(containerName string, dockerImage string) *bytes.Buffer {
+	s := fmt.Sprintf(`{
 		"Job": {
-			"ID": "nginx-test",
-			"Name": "nginx-test",
+			"ID": "%s",
+			"Name": "%s",
 			"Type": "service",
 			"Datacenters": [
 				"dc1"
 			],
 			"TaskGroups": [
 				{
-					"Name": "nginx-test",
+					"Name": "%s",
 					"Count": 1,
 					"Tasks": [
 						{
 							"Name": "server",
 							"Driver": "docker",
 							"Config": {
-								"image": "nginx",
+								"image": "%s",
 								"ports": [
 									"http"
 								]
@@ -73,7 +72,7 @@ func GenerateJobObject() *bytes.Buffer {
 					],
 					"Services": [
 						{
-							"Name": "nginx-test",
+							"Name": "%s",
 							"PortLabel": "http",
 							"Provider": "nomad"
 						}
@@ -81,13 +80,15 @@ func GenerateJobObject() *bytes.Buffer {
 				}
 			]
 		}
-	}`)
-	return bytes.NewBuffer(data)
+	}`, containerName, containerName, containerName, dockerImage, containerName)
+
+	return bytes.NewBuffer([]byte(s))
 }
 
 func CreateJob(c echo.Context) error {
+	data := GenerateJobObject("nginx-test", "nginx")
 
-	resp, err := http.Post("https://nomad.local.cawnj.dev/v1/jobs", "application/json", GenerateJobObject())
+	resp, err := http.Post("https://nomad.local.cawnj.dev/v1/jobs", "application/json", data)
 	if err != nil {
 		log.Println("[nomad/CreateJob]", err)
 		return err
@@ -108,10 +109,11 @@ func CreateJob(c echo.Context) error {
 }
 
 func UpdateJob(c echo.Context) error {
+	data := GenerateJobObject("nginx-test", "nginx")
 
 	id := c.Param("id")
 	url := fmt.Sprintf("https://nomad.local.cawnj.dev/v1/job/%s", id)
-	resp, err := http.Post(url, "application/json", GenerateJobObject())
+	resp, err := http.Post(url, "application/json", data)
 	if err != nil {
 		log.Println("[nomad/UpdateJob]", err)
 		return err
