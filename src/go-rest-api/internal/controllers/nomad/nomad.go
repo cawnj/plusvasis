@@ -1,13 +1,14 @@
 package nomad
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"continens/internal/templates"
 
 	"github.com/labstack/echo/v4"
 )
@@ -33,60 +34,13 @@ func GetJobs(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
-func GenerateJobObject(containerName string, dockerImage string) *bytes.Buffer {
-	s := fmt.Sprintf(`{
-		"Job": {
-			"ID": "%s",
-			"Name": "%s",
-			"Type": "service",
-			"Datacenters": [
-				"dc1"
-			],
-			"TaskGroups": [
-				{
-					"Name": "%s",
-					"Count": 1,
-					"Tasks": [
-						{
-							"Name": "server",
-							"Driver": "docker",
-							"Config": {
-								"image": "%s",
-								"ports": [
-									"http"
-								]
-							}
-						}
-					],
-					"Networks": [
-						{
-							"Mode": "bridge",
-							"DynamicPorts": [
-								{
-									"Label": "http",
-									"Value": 0,
-									"To": 80
-								}
-							]
-						}
-					],
-					"Services": [
-						{
-							"Name": "%s",
-							"PortLabel": "http",
-							"Provider": "nomad"
-						}
-					]
-				}
-			]
-		}
-	}`, containerName, containerName, containerName, dockerImage, containerName)
-
-	return bytes.NewBuffer([]byte(s))
-}
-
 func CreateJob(c echo.Context) error {
-	data := GenerateJobObject("nginx-test", "nginx")
+	job := templates.CreateJobObject("nginx-test", "nginx", "cawnj")
+	data, err := templates.CreateJobJson(job)
+	if err != nil {
+		log.Println("[nomad/CreateJob]", err)
+		return err
+	}
 
 	resp, err := http.Post("https://nomad.local.cawnj.dev/v1/jobs", "application/json", data)
 	if err != nil {
@@ -109,7 +63,12 @@ func CreateJob(c echo.Context) error {
 }
 
 func UpdateJob(c echo.Context) error {
-	data := GenerateJobObject("nginx-test", "nginx")
+	job := templates.CreateJobObject("nginx-test", "nginx", "cawnj")
+	data, err := templates.CreateJobJson(job)
+	if err != nil {
+		log.Println("[nomad/CreateJob]", err)
+		return err
+	}
 
 	id := c.Param("id")
 	url := fmt.Sprintf("https://nomad.local.cawnj.dev/v1/job/%s", id)
