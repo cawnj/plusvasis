@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import ExecController from '$lib/ExecController.svelte';
 	import { nomadAllocExecEndpoint, nomadAllocExecQueryParams, job } from '../stores/nomadStore';
+	import { hostname } from '../stores/environmentStore';
 
 	let execControllerComponent: ExecController;
 	export let getContainerClicked = false;
@@ -23,7 +24,7 @@
 	export async function fetchJobIdAllocations(jobId: string) {
 		containerRunning = true;
 		job.update(() => jobId);
-		const url = `http://localhost:8080/job/${jobId}/allocations`;
+		const url = `${hostname}/job/${jobId}/allocations`;
 		const res = await fetch(url);
 		const json = await res.json();
 		const allocId = json[0]['ID'];
@@ -39,7 +40,7 @@
 	}
 
 	export async function fetchJobIdDelete(jobId: string) {
-		const url = `http://localhost:8080/job/${jobId}`;
+		const url = `${hostname}/job/${jobId}`;
 		const res = await fetch(url, {
 			method: 'DELETE'
 		});
