@@ -41,6 +41,9 @@
 .div-login {
 	@apply w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700;
 }
+.div-container {
+	@apply w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700;
+}
 .div-txt {
 	@apply text-sm font-medium text-gray-500 dark:text-gray-300;
 }

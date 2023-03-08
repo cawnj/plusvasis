@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import Nav from '$lib/NavBar.svelte';
 	import NomadController from '$lib/NomadController.svelte';
+	import xtermIcon from '$lib/assets/xTerm.png';
 
 	let getContainerClicked: boolean;
 	let getContainerCreatedClicked: boolean;
@@ -14,7 +15,6 @@
 </script>
 
 <Nav />
-<h1 class="mb-4 text-4xl font-bold font-sans text-white">Continens</h1>
 <button class="mb-4 btn btn-blue" on:click={nomadControllerComponent.getContainers}
 	>Get Containers</button
 >
@@ -24,11 +24,23 @@
 {#if getContainerClicked}
 	{#each nomadControllerComponent.parseData(jobs) as job}
 		<ul>
-			<button
+			<!-- <button
 				type="button"
 				class="btn-purple"
 				on:click={() => nomadControllerComponent.fetchJobIdAllocations(job.ID)}>{job.ID}</button
-			>
+			> -->
+			<div class="mt-3">
+				<div class="div-container">
+					<a href="/container/{job.ID}">
+						<div class="card-body login-form">
+							<div class="flex items-center">
+								<img alt="The project logo" src={xtermIcon} class="mr-3 h-6 sm:h-14 float-left" />
+								<h5 class="h5">{job.ID}</h5>
+							</div>
+						</div>
+					</a>
+				</div>
+			</div>
 		</ul>
 	{/each}
 {/if}

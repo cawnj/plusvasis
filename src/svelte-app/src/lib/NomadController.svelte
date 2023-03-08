@@ -94,12 +94,10 @@
 
 	export function parseData(data: []) {
 		var parsedData: never[] = [];
-		for(let i=0; i<data.length; i++){
-
-			if(data[i].ID.includes(localStorage.getItem("uid"))) {
-				parsedData.push(data[i])
+		for (let i = 0; i < data.length; i++) {
+			if (data[i].ID.includes(localStorage.getItem('uid'))) {
+				parsedData.push(data[i]);
 			}
-
 		}
 		return parsedData;
 	}
