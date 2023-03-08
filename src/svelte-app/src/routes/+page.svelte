@@ -22,7 +22,7 @@
 	>Create Container</button
 >
 {#if getContainerClicked}
-	{#each jobs as job}
+	{#each nomadControllerComponent.parseData(jobs) as job}
 		<ul>
 			<button
 				type="button"
