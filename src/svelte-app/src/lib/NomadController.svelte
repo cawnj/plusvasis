@@ -9,7 +9,6 @@
 	export let containerRunning = false;
 	export let containerName = '';
 	export let dockerImage = '';
-	export let ports = '';
 
 	let jsonData;
 
@@ -67,12 +66,10 @@
 	export function createJobJson() {
 		containerName = document.getElementById('containerNameInput').value;
 		dockerImage = document.getElementById('dockerImageInput').value;
-		ports = document.getElementById('portsInput').value;
 		jsonData = {
 			containerName: containerName,
 			dockerImage: dockerImage,
-			ports: ports,
-			email: localStorage.getItem('email')
+			user: localStorage.getItem('uid')
 		};
 
 		return jsonData;

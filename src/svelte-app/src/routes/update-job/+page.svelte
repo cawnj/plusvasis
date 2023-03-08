@@ -24,16 +24,6 @@
 		placeholder="Docker Image"
 	/>
 </div>
-<div class="mb-3">
-	<label for="portsInput" class="txt-input-label">Ports</label>
-	<input
-		type="ports"
-		class="txt-input"
-		id="portsInput"
-		aria-describedby="portsHelp"
-		placeholder="Ports"
-	/>
-</div>
 <button class="mb-4 btn btn-blue" on:click={() => nomadControllerComponent.fetchJobCreate()}
 	>Update Container</button
 >
