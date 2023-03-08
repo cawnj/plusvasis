@@ -20,17 +20,6 @@
 		getContainerCreatedClicked = true;
 	}
 
-	export async function fetchJobId(jobId: string) {
-		const url = `http://localhost:8080/job/${jobId}`;
-		const res = await fetch(url);
-
-		if (res.ok) {
-			execControllerComponent.write('Starting container ' + jobId);
-		} else {
-			execControllerComponent.write('Error starting container ' + jobId);
-		}
-	}
-
 	export async function fetchJobIdAllocations(jobId: string) {
 		containerRunning = true;
 		job.update(() => jobId);
@@ -67,7 +56,7 @@
 		containerName = document.getElementById('containerNameInput').value;
 		dockerImage = document.getElementById('dockerImageInput').value;
 		jsonData = {
-			containerName: containerName,
+			containerName: containerName + '-' + localStorage.getItem('uid'),
 			dockerImage: dockerImage,
 			user: localStorage.getItem('uid')
 		};
@@ -77,6 +66,23 @@
 
 	export async function fetchJobCreate() {
 		const url = `http://localhost:8080/jobs`;
+		const json = createJobJson();
+		const res = await fetch(url, {
+			method: 'POST',
+			body: JSON.stringify(json)
+		});
+
+		if (res.ok) {
+			console.log('Container Created');
+		} else {
+			console.log('Error');
+		}
+		getContainerCreatedClicked = false;
+		goto('/');
+	}
+
+	export async function fetchJobUpdate(jobId: string) {
+		const url = `http://localhost:8080/job/${jobId}`;
 		const json = createJobJson();
 		const res = await fetch(url, {
 			method: 'POST',
