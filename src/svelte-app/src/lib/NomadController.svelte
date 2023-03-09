@@ -11,8 +11,6 @@
 	export let containerName = '';
 	export let dockerImage = '';
 
-	let jsonData;
-
 	export function getContainers() {
 		getContainerClicked = true;
 	}
@@ -56,8 +54,9 @@
 	export function createJobJson() {
 		containerName = document.getElementById('containerNameInput').value;
 		dockerImage = document.getElementById('dockerImageInput').value;
-		jsonData = {
-			containerName: containerName + '-' + localStorage.getItem('uid'),
+		let jsonData = {
+			id: containerName + '-' + localStorage.getItem('uid'),
+			containerName: containerName,
 			dockerImage: dockerImage,
 			user: localStorage.getItem('uid')
 		};

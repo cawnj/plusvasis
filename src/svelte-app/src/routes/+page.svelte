@@ -35,7 +35,7 @@
 						<div class="card-body login-form">
 							<div class="flex items-center">
 								<img alt="The project logo" src={xtermIcon} class="mr-3 h-6 sm:h-14 float-left" />
-								<h5 class="h5">{job.ID}</h5>
+								<h5 class="h5">{job.Name}</h5>
 							</div>
 						</div>
 					</a>

@@ -2,6 +2,7 @@ package nomad
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -34,8 +35,22 @@ func GetJobs(c echo.Context) error {
 }
 
 func CreateJob(c echo.Context) error {
-	job := templates.CreateJobObject("nginx-test", "nginx", "cawnj")
-	data, err := templates.CreateJobJson(job)
+	var j templates.NomadJob
+	var unmarshalErr *json.UnmarshalTypeError
+
+	decoder := json.NewDecoder(c.Request().Body)
+	decoder.DisallowUnknownFields()
+	err := decoder.Decode(&j)
+
+	if err != nil {
+		if errors.As(err, &unmarshalErr) {
+			errorResponse(c.Response().Writer, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field, http.StatusBadRequest)
+		} else {
+			errorResponse(c.Response().Writer, "Bad Request "+err.Error(), http.StatusBadRequest)
+		}
+	}
+
+	data, err := templates.CreateJobJson(j)
 	if err != nil {
 		log.Println("[nomad/CreateJob]", err)
 		return err
@@ -62,8 +77,22 @@ func CreateJob(c echo.Context) error {
 }
 
 func UpdateJob(c echo.Context) error {
-	job := templates.CreateJobObject("nginx-test", "nginx", "cawnj")
-	data, err := templates.CreateJobJson(job)
+	var j templates.NomadJob
+	var unmarshalErr *json.UnmarshalTypeError
+
+	decoder := json.NewDecoder(c.Request().Body)
+	decoder.DisallowUnknownFields()
+	err := decoder.Decode(&j)
+
+	if err != nil {
+		if errors.As(err, &unmarshalErr) {
+			errorResponse(c.Response().Writer, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field, http.StatusBadRequest)
+		} else {
+			errorResponse(c.Response().Writer, "Bad Request "+err.Error(), http.StatusBadRequest)
+		}
+	}
+
+	data, err := templates.CreateJobJson(j)
 	if err != nil {
 		log.Println("[nomad/CreateJob]", err)
 		return err
@@ -189,4 +218,16 @@ func ReadJobAllocs(c echo.Context) error {
 		return c.JSONBlob(http.StatusBadRequest, encodedJSON)
 	}
 	return c.JSON(http.StatusOK, data)
+}
+
+func errorResponse(w http.ResponseWriter, message string, httpStatusCode int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(httpStatusCode)
+	resp := make(map[string]string)
+	resp["message"] = message
+	jsonResp, _ := json.Marshal(resp)
+	_, err := w.Write(jsonResp)
+	if err != nil {
+		log.Println("[nomad/errorResponse]", err)
+	}
 }

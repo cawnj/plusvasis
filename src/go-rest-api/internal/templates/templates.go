@@ -2,15 +2,14 @@ package templates
 
 import (
 	"bytes"
-	"fmt"
 	"text/template"
 )
 
 type NomadJob struct {
-	ID    string
-	Name  string
-	Image string
-	User  string
+	ID    string `json:"id"`
+	Name  string `json:"containerName"`
+	Image string `json:"dockerImage"`
+	User  string `json:"user"`
 }
 
 func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
@@ -26,19 +25,10 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 	return buf, err
 }
 
-func CreateJobObject(name, image, user string) NomadJob {
-	return NomadJob{
-		ID:    fmt.Sprintf("%s-%s", user, name),
-		Name:  name,
-		Image: image,
-		User:  user,
-	}
-}
-
 const JOB_TMPL = `{
 	"Job": {
 		"ID": "{{.ID}}",
-		"Name": "{{.ID}}",
+		"Name": "{{.Name}}",
 		"Type": "service",
 		"Datacenters": [
 			"dc1"
