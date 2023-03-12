@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import ExecController from '$lib/ExecController.svelte';
-	import { nomadAllocExecEndpoint, nomadAllocExecQueryParams, job } from '../stores/nomadStore';
+	import { job } from '../stores/nomadStore';
 	import { hostname } from '../stores/environmentStore';
 
 	let execControllerComponent: ExecController;
@@ -19,19 +19,31 @@
 		getContainerCreatedClicked = true;
 	}
 
+	function getAllocExecEndpoint(jobId: string, json: any) {
+		const allocId = json[0]['ID'];
+		const taskName = Object.keys(json[0]['TaskStates'])[0];
+		const command = '["/bin/bash"]';
+
+		const url = new URL(`wss://nomad.local.cawnj.dev/v1/client/allocation/${allocId}/exec`);
+		url.searchParams.append('task', taskName);
+		url.searchParams.append('command', command);
+		url.searchParams.append('tty', 'true');
+		url.searchParams.append('ws_handshake', 'true');
+
+		return url.toString();
+	}
+
 	export async function fetchJobIdAllocations(jobId: string) {
 		containerRunning = true;
 		job.update(() => jobId);
 		const url = `${hostname}/job/${jobId}/allocations`;
 		const res = await fetch(url);
-		const json = await res.json();
-		const allocId = json[0]['ID'];
 
 		if (res.ok) {
+			const json = await res.json();
+			const url = getAllocExecEndpoint(jobId, json);
 			execControllerComponent.write('Starting container ' + jobId);
-			execControllerComponent.connectTerm(
-				nomadAllocExecEndpoint + allocId + nomadAllocExecQueryParams
-			);
+			execControllerComponent.connectTerm(url);
 		} else {
 			execControllerComponent.write('Error starting container ' + jobId);
 		}
