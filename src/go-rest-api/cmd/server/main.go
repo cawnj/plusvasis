@@ -1,15 +1,25 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"os"
 
 	"continens/internal/routes"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	sample := os.Getenv("SAMPLE_KEY")
+	fmt.Println(sample)
 
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
