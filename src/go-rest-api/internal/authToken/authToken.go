@@ -1,20 +1,14 @@
-package main
+package auth
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
 )
 
 func GenerateJWT() (string, error) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 
 	mySigningKey := []byte(os.Getenv("SAMPLE_KEY"))
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -33,13 +27,4 @@ func GenerateJWT() (string, error) {
 	}
 
 	return tokenString, nil
-}
-
-func main() {
-	tokenString, err := GenerateJWT()
-	if err != nil {
-		fmt.Println("error")
-	}
-
-	fmt.Println(tokenString)
 }

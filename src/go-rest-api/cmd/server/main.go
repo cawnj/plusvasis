@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -18,9 +17,6 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	sample := os.Getenv("SAMPLE_KEY")
-	fmt.Println(sample)
-
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
@@ -31,6 +27,7 @@ func main() {
 
 	routes.Health(e)
 	routes.NomadJobs(e)
+	routes.AuthToken(e)
 
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
