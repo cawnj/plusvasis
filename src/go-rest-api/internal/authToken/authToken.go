@@ -8,23 +8,31 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func GenerateJWT() (string, error) {
+type APIKey struct {
+	Secret string `json:"secret"`
+}
 
-	mySigningKey := []byte(os.Getenv("SAMPLE_KEY"))
-	token := jwt.New(jwt.SigningMethodHS256)
+func GenerateJWT(key APIKey) (string, error) {
+	if key.Secret == string(os.Getenv("SAMPLE_KEY")) {
+		mySigningKey := []byte(os.Getenv("SAMPLE_KEY"))
+		token := jwt.New(jwt.SigningMethodHS256)
 
-	claims := token.Claims.(jwt.MapClaims)
+		claims := token.Claims.(jwt.MapClaims)
 
-	claims["authorized"] = true
-	claims["client"] = "svelte"
-	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+		claims["authorized"] = true
+		claims["client"] = "svelte"
+		claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
 
-	tokenString, err := token.SignedString(mySigningKey)
+		tokenString, err := token.SignedString(mySigningKey)
 
-	if err != nil {
-		fmt.Println("Something Went Wrong")
-		return "", err
+		if err != nil {
+			fmt.Println("Something Went Wrong")
+			return "", err
+		}
+
+		return tokenString, nil
+	} else {
+		fmt.Println("Invalid API Key")
+		return "Invalid API Key", nil
 	}
-
-	return tokenString, nil
 }

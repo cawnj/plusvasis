@@ -8,5 +8,5 @@ import (
 
 func AuthToken(e *echo.Echo) {
 
-	e.GET("/token", auth.GetToken)
+	e.POST("/token", auth.GetToken)
 }
