@@ -21,7 +21,7 @@ func GenerateJWT(key APIKey) (string, error) {
 
 		claims["authorized"] = true
 		claims["client"] = "svelte"
-		claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+		claims["exp"] = time.Now().Add(time.Hour * 168).Unix()
 
 		tokenString, err := token.SignedString(mySigningKey)
 
