@@ -3,13 +3,14 @@
 	import { page } from '$app/stores';
 	import Nav from '$lib/NavBar.svelte';
 	import NomadController from '$lib/NomadController.svelte';
+	import { hostname } from '../../../stores/environmentStore';
 
 	let nomadControllerComponent: NomadController;
 	let validPath = false;
 
 	async function fetchJobId() {
 		const jobId = $page.params.id;
-		const url = `http://localhost:8080/job/${jobId}`;
+		const url = `${hostname}/job/${jobId}`;
 		const res = await fetch(url);
 		const data = await res.json();
 
