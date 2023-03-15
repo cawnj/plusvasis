@@ -77,7 +77,7 @@
 	}
 
 	export async function fetchJobCreate() {
-		const url = `http://localhost:8080/jobs`;
+		const url = `${hostname}/jobs`;
 		const json = createJobJson();
 		const res = await fetch(url, {
 			method: 'POST',
@@ -94,7 +94,7 @@
 	}
 
 	export async function fetchJobUpdate(jobId: string) {
-		const url = `http://localhost:8080/job/${jobId}`;
+		const url = `${hostname}/job/${jobId}`;
 		const json = createJobJson();
 		const res = await fetch(url, {
 			method: 'POST',
