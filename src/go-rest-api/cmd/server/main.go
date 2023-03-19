@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
+	"continens/internal/auth"
 	"continens/internal/routes"
 
 	"github.com/joho/godotenv"
@@ -17,6 +19,13 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	client, err := auth.InitAuth()
+	if err != nil {
+		log.Fatalln("failed to init firebase auth", err)
+	}
+
+	fmt.Println(client)
+
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
@@ -27,7 +36,6 @@ func main() {
 
 	routes.Health(e)
 	routes.NomadJobs(e)
-	routes.AuthToken(e)
 
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
