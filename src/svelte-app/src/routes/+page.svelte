@@ -1,12 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Nav from '$lib/NavBar.svelte';
-	import NomadController from '$lib/NomadController.svelte';
 	import xtermIcon from '$lib/assets/xTerm.png';
 	import { onMount } from 'svelte';
 	import { hostname } from '../stores/environmentStore';
-
-	let nomadControllerComponent: NomadController;
 
 	let jobs: any[] = [];
 	onMount(async () => {
