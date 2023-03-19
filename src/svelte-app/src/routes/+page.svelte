@@ -16,9 +16,7 @@
 </script>
 
 <Nav />
-<button class="mb-4 btn btn-blue" on:click={() => goto('/create')}
-	>Create Container</button
->
+<button class="mb-4 btn btn-blue" on:click={() => goto('/create')}>Create Container</button>
 {#each jobs as job}
 	{#if job.Meta && job.Meta.user === localStorage.getItem('uid')}
 		<ul>

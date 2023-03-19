@@ -94,7 +94,6 @@
 		}
 		goto('/');
 	}
-
 </script>
 
 <ExecController bind:this={execControllerComponent} />
