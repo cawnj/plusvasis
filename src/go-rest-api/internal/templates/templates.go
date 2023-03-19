@@ -34,39 +34,24 @@ const JOB_TMPL = `{
 			"dc1"
 		],
         "Meta": {
-            "user": "{{.User}}"
+            "User": "{{.User}}"
         },
 		"TaskGroups": [
 			{
 				"Name": "{{.Name}}",
-				"Count": 1,
 				"Tasks": [
 					{
 						"Name": "{{.Name}}",
 						"Driver": "docker",
 						"Config": {
 							"image": "{{.Image}}",
-							"ports": [
-								"http"
-							]
+							"network_mode": "host",
 						}
-					}
-				],
-				"Networks": [
-					{
-						"Mode": "bridge",
-						"DynamicPorts": [
-							{
-								"Label": "http",
-								"To": 80
-							}
-						]
 					}
 				],
 				"Services": [
 					{
 						"Name": "{{.Name}}",
-						"PortLabel": "http",
 						"Provider": "nomad"
 					}
 				]
