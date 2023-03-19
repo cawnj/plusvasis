@@ -19,7 +19,7 @@
 
 <div>
 	<div>
-		<nav class="container px-6 py-8 mx-auto md:flex md:justify-between md:items-center">
+		<nav class="container mb-8 w-screen md:flex md:justify-between md:items-center">
 			<a href="/">
 				<div class="flex items-center justify-between">
 					<img alt="The project logo" src={logo} class="mr-3 h-6 sm:h-9 float-left" />
