@@ -13,11 +13,7 @@
 	async function fetchJobId() {
 		const jobId = $page.params.id;
 		const url = `http://localhost:8080/job/${jobId}`;
-		const res = await fetch(url, {
-			headers: {
-				Token: `${import.meta.env.VITE_SECRET_JWT}`
-			}
-		});
+		const res = await fetch(url);
 		const data = await res.json();
 
 		if (res.ok) {

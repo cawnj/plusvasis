@@ -25,11 +25,7 @@
 	export async function fetchJobIdAllocations(jobId: string) {
 		job.update(() => jobId);
 		const url = `${hostname}/job/${jobId}/allocations`;
-		const res = await fetch(url, {
-			headers: {
-				Token: `${import.meta.env.VITE_SECRET_JWT}`
-			}
-		});
+		const res = await fetch(url);
 
 		if (res.ok) {
 			const json = await res.json();
@@ -44,10 +40,7 @@
 	export async function fetchJobIdDelete(jobId: string) {
 		const url = `${hostname}/job/${jobId}`;
 		const res = await fetch(url, {
-			method: 'DELETE',
-			headers: {
-				Token: `${import.meta.env.VITE_SECRET_JWT}`
-			}
+			method: 'DELETE'
 		});
 
 		if (res.ok) {
@@ -75,9 +68,6 @@
 		const json = createJobJson();
 		const res = await fetch(url, {
 			method: 'POST',
-			headers: {
-				Token: `${import.meta.env.VITE_SECRET_JWT}`
-			},
 			body: JSON.stringify(json)
 		});
 
@@ -94,9 +84,6 @@
 		const json = createJobJson();
 		const res = await fetch(url, {
 			method: 'POST',
-			headers: {
-				Token: `${import.meta.env.VITE_SECRET_JWT}`
-			},
 			body: JSON.stringify(json)
 		});
 
