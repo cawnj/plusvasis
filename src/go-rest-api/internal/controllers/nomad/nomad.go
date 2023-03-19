@@ -88,7 +88,7 @@ func errorResponse(w http.ResponseWriter, message string, httpStatusCode int) {
 }
 
 func GetJobs(c echo.Context) error {
-	data, err := nomadGet("/jobs")
+	data, err := nomadGet("/jobs?meta=true")
 	if err != nil {
 		log.Println("[nomad/GetJobs]", err)
 		return err
