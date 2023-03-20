@@ -7,6 +7,7 @@
 
 	let nomadControllerComponent: NomadController;
 	let validPath = false;
+	let jobName: string;
 
 	async function fetchJobId() {
 		const jobId = $page.params.id;
@@ -22,11 +23,15 @@
 	}
 
 	fetchJobId().then(
-		() => {
-			validPath = true;
+		(data) => {
+			if (data.Meta && data.Meta.user == localStorage.getItem('uid')) {
+				validPath = true;
+				jobName = data.Name;
+			} else {
+				validPath = false;
+			}
 		},
 		(err) => {
-			console.error('Could not reach backend', err);
 			validPath = false;
 		}
 	);
@@ -34,18 +39,20 @@
 
 {#if validPath}
 	<Nav />
-	<h1 class="mb-4 text-4xl font-bold font-sans text-white">{$page.params.id}</h1>
-	<button
-		type="button"
-		class="btn-purple"
-		on:click={() => nomadControllerComponent.fetchJobIdAllocations($page.params.id)}
-		>Start Container</button
-	>
-	<button
-		type="button"
-		class="btn-purple"
-		on:click={() => goto('/container/update/' + $page.params.id)}>Update Container</button
-	>
+	<h1 class="mb-4 text-4xl font-bold font-sans text-white">{jobName}</h1>
+	<div class="mb-2">
+		<button
+			type="button"
+			class="btn-purple"
+			on:click={() => nomadControllerComponent.fetchJobIdAllocations($page.params.id)}
+			>Start Container</button
+		>
+		<button
+			type="button"
+			class="btn-purple"
+			on:click={() => goto('/container/update/' + $page.params.id)}>Update Container</button
+		>
+	</div>
 	<NomadController bind:this={nomadControllerComponent} />
 {/if}
 {#if !validPath}

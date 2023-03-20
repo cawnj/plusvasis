@@ -5,19 +5,8 @@
 	import { hostname } from '../stores/environmentStore';
 
 	let execControllerComponent: ExecController;
-	export let getContainerClicked = false;
-	export let getContainerCreatedClicked = false;
-	export let containerRunning = false;
 	export let containerName = '';
 	export let dockerImage = '';
-
-	export function getContainers() {
-		getContainerClicked = true;
-	}
-
-	export function getContainerCreated() {
-		getContainerCreatedClicked = true;
-	}
 
 	function getAllocExecEndpoint(jobId: string, json: any) {
 		const allocId = json[0]['ID'];
@@ -34,7 +23,6 @@
 	}
 
 	export async function fetchJobIdAllocations(jobId: string) {
-		containerRunning = true;
 		job.update(() => jobId);
 		const url = `${hostname}/job/${jobId}/allocations`;
 		const res = await fetch(url);
@@ -60,7 +48,6 @@
 		} else {
 			execControllerComponent.write('Error stopping container ' + jobId);
 		}
-		containerRunning = false;
 	}
 
 	export function createJobJson() {
@@ -89,7 +76,6 @@
 		} else {
 			console.log('Error');
 		}
-		getContainerCreatedClicked = false;
 		goto('/');
 	}
 
@@ -106,18 +92,7 @@
 		} else {
 			console.log('Error');
 		}
-		getContainerCreatedClicked = false;
 		goto('/');
-	}
-
-	export function parseData(data: []) {
-		var parsedData: never[] = [];
-		for (let i = 0; i < data.length; i++) {
-			if (data[i].ID.includes(localStorage.getItem('uid'))) {
-				parsedData.push(data[i]);
-			}
-		}
-		return parsedData;
 	}
 </script>
 
