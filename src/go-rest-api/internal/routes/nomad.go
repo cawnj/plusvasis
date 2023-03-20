@@ -6,6 +6,7 @@ import (
 	"continens/internal/fauth"
 	"fmt"
 	"log"
+	"strings"
 
 	"firebase.google.com/go/auth"
 
@@ -14,9 +15,10 @@ import (
 
 func isAuthorised(next echo.HandlerFunc, client *auth.Client) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if c.Request().Header["Token"] != nil {
+		if c.Request().Header["Authorization"] != nil {
 
-			token, err := client.VerifyIDToken(context.Background(), c.Request().Header["Token"][0])
+			token := strings.Split(c.Request().Header["Authorization"][0], "Bearer ")[1]
+			_, err := client.VerifyIDToken(context.Background(), token)
 			if err != nil {
 				fmt.Println("error verifying ID token: ", err)
 				return echo.ErrUnauthorized
