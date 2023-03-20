@@ -12,7 +12,11 @@
 	async function fetchJobId() {
 		const jobId = $page.params.id;
 		const url = `${hostname}/job/${jobId}`;
-		const res = await fetch(url);
+		const res = await fetch(url, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem('token')}`
+			}
+		});
 		const data = await res.json();
 
 		if (res.ok) {
