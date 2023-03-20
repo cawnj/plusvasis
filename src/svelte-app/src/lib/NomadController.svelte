@@ -58,8 +58,8 @@
 	}
 
 	export function createJobJson() {
-		containerName = document.getElementById('containerNameInput').value;
-		dockerImage = document.getElementById('dockerImageInput').value;
+		containerName = (<HTMLInputElement>document.getElementById('containerNameInput')).value;
+		dockerImage = (<HTMLInputElement>document.getElementById('dockerImageInput')).value;
 		let jsonData = {
 			id: containerName + '-' + localStorage.getItem('uid'),
 			containerName: containerName,
