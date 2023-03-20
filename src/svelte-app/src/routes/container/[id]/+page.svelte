@@ -24,11 +24,14 @@
 
 	fetchJobId().then(
 		(data) => {
-			validPath = true;
-			jobName = data.Name;
+			if (data.Meta && data.Meta.user == localStorage.getItem('uid')) {
+				validPath = true;
+				jobName = data.Name;
+			} else {
+				validPath = false;
+			}
 		},
 		(err) => {
-			console.error('Could not reach backend', err);
 			validPath = false;
 		}
 	);
