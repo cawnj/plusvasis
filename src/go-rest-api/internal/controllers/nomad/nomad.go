@@ -74,18 +74,6 @@ func nomadDelete(endpoint string) (interface{}, error) {
 	return data, nil
 }
 
-func errorResponse(w http.ResponseWriter, message string, httpStatusCode int) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(httpStatusCode)
-	resp := make(map[string]string)
-	resp["message"] = message
-	jsonResp, _ := json.Marshal(resp)
-	_, err := w.Write(jsonResp)
-	if err != nil {
-		log.Println("[nomad/errorResponse]", err)
-	}
-}
-
 func GetJobs(c echo.Context) error {
 	data, err := nomadGet("/jobs?meta=true")
 	if err != nil {
@@ -105,9 +93,9 @@ func CreateJob(c echo.Context) error {
 
 	if err != nil {
 		if errors.As(err, &unmarshalErr) {
-			errorResponse(c.Response().Writer, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field, http.StatusBadRequest)
+			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field)
 		} else {
-			errorResponse(c.Response().Writer, "Bad Request "+err.Error(), http.StatusBadRequest)
+			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request "+err.Error())
 		}
 	}
 
@@ -135,9 +123,9 @@ func UpdateJob(c echo.Context) error {
 
 	if err != nil {
 		if errors.As(err, &unmarshalErr) {
-			errorResponse(c.Response().Writer, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field, http.StatusBadRequest)
+			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field)
 		} else {
-			errorResponse(c.Response().Writer, "Bad Request "+err.Error(), http.StatusBadRequest)
+			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request "+err.Error())
 		}
 	}
 
