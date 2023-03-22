@@ -2,7 +2,6 @@ package fauth
 
 import (
 	"context"
-	"os"
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
@@ -11,7 +10,7 @@ import (
 )
 
 func InitAuth() (*auth.Client, error) {
-	opt := option.WithCredentialsFile(os.Getenv("FIREBASE_CONFIG"))
+	opt := option.WithCredentialsFile("firebase.json")
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		return nil, errors.Wrap(err, "error initializing firebase auth (create firebase app)")
