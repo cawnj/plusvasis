@@ -23,15 +23,13 @@
 <div class="">
 	<button class="mb-4 btn btn-blue" on:click={() => goto('/create')}>Create Container</button>
 	{#each jobs as job}
-		{#if job.Meta && job.Meta.user === localStorage.getItem('uid')}
-			<a href="/container/{job.ID}">
-				<div class="div-container mt-3">
-					<div class="flex items-center">
-						<Fa icon={faTerminal} color="white" class="pr-6" />
-						<span class="text-xl text-white">{job.Name}</span>
-					</div>
+		<a href="/container/{job.ID}">
+			<div class="div-container mt-3">
+				<div class="flex items-center">
+					<Fa icon={faTerminal} color="white" class="pr-6" />
+					<span class="text-xl text-white">{job.Name}</span>
 				</div>
-			</a>
-		{/if}
+			</div>
+		</a>
 	{/each}
 </div>

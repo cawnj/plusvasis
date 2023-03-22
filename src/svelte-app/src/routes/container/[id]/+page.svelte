@@ -3,13 +3,13 @@
 	import { page } from '$app/stores';
 	import Nav from '$lib/NavBar.svelte';
 	import NomadController from '$lib/NomadController.svelte';
+	import { onMount } from 'svelte';
 	import { hostname } from '../../../stores/environmentStore';
 
 	let nomadControllerComponent: NomadController;
-	let validPath = false;
-	let jobName: string;
 
-	async function fetchJobId() {
+	let jobName: string;
+	onMount(async () => {
 		const jobId = $page.params.id;
 		const url = `${hostname}/job/${jobId}`;
 		const res = await fetch(url, {
@@ -17,31 +17,14 @@
 				Authorization: `Bearer ${localStorage.getItem('token')}`
 			}
 		});
-		const data = await res.json();
-
 		if (res.ok) {
-			return data;
-		} else {
-			throw new Error(data);
+			const data = await res.json();
+			jobName = data.Name;
 		}
-	}
-
-	fetchJobId().then(
-		(data) => {
-			if (data.Meta && data.Meta.user == localStorage.getItem('uid')) {
-				validPath = true;
-				jobName = data.Name;
-			} else {
-				validPath = false;
-			}
-		},
-		(err) => {
-			validPath = false;
-		}
-	);
+	});
 </script>
 
-{#if validPath}
+{#if jobName}
 	<Nav />
 	<h1 class="mb-4 text-4xl font-bold font-sans text-white">{jobName}</h1>
 	<div class="mb-2">
@@ -58,8 +41,7 @@
 		>
 	</div>
 	<NomadController bind:this={nomadControllerComponent} />
-{/if}
-{#if !validPath}
+{:else}
 	<h1 class="mb-4 text-4xl font-bold font-sans text-white">Page Not Found</h1>
 	<button class="mb-4 btn btn-blue" on:click={() => goto('/')}>Return to Homepage</button>
 {/if}
