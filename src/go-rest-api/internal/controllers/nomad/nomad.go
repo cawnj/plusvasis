@@ -89,6 +89,24 @@ func nomadDelete(endpoint string) ([]byte, error) {
 	return body, nil
 }
 
+func decodeJobJson(job *templates.NomadJob, body io.ReadCloser) error {
+	var unmarshalErr *json.UnmarshalTypeError
+
+	decoder := json.NewDecoder(body)
+	decoder.DisallowUnknownFields()
+	err := decoder.Decode(&job)
+
+	if err != nil {
+		if errors.As(err, &unmarshalErr) {
+			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field)
+		} else {
+			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request "+err.Error())
+		}
+	}
+
+	return nil
+}
+
 func GetJobs(c echo.Context) error {
 	data, err := nomadGet("/jobs?meta=true")
 	if err != nil {
@@ -116,18 +134,9 @@ func GetJobs(c echo.Context) error {
 
 func CreateJob(c echo.Context) error {
 	var job templates.NomadJob
-	var unmarshalErr *json.UnmarshalTypeError
-
-	decoder := json.NewDecoder(c.Request().Body)
-	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&job)
-
+	err := decodeJobJson(&job, c.Request().Body)
 	if err != nil {
-		if errors.As(err, &unmarshalErr) {
-			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field)
-		} else {
-			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request "+err.Error())
-		}
+		return err
 	}
 
 	body, err := templates.CreateJobJson(job)
@@ -152,20 +161,10 @@ func CreateJob(c echo.Context) error {
 }
 
 func UpdateJob(c echo.Context) error {
-
 	var job templates.NomadJob
-	var unmarshalErr *json.UnmarshalTypeError
-
-	decoder := json.NewDecoder(c.Request().Body)
-	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&job)
-
+	err := decodeJobJson(&job, c.Request().Body)
 	if err != nil {
-		if errors.As(err, &unmarshalErr) {
-			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field)
-		} else {
-			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request "+err.Error())
-		}
+		return err
 	}
 
 	body, err := templates.CreateJobJson(job)
