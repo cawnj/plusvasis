@@ -25,7 +25,11 @@
 	export async function fetchJobIdAllocations(jobId: string) {
 		job.update(() => jobId);
 		const url = `${hostname}/job/${jobId}/allocations`;
-		const res = await fetch(url);
+		const res = await fetch(url, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem('token')}`
+			}
+		});
 
 		if (res.ok) {
 			const json = await res.json();
@@ -40,7 +44,10 @@
 	export async function fetchJobIdDelete(jobId: string) {
 		const url = `${hostname}/job/${jobId}`;
 		const res = await fetch(url, {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem('token')}`
+			}
 		});
 
 		if (res.ok) {
@@ -51,8 +58,8 @@
 	}
 
 	export function createJobJson() {
-		containerName = document.getElementById('containerNameInput').value;
-		dockerImage = document.getElementById('dockerImageInput').value;
+		containerName = (<HTMLInputElement>document.getElementById('containerNameInput')).value;
+		dockerImage = (<HTMLInputElement>document.getElementById('dockerImageInput')).value;
 		let jsonData = {
 			id: containerName + '-' + localStorage.getItem('uid'),
 			containerName: containerName,
@@ -68,7 +75,10 @@
 		const json = createJobJson();
 		const res = await fetch(url, {
 			method: 'POST',
-			body: JSON.stringify(json)
+			body: JSON.stringify(json),
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem('token')}`
+			}
 		});
 
 		if (res.ok) {
@@ -84,7 +94,10 @@
 		const json = createJobJson();
 		const res = await fetch(url, {
 			method: 'POST',
-			body: JSON.stringify(json)
+			body: JSON.stringify(json),
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem('token')}`
+			}
 		});
 
 		if (res.ok) {

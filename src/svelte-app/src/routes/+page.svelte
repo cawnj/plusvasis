@@ -8,8 +8,14 @@
 
 	let jobs: any[] = [];
 	onMount(async () => {
-		const res = await fetch(`${hostname}/jobs`);
-		jobs = await res.json();
+		const res = await fetch(`${hostname}/jobs`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem('token')}`
+			}
+		});
+		if (res.ok) {
+			jobs = await res.json();
+		}
 	});
 </script>
 

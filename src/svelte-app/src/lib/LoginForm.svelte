@@ -18,6 +18,9 @@
 					const user = userCredential.user;
 					localStorage.setItem('uid', user.uid);
 					localStorage.setItem('isLoggedIn', true);
+					user.getIdToken().then((token) => {
+						localStorage.setItem('token', token);
+					});
 					goto('/');
 				})
 				.catch((error) => {
