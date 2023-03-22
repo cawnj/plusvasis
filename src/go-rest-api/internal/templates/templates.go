@@ -6,7 +6,6 @@ import (
 )
 
 type NomadJob struct {
-	ID    string `json:"id"`
 	Name  string `json:"containerName"`
 	Image string `json:"dockerImage"`
 	User  string `json:"user"`
@@ -27,8 +26,8 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 
 const JOB_TMPL = `{
 	"Job": {
-		"ID": "{{.ID}}",
-		"Name": "{{.Name}}",
+		"ID": "{{.Name}}-{{.User}}",
+		"Name": "{{.Name}}-{{.User}}",
 		"Type": "service",
 		"Datacenters": [
 			"dc1"
