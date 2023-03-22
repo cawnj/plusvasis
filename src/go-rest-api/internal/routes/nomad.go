@@ -4,7 +4,6 @@ import (
 	"context"
 	"continens/internal/controllers/nomad"
 	"continens/internal/fauth"
-	"fmt"
 	"log"
 	"strings"
 
@@ -18,17 +17,14 @@ func isAuthorised(next echo.HandlerFunc, client *auth.Client) echo.HandlerFunc {
 		if c.Request().Header["Authorization"] != nil {
 
 			token := strings.Split(c.Request().Header["Authorization"][0], "Bearer ")[1]
-			_, err := client.VerifyIDToken(context.Background(), token)
+			user, err := client.VerifyIDToken(context.Background(), token)
 			if err != nil {
-				fmt.Println("error verifying ID token: ", err)
 				return echo.ErrUnauthorized
 			}
 
-			fmt.Println("Verified ID token: ", token)
+			c.Set("uid", user.UID)
 			return next(c)
-
 		} else {
-
 			return echo.ErrUnauthorized
 		}
 	}

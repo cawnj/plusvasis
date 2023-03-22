@@ -11,27 +11,26 @@ import (
 
 	"continens/internal/templates"
 
+	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
 )
 
 const NOMAD_URL = "https://nomad.local.cawnj.dev/v1"
 
-func nomadGet(endpoint string) (interface{}, error) {
+func nomadGet(endpoint string) ([]byte, error) {
 	url := NOMAD_URL + endpoint
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
+	if resp.StatusCode != 200 {
+		return nil, echo.NewHTTPError(resp.StatusCode)
+	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	var data interface{}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
+	return body, nil
 }
 
 func nomadPost(endpoint string, reqBody *bytes.Buffer) (interface{}, error) {
@@ -162,11 +161,21 @@ func ReadJob(c echo.Context) error {
 		log.Println("[nomad/ReadJob]", err)
 		return err
 	}
-
 	if data == nil {
-		return c.JSONBlob(http.StatusBadRequest, []byte(`{ "Response" : "Job Not Found" }`))
+		return echo.ErrNotFound
 	}
-	return c.JSON(http.StatusOK, data)
+
+	var job structs.Job
+	err = json.Unmarshal(data, &job)
+	if err != nil {
+		log.Println("[nomad/ReadJob]", err)
+		return err
+	}
+	if job.Meta["user"] != c.Get("uid") {
+		return echo.ErrUnauthorized
+	}
+
+	return c.JSON(http.StatusOK, job)
 }
 
 func StopJob(c echo.Context) error {
