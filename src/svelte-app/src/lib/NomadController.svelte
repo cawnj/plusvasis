@@ -8,7 +8,7 @@
 	export let containerName = '';
 	export let dockerImage = '';
 
-	function getAllocExecEndpoint(jobId: string, json: any) {
+	function getAllocExecEndpoint(json: any) {
 		const allocId = json[0]['ID'];
 		const taskName = Object.keys(json[0]['TaskStates'])[0];
 		const command = '["/bin/bash"]';
@@ -33,7 +33,7 @@
 
 		if (res.ok) {
 			const json = await res.json();
-			const url = getAllocExecEndpoint(jobId, json);
+			const url = getAllocExecEndpoint(json);
 			execControllerComponent.write('Starting container ' + jobId);
 			execControllerComponent.connectTerm(url);
 		} else {
