@@ -52,25 +52,23 @@ func nomadGet(endpoint string) ([]byte, error) {
 	return body, nil
 }
 
-func nomadPost(endpoint string, reqBody *bytes.Buffer) (interface{}, error) {
+func nomadPost(endpoint string, reqBody *bytes.Buffer) ([]byte, error) {
 	url := NOMAD_URL + endpoint
 	resp, err := http.Post(url, "application/json", reqBody)
 	if err != nil {
 		return nil, err
 	}
+	if resp.StatusCode != 200 {
+		return nil, echo.NewHTTPError(resp.StatusCode)
+	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	var data interface{}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
+	return body, nil
 }
 
-func nomadDelete(endpoint string) (interface{}, error) {
+func nomadDelete(endpoint string) ([]byte, error) {
 	url := NOMAD_URL + endpoint
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
@@ -81,16 +79,14 @@ func nomadDelete(endpoint string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+	if resp.StatusCode != 200 {
+		return nil, echo.NewHTTPError(resp.StatusCode)
+	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	var data interface{}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
+	return body, nil
 }
 
 func GetJobs(c echo.Context) error {
@@ -145,7 +141,14 @@ func CreateJob(c echo.Context) error {
 		log.Println("[nomad/CreateJob]", err)
 		return err
 	}
-	return c.JSON(http.StatusOK, data)
+
+	var resp structs.JobRegisterResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func UpdateJob(c echo.Context) error {
@@ -183,7 +186,14 @@ func UpdateJob(c echo.Context) error {
 		log.Println("[nomad/UpdateJob]", err)
 		return err
 	}
-	return c.JSON(http.StatusOK, data)
+
+	var resp structs.JobRegisterResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func ReadJob(c echo.Context) error {
@@ -224,7 +234,14 @@ func StopJob(c echo.Context) error {
 		log.Println("[nomad/StopJob]", err)
 		return err
 	}
-	return c.JSON(http.StatusOK, data)
+
+	var resp structs.JobRegisterResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func ReadJobAllocs(c echo.Context) error {
@@ -241,7 +258,7 @@ func ReadJobAllocs(c echo.Context) error {
 		return err
 	}
 
-	var allocs interface{}
+	var allocs []structs.AllocListStub
 	err = json.Unmarshal(data, &allocs)
 	if err != nil {
 		log.Println("[nomad/ReadJobAllocs]", err)
