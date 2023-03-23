@@ -6,8 +6,6 @@
 	import { onMount } from 'svelte';
 
 	let execControllerComponent: ExecController;
-	export let containerName = '';
-	export let dockerImage = '';
 	export let jobId = '';
 	job.subscribe((value) => {
 		jobId = value;
@@ -58,57 +56,6 @@
 		} else {
 			execControllerComponent.write('Error stopping container ' + jobId);
 		}
-	}
-
-	export function createJobJson() {
-		containerName = (<HTMLInputElement>document.getElementById('containerNameInput')).value;
-		dockerImage = (<HTMLInputElement>document.getElementById('dockerImageInput')).value;
-		let jsonData = {
-			id: containerName + '-' + localStorage.getItem('uid'),
-			containerName: containerName,
-			dockerImage: dockerImage,
-			user: localStorage.getItem('uid')
-		};
-
-		return jsonData;
-	}
-
-	export async function fetchJobCreate() {
-		const url = `${hostname}/jobs`;
-		const json = createJobJson();
-		const res = await fetch(url, {
-			method: 'POST',
-			body: JSON.stringify(json),
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`
-			}
-		});
-
-		if (res.ok) {
-			console.log('Container Created');
-		} else {
-			console.log('Error');
-		}
-		goto('/');
-	}
-
-	export async function fetchJobUpdate() {
-		const url = `${hostname}/job/${jobId}`;
-		const json = createJobJson();
-		const res = await fetch(url, {
-			method: 'POST',
-			body: JSON.stringify(json),
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`
-			}
-		});
-
-		if (res.ok) {
-			console.log('Container Created');
-		} else {
-			console.log('Error');
-		}
-		goto('/');
 	}
 
 	onMount(async () => {
