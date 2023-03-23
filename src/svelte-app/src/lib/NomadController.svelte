@@ -11,22 +11,9 @@
 		jobId = value;
 	});
 
-	function getRunningAlloc(json: any) {
-		for (let i = 0; i < json.length; i++) {
-			if (json[i]['ClientStatus'] === 'running') {
-				return json[i]['ID'];
-			}
-		}
-		return undefined;
-	}
-
 	function getAllocExecEndpoint(json: any) {
-		const allocId = getRunningAlloc(json);
-		if (!allocId) {
-			throw new Error('No running allocations');
-		}
-
-		const taskName = Object.keys(json[0]['TaskStates'])[0];
+		const allocId = json['ID'];
+		const taskName = Object.keys(json['TaskStates'])[0];
 		const command = '["/bin/bash"]';
 
 		const url = new URL(`wss://nomad.local.cawnj.dev/v1/client/allocation/${allocId}/exec`);
@@ -39,7 +26,7 @@
 	}
 
 	export async function fetchJobIdAllocations() {
-		const url = `${hostname}/job/${jobId}/allocations`;
+		const url = `${hostname}/job/${jobId}/alloc`;
 		const res = await fetch(url, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('token')}`

@@ -266,3 +266,32 @@ func ReadJobAllocs(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, allocs)
 }
+
+func ReadJobAlloc(c echo.Context) error {
+	uid := c.Get("uid").(string)
+	jobId := c.Param("id")
+
+	if err := checkUserAllowed(uid, jobId); err != nil {
+		return err
+	}
+
+	data, err := nomadGet(fmt.Sprintf("/job/%s/allocations", jobId))
+	if err != nil {
+		log.Println("[nomad/ReadJobAllocs]", err)
+		return err
+	}
+
+	var allocs []structs.AllocListStub
+	err = json.Unmarshal(data, &allocs)
+	if err != nil {
+		log.Println("[nomad/ReadJobAllocs]", err)
+		return err
+	}
+	for _, alloc := range allocs {
+		if alloc.ClientStatus == "running" {
+			return c.JSON(http.StatusOK, alloc)
+		}
+	}
+
+	return echo.NewHTTPError(http.StatusNotFound, "No running allocation found")
+}
