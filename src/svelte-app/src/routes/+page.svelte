@@ -6,7 +6,7 @@
 	import Fa from 'svelte-fa';
 	import { faTerminal } from '@fortawesome/free-solid-svg-icons';
 
-	let jobs: any[] = [];
+	let jobs: object[] = [];
 	onMount(async () => {
 		const res = await fetch(`${hostname}/jobs`, {
 			headers: {

@@ -12,6 +12,10 @@
 		dockerImage: '',
 		user: ''
 	};
+	let jobId: string;
+	job.subscribe((value) => {
+		jobId = value;
+	});
 	let jobName: string;
 	onMount(async () => {
 		const jobId = $page.params.id;
@@ -32,8 +36,7 @@
 	});
 
 	async function fetchJobUpdate(job: Job) {
-		console.log(job);
-		const url = `${hostname}/job/${$job}`;
+		const url = `${hostname}/job/${jobId}`;
 		const res = await fetch(url, {
 			method: 'POST',
 			body: JSON.stringify(job),
