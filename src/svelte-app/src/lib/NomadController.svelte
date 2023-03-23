@@ -11,8 +11,21 @@
 		jobId = value;
 	});
 
+	function getRunningAlloc(json: any) {
+		for (let i = 0; i < json.length; i++) {
+			if (json[i]['ClientStatus'] === 'running') {
+				return json[i]['ID'];
+			}
+		}
+		return undefined;
+	}
+
 	function getAllocExecEndpoint(json: any) {
-		const allocId = json[0]['ID'];
+		const allocId = getRunningAlloc(json);
+		if (!allocId) {
+			throw new Error('No running allocations');
+		}
+
 		const taskName = Object.keys(json[0]['TaskStates'])[0];
 		const command = '["/bin/bash"]';
 
