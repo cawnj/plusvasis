@@ -1,16 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import 'xterm/css/xterm.css';
-
+	import type { Terminal } from 'xterm';
+	import type { FitAddon } from 'xterm-addon-fit';
 	import { ExecSocketAdapter } from './ExecSocketAdapter';
 
-	let xterm: any;
-	let fit: any;
+	type xtermType = typeof import('xterm');
+	type fitType = typeof import('xterm-addon-fit');
+	let xterm: xtermType;
+	let fit: fitType;
 
-	let terminal: any;
+	let terminal: Terminal;
 	let terminalElement: HTMLElement;
-	let termFit: any;
-	let execSocketAdapter: ExecSocketAdapter;
+	let termFit: FitAddon;
 
 	function initalizeXterm() {
 		terminal = new xterm.Terminal({
@@ -23,7 +25,7 @@
 		termFit.fit();
 	}
 	export function connectTerm(url: string) {
-		execSocketAdapter = new ExecSocketAdapter(terminal, url);
+		new ExecSocketAdapter(terminal, url);
 	}
 	onMount(async () => {
 		xterm = await import('xterm');

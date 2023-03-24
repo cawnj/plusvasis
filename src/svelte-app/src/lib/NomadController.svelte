@@ -1,16 +1,24 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import ExecController from '$lib/ExecController.svelte';
 	import { job } from '../stores/nomadStore';
 	import { hostname } from '../stores/environmentStore';
+	import { onMount } from 'svelte';
 
 	let execControllerComponent: ExecController;
-	export let containerName = '';
-	export let dockerImage = '';
+	export let jobId = '';
+	job.subscribe((value) => {
+		jobId = value;
+	});
 
-	function getAllocExecEndpoint(json: any) {
-		const allocId = json[0]['ID'];
-		const taskName = Object.keys(json[0]['TaskStates'])[0];
+	function getAllocExecEndpoint(json: unknown) {
+		let allocId: string;
+		let taskName: string;
+		if (typeof json === 'object' && json !== null) {
+			allocId = (json as { ID: string })['ID'];
+			taskName = Object.keys((json as { TaskStates: Record<string, unknown> })['TaskStates'])[0];
+		} else {
+			throw new Error('Invalid JSON');
+		}
 		const command = '["/bin/bash"]';
 
 		const url = new URL(`wss://nomad.local.cawnj.dev/v1/client/allocation/${allocId}/exec`);
@@ -22,9 +30,8 @@
 		return url.toString();
 	}
 
-	export async function fetchJobIdAllocations(jobId: string) {
-		job.update(() => jobId);
-		const url = `${hostname}/job/${jobId}/allocations`;
+	export async function fetchJobIdAllocations() {
+		const url = `${hostname}/job/${jobId}/alloc`;
 		const res = await fetch(url, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -34,14 +41,13 @@
 		if (res.ok) {
 			const json = await res.json();
 			const url = getAllocExecEndpoint(json);
-			execControllerComponent.write('Starting container ' + jobId);
 			execControllerComponent.connectTerm(url);
 		} else {
 			execControllerComponent.write('Error starting container ' + jobId);
 		}
 	}
 
-	export async function fetchJobIdDelete(jobId: string) {
+	export async function fetchJobIdDelete() {
 		const url = `${hostname}/job/${jobId}`;
 		const res = await fetch(url, {
 			method: 'DELETE',
@@ -57,55 +63,9 @@
 		}
 	}
 
-	export function createJobJson() {
-		containerName = (<HTMLInputElement>document.getElementById('containerNameInput')).value;
-		dockerImage = (<HTMLInputElement>document.getElementById('dockerImageInput')).value;
-		let jsonData = {
-			containerName: containerName,
-			dockerImage: dockerImage,
-			user: localStorage.getItem('uid')
-		};
-
-		return jsonData;
-	}
-
-	export async function fetchJobCreate() {
-		const url = `${hostname}/jobs`;
-		const json = createJobJson();
-		const res = await fetch(url, {
-			method: 'POST',
-			body: JSON.stringify(json),
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`
-			}
-		});
-
-		if (res.ok) {
-			console.log('Container Created');
-		} else {
-			console.log('Error');
-		}
-		goto('/');
-	}
-
-	export async function fetchJobUpdate(jobId: string) {
-		const url = `${hostname}/job/${jobId}`;
-		const json = createJobJson();
-		const res = await fetch(url, {
-			method: 'POST',
-			body: JSON.stringify(json),
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`
-			}
-		});
-
-		if (res.ok) {
-			console.log('Container Created');
-		} else {
-			console.log('Error');
-		}
-		goto('/');
-	}
+	onMount(async () => {
+		fetchJobIdAllocations();
+	});
 </script>
 
 <ExecController bind:this={execControllerComponent} />

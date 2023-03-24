@@ -22,4 +22,5 @@ func NomadJobs(e *echo.Echo) {
 	e.DELETE("job/:id", middleware.IsAuthorised(nomad.StopJob, client))
 	e.POST("/job/:id", middleware.IsAuthorised(nomad.UpdateJob, client))
 	e.GET("/job/:id/allocations", middleware.IsAuthorised(nomad.ReadJobAllocs, client))
+	e.GET("/job/:id/alloc", middleware.IsAuthorised(nomad.ReadJobAlloc, client))
 }
