@@ -3,10 +3,15 @@
 	import ExecController from '$lib/ExecController.svelte';
 	import { job } from '../stores/nomadStore';
 	import { hostname } from '../stores/environmentStore';
+	import { onMount } from 'svelte';
 
 	let execControllerComponent: ExecController;
 	export let containerName = '';
 	export let dockerImage = '';
+	export let jobId = '';
+	job.subscribe((value) => {
+		jobId = value;
+	});
 
 	function getAllocExecEndpoint(json: any) {
 		const allocId = json[0]['ID'];
@@ -22,8 +27,7 @@
 		return url.toString();
 	}
 
-	export async function fetchJobIdAllocations(jobId: string) {
-		job.update(() => jobId);
+	export async function fetchJobIdAllocations() {
 		const url = `${hostname}/job/${jobId}/allocations`;
 		const res = await fetch(url, {
 			headers: {
@@ -34,14 +38,13 @@
 		if (res.ok) {
 			const json = await res.json();
 			const url = getAllocExecEndpoint(json);
-			execControllerComponent.write('Starting container ' + jobId);
 			execControllerComponent.connectTerm(url);
 		} else {
 			execControllerComponent.write('Error starting container ' + jobId);
 		}
 	}
 
-	export async function fetchJobIdDelete(jobId: string) {
+	export async function fetchJobIdDelete() {
 		const url = `${hostname}/job/${jobId}`;
 		const res = await fetch(url, {
 			method: 'DELETE',
@@ -88,7 +91,7 @@
 		goto('/');
 	}
 
-	export async function fetchJobUpdate(jobId: string) {
+	export async function fetchJobUpdate() {
 		const url = `${hostname}/job/${jobId}`;
 		const json = createJobJson();
 		const res = await fetch(url, {
@@ -106,6 +109,10 @@
 		}
 		goto('/');
 	}
+
+	onMount(async () => {
+		fetchJobIdAllocations();
+	});
 </script>
 
 <ExecController bind:this={execControllerComponent} />
