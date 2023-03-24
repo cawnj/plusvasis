@@ -2,58 +2,69 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Nav from '$lib/NavBar.svelte';
-	import NomadController from '$lib/NomadController.svelte';
+	import type { Job } from '$lib/Types';
+	import { job } from '../../../../stores/nomadStore';
+	import { onMount } from 'svelte';
+	import { hostname } from '../../../../stores/environmentStore';
 
-	let nomadControllerComponent: NomadController;
-
-	let containerName: '';
-	let dockerImage: '';
-	let validPath = false;
-
-	async function fetchJobId() {
+	let newJob: Job = {
+		containerName: '',
+		dockerImage: '',
+		user: ''
+	};
+	let jobId: string;
+	job.subscribe((value) => {
+		jobId = value;
+	});
+	let jobName: string;
+	onMount(async () => {
 		const jobId = $page.params.id;
-		const url = `http://localhost:8080/job/${jobId}`;
+		job.set(jobId);
+
+		const url = `${hostname}/job/${jobId}`;
 		const res = await fetch(url, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('token')}`
 			}
 		});
-		const data = await res.json();
+		if (res.ok) {
+			const data = await res.json();
+			jobName = data.Name;
+			newJob.containerName = data.Name;
+			newJob.dockerImage = data.TaskGroups[0].Tasks[0].Config.image;
+		}
+	});
+
+	async function fetchJobUpdate(job: Job) {
+		const url = `${hostname}/job/${jobId}`;
+		const res = await fetch(url, {
+			method: 'POST',
+			body: JSON.stringify(job),
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem('token')}`
+			}
+		});
 
 		if (res.ok) {
-			return data;
+			console.log('Container Updated');
 		} else {
-			throw new Error(data);
+			console.log('Error');
 		}
+		goto('/');
 	}
 
-	fetchJobId().then(
-		(job) => {
-			validPath = true;
-			containerName = job.ID;
-			dockerImage = job.TaskGroups[0].Tasks[0].Config.image;
-		},
-		(err) => {
-			console.error('Could not reach backend', err);
-			validPath = false;
-		}
-	);
+	async function updateJob() {
+		const dockerImage = document.getElementById('dockerImageInput') as HTMLInputElement;
+
+		newJob.dockerImage = dockerImage.value;
+		newJob.user = localStorage.getItem('uid');
+		fetchJobUpdate(newJob);
+	}
 </script>
 
-{#if validPath}
-	<Nav />
-	<h1 class="mb-4 text-4xl font-bold font-sans text-white">{$page.params.id}</h1>
-	<div class="mb-3 mt-3">
-		<label for="containerNameInput" class="txt-input-label">Container Name</label>
-		<input
-			type="containerName"
-			class="txt-input"
-			id="containerNameInput"
-			aria-describedby="containerNameHelp"
-			placeholder="Container Name"
-			value={containerName}
-		/>
-	</div>
+<Nav />
+{#if jobName}
+	<h1 class="mb-4 text-4xl font-bold font-sans text-white">{jobName}</h1>
 	<div class="mb-3">
 		<label for="imageInput" class="txt-input-label">Docker Image</label>
 		<input
@@ -62,18 +73,11 @@
 			id="dockerImageInput"
 			aria-describedby="dockerImageNameHelp"
 			placeholder="Docker Image"
-			value={dockerImage}
+			value={newJob.dockerImage}
 		/>
 	</div>
-	<button
-		class="mb-4 btn btn-blue"
-		on:click={() => nomadControllerComponent.fetchJobUpdate(containerName)}>Update Container</button
-	>
-	<div hidden>
-		<NomadController bind:this={nomadControllerComponent} />
-	</div>
-{/if}
-{#if !validPath}
+	<button class="mb-4 btn btn-blue" on:click={() => updateJob()}>Update Container</button>
+{:else}
 	<h1 class="mb-4 text-4xl font-bold font-sans text-white">Page Not Found</h1>
 	<button class="mb-4 btn btn-blue" on:click={() => goto('/')}>Return to Homepage</button>
 {/if}

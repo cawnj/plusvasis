@@ -1,21 +1,24 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import ExecController from '$lib/ExecController.svelte';
 	import { job } from '../stores/nomadStore';
 	import { hostname } from '../stores/environmentStore';
 	import { onMount } from 'svelte';
 
 	let execControllerComponent: ExecController;
-	export let containerName = '';
-	export let dockerImage = '';
 	export let jobId = '';
 	job.subscribe((value) => {
 		jobId = value;
 	});
 
-	function getAllocExecEndpoint(json: any) {
-		const allocId = json[0]['ID'];
-		const taskName = Object.keys(json[0]['TaskStates'])[0];
+	function getAllocExecEndpoint(json: unknown) {
+		let allocId: string;
+		let taskName: string;
+		if (typeof json === 'object' && json !== null) {
+			allocId = (json as { ID: string })['ID'];
+			taskName = Object.keys((json as { TaskStates: Record<string, unknown> })['TaskStates'])[0];
+		} else {
+			throw new Error('Invalid JSON');
+		}
 		const command = '["/bin/bash"]';
 
 		const url = new URL(`wss://nomad.local.cawnj.dev/v1/client/allocation/${allocId}/exec`);
@@ -28,7 +31,7 @@
 	}
 
 	export async function fetchJobIdAllocations() {
-		const url = `${hostname}/job/${jobId}/allocations`;
+		const url = `${hostname}/job/${jobId}/alloc`;
 		const res = await fetch(url, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -58,56 +61,6 @@
 		} else {
 			execControllerComponent.write('Error stopping container ' + jobId);
 		}
-	}
-
-	export function createJobJson() {
-		containerName = (<HTMLInputElement>document.getElementById('containerNameInput')).value;
-		dockerImage = (<HTMLInputElement>document.getElementById('dockerImageInput')).value;
-		let jsonData = {
-			containerName: containerName,
-			dockerImage: dockerImage,
-			user: localStorage.getItem('uid')
-		};
-
-		return jsonData;
-	}
-
-	export async function fetchJobCreate() {
-		const url = `${hostname}/jobs`;
-		const json = createJobJson();
-		const res = await fetch(url, {
-			method: 'POST',
-			body: JSON.stringify(json),
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`
-			}
-		});
-
-		if (res.ok) {
-			console.log('Container Created');
-		} else {
-			console.log('Error');
-		}
-		goto('/');
-	}
-
-	export async function fetchJobUpdate() {
-		const url = `${hostname}/job/${jobId}`;
-		const json = createJobJson();
-		const res = await fetch(url, {
-			method: 'POST',
-			body: JSON.stringify(json),
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`
-			}
-		});
-
-		if (res.ok) {
-			console.log('Container Created');
-		} else {
-			console.log('Error');
-		}
-		goto('/');
 	}
 
 	onMount(async () => {

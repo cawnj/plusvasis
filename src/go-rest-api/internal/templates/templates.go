@@ -26,8 +26,8 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 
 const JOB_TMPL = `{
 	"Job": {
-		"ID": "{{.Name}}-{{.User}}",
-		"Name": "{{.Name}}-{{.User}}",
+		"ID": "{{.User}}-{{.Name}}",
+		"Name": "{{.Name}}",
 		"Type": "service",
 		"Datacenters": [
 			"dc1"
