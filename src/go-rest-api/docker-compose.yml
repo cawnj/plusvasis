@@ -3,18 +3,17 @@ version: "3.9"
 services:
   api:
     build: .
-    image: continens-api:latest
-    container_name: continens-api
+    image: plusvasis-api:latest
+    container_name: plusvasis-api
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.continens.entrypoints=https"
-      - "traefik.http.routers.continens.rule=Host(`api.local.continens.xyz`)"
-      - "traefik.http.services.continens.loadbalancer.server.port=8080"
+      - "traefik.http.routers.plusvasis-api.entrypoints=https"
+      - "traefik.http.routers.plusvasis-api.rule=Host(`api.local.plusvasis.xyz`)"
+      - "traefik.http.services.plusvasis-api.loadbalancer.server.port=8080"
     networks:
       - proxy
 
 networks:
   proxy:
     external: true
-

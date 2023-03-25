@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"continens/internal/controllers/nomad"
-	"continens/internal/fauth"
-	"continens/internal/middleware"
 	"log"
+	"plusvasis/internal/controllers/nomad"
+	"plusvasis/internal/fauth"
+	"plusvasis/internal/middleware"
 
 	"github.com/labstack/echo/v4"
 )
