@@ -5,6 +5,7 @@
 	import { hostname } from '../stores/environmentStore';
 	import Fa from 'svelte-fa';
 	import { faTerminal } from '@fortawesome/free-solid-svg-icons';
+	import { logout } from '$lib/fb';
 
 	let jobs: object[] = [];
 	onMount(async () => {
@@ -15,6 +16,8 @@
 		});
 		if (res.ok) {
 			jobs = await res.json();
+		} else if (res.status === 401) {
+			logout();
 		}
 	});
 </script>
