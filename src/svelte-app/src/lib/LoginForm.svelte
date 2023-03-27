@@ -49,7 +49,7 @@
 		<div class="card-body login-form">
 			<div class="flex items-center">
 				<img alt="The project logo" src={logo} class="mr-3 h-6 sm:h-9 float-left" />
-				<h5 class="h5">Continens {title}</h5>
+				<h5 class="h5">PlusVasis {title}</h5>
 			</div>
 			<form on:submit|preventDefault={login}>
 				<div class="mb-3 mt-3">

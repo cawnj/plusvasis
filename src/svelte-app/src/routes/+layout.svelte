@@ -11,7 +11,7 @@
 		const auth = getAuth();
 		onAuthStateChanged(auth, (user) => {
 			if (user) {
-				console.log('Welcome to Continens');
+				console.log('Welcome to PlusVasis');
 				isLoggedIn.update(() => true);
 			} else {
 				goto('/login');

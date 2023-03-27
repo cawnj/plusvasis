@@ -5,12 +5,12 @@ import { initializeApp } from 'firebase/app';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-	apiKey: 'AIzaSyBFdSMSsCOpX9BDYlhxotMihiTmjsJwem8',
-	authDomain: 'continens-auth.firebaseapp.com',
-	projectId: 'continens-auth',
-	storageBucket: 'continens-auth.appspot.com',
-	messagingSenderId: '289486958559',
-	appId: '1:289486958559:web:7f6f480407893357f99e6a'
+	apiKey: 'AIzaSyDmVW0FZOfgAlKsui0mYMT2g2WZBUVQLks',
+	authDomain: 'plusvasis-auth.firebaseapp.com',
+	projectId: 'plusvasis-auth',
+	storageBucket: 'plusvasis-auth.appspot.com',
+	messagingSenderId: '698224470064',
+	appId: '1:698224470064:web:72faaa97b7a670ecbc25f5'
 };
 
 // Initialize Firebase

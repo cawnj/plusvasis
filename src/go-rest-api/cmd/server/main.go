@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"continens/internal/routes"
+	"plusvasis/internal/routes"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

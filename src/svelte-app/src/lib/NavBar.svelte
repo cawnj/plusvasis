@@ -24,7 +24,7 @@
 				<div class="flex items-center justify-between">
 					<img alt="The project logo" src={logo} class="mr-3 h-6 sm:h-9 float-left" />
 					<span class="text-xl font-bold text-white md:text-2xl hover:text-blue-400"
-						>Continens
+						>PlusVasis
 					</span>
 				</div>
 			</a>

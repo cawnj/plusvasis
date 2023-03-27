@@ -2,15 +2,15 @@ version: '3.8'
 
 services:
   app:
-    image: continens-app:latest
+    image: plusvasis-app:latest
     build: .
-    container_name: continens-app
+    container_name: plusvasis-app
     restart: unless-stopped
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.continens-app.entrypoints=https'
-      - 'traefik.http.routers.continens-app.rule=Host(`app.local.continens.xyz`)'
-      - 'traefik.http.services.continens-app.loadbalancer.server.port=3000'
+      - 'traefik.http.routers.plusvasis-app.entrypoints=https'
+      - 'traefik.http.routers.plusvasis-app.rule=Host(`app.local.plusvasis.xyz`)'
+      - 'traefik.http.services.plusvasis-app.loadbalancer.server.port=3000'
     networks:
       - proxy
 

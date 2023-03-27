@@ -9,7 +9,7 @@ import (
 	"log"
 	"net/http"
 
-	"continens/internal/templates"
+	"plusvasis/internal/templates"
 
 	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
