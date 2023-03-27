@@ -288,7 +288,7 @@ func ReadJobAlloc(c echo.Context) error {
 		return err
 	}
 	for _, alloc := range allocs {
-		if alloc.ClientStatus == "running" {
+		if alloc.ClientStatus == "running" || alloc.ClientStatus == "pending" {
 			return c.JSON(http.StatusOK, alloc)
 		}
 	}
