@@ -47,6 +47,14 @@ const JOB_TMPL = `{
 							"image": "{{.Image}}",
 							"ports": [
 								"http"
+							],
+							"mount": [
+								{
+										"type": "volume",
+										"readonly": false,
+										"source": "plusvasis-{{.User}}",
+										"target": "/userdata"
+								}
 							]
 						}
 					}
