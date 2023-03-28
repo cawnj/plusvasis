@@ -53,84 +53,84 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 }
 
 const JOB_TMPL = `{
-	"Job": {
-		"ID": "{{.User}}-{{.Name}}",
-		"Name": "{{.Name}}",
-		"Type": "service",
-		"Datacenters": [
-			"dc1"
-		],
+    "Job": {
+        "ID": "{{.User}}-{{.Name}}",
+        "Name": "{{.Name}}",
+        "Type": "service",
+        "Datacenters": [
+            "dc1"
+        ],
         "Meta": {
             "user": "{{.User}}",
-			"shell": "{{.Shell}}",
-			"volumes": "{{range $i, $v := .Volumes}}{{index $v 0}}:{{index $v 1}}{{if not (last $i $.Volumes)}},{{end}}{{end}}",
-			"env": "{{range $i, $v := .Env}}{{index $v 0}}={{index $v 1}}{{if not (last $i $.Env)}},{{end}}{{end}}",
-			"port": "{{.Port}}"
+            "shell": "{{.Shell}}",
+            "volumes": "{{range $i, $v := .Volumes}}{{index $v 0}}:{{index $v 1}}{{if not (last $i $.Volumes)}},{{end}}{{end}}",
+            "env": "{{range $i, $v := .Env}}{{index $v 0}}={{index $v 1}}{{if not (last $i $.Env)}},{{end}}{{end}}",
+            "port": "{{.Port}}"
         },
-		"TaskGroups": [
-			{
-				"Name": "{{.Name}}",
-				"Count": 1,
-				"Tasks": [
-					{
-						"Name": "{{.Name}}",
-						"Driver": "docker",
-						"Config": {
-							"image": "{{.Image}}",
-							"ports": [
-								"http"
-							],
-							"mount": [
-								{{range $_, $v := .Volumes}}
-								{
-									"type": "volume",
-									"readonly": false,
-									"source": "plusvasis-{{$.User}}-{{index $v 0}}",
-									"target": "{{index $v 1}}"
-								},
-								{{end}}
-								{
-									"type": "volume",
-									"readonly": false,
-									"source": "plusvasis-{{.User}}",
-									"target": "/userdata"
-								}
-							]
-						},
-						"Env": {
-							{{range $i, $v := .Env}}
-							"{{index $v 0}}": "{{index $v 1}}"{{if not (last $i $.Env)}},{{end}}
-							{{end}}
-						}
-					}
-				],
-				"Networks": [
-					{
-						"Mode": "host",
-						"DynamicPorts": [
-							{
-								"Label": "http",
-								"To": {{.Port}}
-							}
-						]
-					}
-				],
-				"Services": [
-					{
-						"Name": "{{.Name}}",
-						"PortLabel": "http",
-						{{if .Expose}}
-						"Tags": [
-							"traefik.enable=true",
-							"traefik.http.routers.{{.User}}-{{.Name}}.entrypoints=https",
-							"traefik.http.routers.{{.User}}-{{.Name}}.rule=Host(` + "`" + `{{.User}}-{{.Name}}.local.plusvasis.xyz` + "`" + `)",
-							"traefik.port=${NOMAD_PORT_http}"
-						],
-						{{end}}
-						"Provider": "nomad"
-					}
-				]
-			}
-		]
-	}
+        "TaskGroups": [
+            {
+                "Name": "{{.Name}}",
+                "Count": 1,
+                "Tasks": [
+                    {
+                        "Name": "{{.Name}}",
+                        "Driver": "docker",
+                        "Config": {
+                            "image": "{{.Image}}",
+                            "ports": [
+                                "http"
+                            ],
+                            "mount": [
+                                {{range $_, $v := .Volumes}}
+                                {
+                                    "type": "volume",
+                                    "readonly": false,
+                                    "source": "plusvasis-{{$.User}}-{{index $v 0}}",
+                                    "target": "{{index $v 1}}"
+                                },
+                                {{end}}
+                                {
+                                    "type": "volume",
+                                    "readonly": false,
+                                    "source": "plusvasis-{{.User}}",
+                                    "target": "/userdata"
+                                }
+                            ]
+                        },
+                        "Env": {
+                            {{range $i, $v := .Env}}
+                            "{{index $v 0}}": "{{index $v 1}}"{{if not (last $i $.Env)}},{{end}}
+                            {{end}}
+                        }
+                    }
+                ],
+                "Networks": [
+                    {
+                        "Mode": "host",
+                        "DynamicPorts": [
+                            {
+                                "Label": "http",
+                                "To": {{.Port}}
+                            }
+                        ]
+                    }
+                ],
+                "Services": [
+                    {
+                        "Name": "{{.Name}}",
+                        "PortLabel": "http",
+                        {{if .Expose}}
+                        "Tags": [
+                            "traefik.enable=true",
+                            "traefik.http.routers.{{.User}}-{{.Name}}.entrypoints=https",
+                            "traefik.http.routers.{{.User}}-{{.Name}}.rule=Host(` + "`" + `{{.User}}-{{.Name}}.local.plusvasis.xyz` + "`" + `)",
+                            "traefik.port=${NOMAD_PORT_http}"
+                        ],
+                        {{end}}
+                        "Provider": "nomad"
+                    }
+                ]
+            }
+        ]
+    }
 }`
