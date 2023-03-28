@@ -15,6 +15,8 @@ type NomadJob struct {
 	Shell   string     `json:"shell"`
 	Volumes [][]string `json:"volumes"`
 	Env     [][]string `json:"env"`
+	Port    int        `json:"port"`
+	Expose  bool       `json:"expose"`
 }
 
 func last(i int, slice interface{}) bool {
@@ -62,7 +64,8 @@ const JOB_TMPL = `{
             "user": "{{.User}}",
 			"shell": "{{.Shell}}",
 			"volumes": "{{range $i, $v := .Volumes}}{{index $v 0}}:{{index $v 1}}{{if not (last $i $.Volumes)}},{{end}}{{end}}",
-			"env": "{{range $i, $v := .Env}}{{index $v 0}}={{index $v 1}}{{if not (last $i $.Env)}},{{end}}{{end}}"
+			"env": "{{range $i, $v := .Env}}{{index $v 0}}={{index $v 1}}{{if not (last $i $.Env)}},{{end}}{{end}}",
+			"port": "{{.Port}}"
         },
 		"TaskGroups": [
 			{
@@ -103,11 +106,11 @@ const JOB_TMPL = `{
 				],
 				"Networks": [
 					{
-						"Mode": "bridge",
+						"Mode": "host",
 						"DynamicPorts": [
 							{
 								"Label": "http",
-								"To": 80
+								"To": {{.Port}}
 							}
 						]
 					}
@@ -116,6 +119,14 @@ const JOB_TMPL = `{
 					{
 						"Name": "{{.Name}}",
 						"PortLabel": "http",
+						{{if .Expose}}
+						"Tags": [
+							"traefik.enable=true",
+							"traefik.http.routers.{{.User}}-{{.Name}}.entrypoints=https",
+							"traefik.http.routers.{{.User}}-{{.Name}}.rule=Host(` + "`" + `{{.User}}-{{.Name}}.local.plusvasis.xyz` + "`" + `)",
+							"traefik.port=${NOMAD_PORT_http}"
+						],
+						{{end}}
 						"Provider": "nomad"
 					}
 				]

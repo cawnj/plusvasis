@@ -34,6 +34,7 @@
 			oldJob.set('shell', data.Meta.shell);
 			oldJob.set('volumes', data.Meta.volumes);
 			oldJob.set('env', data.Meta.env);
+			oldJob.set('port', data.Meta.port);
 		}
 	});
 
@@ -60,6 +61,7 @@
 		const shell = document.getElementById('shellInput') as HTMLInputElement;
 		const volumeStr = document.getElementById('volumesInput') as HTMLInputElement;
 		const envStr = document.getElementById('envInput') as HTMLInputElement;
+		const port = document.getElementById('portInput') as HTMLInputElement;
 
 		const volumes: [string, string][] = [];
 		for (const volume of volumeStr.value.split(',')) {
@@ -82,6 +84,7 @@
 		newJob.shell = shell.value;
 		newJob.volumes = volumes;
 		newJob.env = envs;
+		newJob.port = Number(port.value);
 		fetchJobUpdate(newJob);
 	}
 </script>

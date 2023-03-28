@@ -7,6 +7,8 @@ export type Job = {
 	shell: string;
 	volumes: [string, string][];
 	env: [string, string][];
+	port: number;
+	expose: boolean;
 };
 
 type JobField = {
@@ -54,6 +56,14 @@ export const JobFields: {key: string, value: JobField}[] = [
 			title: 'Environment Variables',
 			placeholder: 'ENV_VAR=VALUE',
 			info: 'These will be passed to the container. You can add multiple environment variables by separating them with a comma.',
+		},
+	},
+	{
+		key: 'port',
+		value: {
+			title: 'Port',
+			placeholder: '8080',
+			info: 'The port to expose to the host.',
 		},
 	},
 ];
