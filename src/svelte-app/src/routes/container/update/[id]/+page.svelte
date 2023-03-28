@@ -10,7 +10,8 @@
 	let newJob: Job = {
 		containerName: '',
 		dockerImage: '',
-		user: ''
+		user: '',
+		shell: ''
 	};
 	let jobId: string;
 	job.subscribe((value) => {
@@ -32,6 +33,7 @@
 			jobName = data.Name;
 			newJob.containerName = data.Name;
 			newJob.dockerImage = data.TaskGroups[0].Tasks[0].Config.image;
+			newJob.shell = data.Meta.shell;
 		}
 	});
 
@@ -55,9 +57,11 @@
 
 	async function updateJob() {
 		const dockerImage = document.getElementById('dockerImageInput') as HTMLInputElement;
+		const shell = document.getElementById('shellInput') as HTMLInputElement;
 
 		newJob.dockerImage = dockerImage.value;
 		newJob.user = localStorage.getItem('uid');
+		newJob.shell = shell.value;
 		fetchJobUpdate(newJob);
 	}
 </script>
@@ -71,9 +75,20 @@
 			type="dockerImage"
 			class="txt-input"
 			id="dockerImageInput"
-			aria-describedby="dockerImageNameHelp"
+			aria-describedby="dockerImageHelp"
 			placeholder="Docker Image"
 			value={newJob.dockerImage}
+		/>
+	</div>
+	<div class="mb-3">
+		<label for="shellInput" class="txt-input-label">Shell Command</label>
+		<input
+			type="shell"
+			class="txt-input"
+			id="shellInput"
+			aria-describedby="shellNameHelp"
+			placeholder="Shell Command"
+			value={newJob.shell}
 		/>
 	</div>
 	<button class="mb-4 btn btn-blue" on:click={() => updateJob()}>Update Container</button>

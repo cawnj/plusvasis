@@ -9,6 +9,7 @@ type NomadJob struct {
 	Name  string `json:"containerName"`
 	Image string `json:"dockerImage"`
 	User  string `json:"user"`
+	Shell string `json:"shell"`
 }
 
 func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
@@ -34,7 +35,7 @@ const JOB_TMPL = `{
 		],
         "Meta": {
             "user": "{{.User}}",
-			"shell": "/bin/sh"
+			"shell": "{{.Shell}}"
         },
 		"TaskGroups": [
 			{

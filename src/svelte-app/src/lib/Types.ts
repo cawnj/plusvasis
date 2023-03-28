@@ -4,6 +4,7 @@ export type Job = {
 	containerName: string;
 	dockerImage: string;
 	user: string | null;
+	shell: string;
 };
 
 export type Tab = {
