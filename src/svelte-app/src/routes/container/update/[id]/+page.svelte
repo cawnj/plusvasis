@@ -93,18 +93,20 @@
 {#if jobName}
 	<h1 class="mb-4 text-4xl font-bold font-sans text-white">{jobName}</h1>
 	{#each JobFields as { key, value }}
-		<div class="mb-3 mt-3">
-			<label for="{key}Input" class="txt-input-label">{value.title}</label>
-			<input
-				type={key}
-				class="txt-input"
-				id="{key}Input"
-				aria-describedby="{key}Help"
-				placeholder={value.placeholder}
-				value={oldJob.get(key)}
-			/>
-			<p class="text-sm text-gray-400">{value.info}</p>
-		</div>
+		{#if key !== 'containerName'}
+			<div class="mb-3 mt-3">
+				<label for="{key}Input" class="txt-input-label">{value.title}</label>
+				<input
+					type={key}
+					class="txt-input"
+					id="{key}Input"
+					aria-describedby="{key}Help"
+					placeholder={value.placeholder}
+					value={oldJob.get(key)}
+				/>
+				<p class="text-sm text-gray-400">{value.info}</p>
+			</div>
+		{/if}
 	{/each}
 	<button class="mb-4 btn btn-blue" on:click={() => updateJob()}>Update Container</button>
 {:else}
