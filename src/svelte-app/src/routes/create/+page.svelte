@@ -29,6 +29,7 @@
 		const dockerImage = document.getElementById('dockerImageInput') as HTMLInputElement;
 		const shell = document.getElementById('shellInput') as HTMLInputElement;
 		const volumeStr = document.getElementById('volumesInput') as HTMLInputElement;
+		const envStr = document.getElementById('envInput') as HTMLInputElement;
 
 		const volumes: [string, string][] = [];
 		for (const volume of volumeStr.value.split(',')) {
@@ -37,12 +38,20 @@
 			}
 			volumes.push(volume.split(':') as [string, string]);
 		}
+		const envs: [string, string][] = [];
+		for (const env of envStr.value.split(',')) {
+			if (env === '') {
+				continue;
+			}
+			envs.push(env.split('=') as [string, string]);
+		}
 
 		job.containerName = containerName.value;
 		job.dockerImage = dockerImage.value;
 		job.user = localStorage.getItem('uid');
 		job.shell = shell.value;
 		job.volumes = volumes;
+		job.env = envs;
 		fetchJobCreate(job);
 	}
 </script>

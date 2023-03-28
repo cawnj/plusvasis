@@ -6,6 +6,7 @@ export type Job = {
 	dockerImage: string;
 	shell: string;
 	volumes: [string, string][];
+	env: [string, string][];
 };
 
 type JobField = {
@@ -45,6 +46,14 @@ export const JobFields: {key: string, value: JobField}[] = [
 			title: 'Volumes',
 			placeholder: 'docker_volume:/mnt/volume',
 			info: 'For persistant storage, volumes are required. You can add multiple volumes by separating them with a comma.',
+		},
+	},
+	{
+		key: 'env',
+		value: {
+			title: 'Environment Variables',
+			placeholder: 'ENV_VAR=VALUE',
+			info: 'These will be passed to the container. You can add multiple environment variables by separating them with a comma.',
 		},
 	},
 ];

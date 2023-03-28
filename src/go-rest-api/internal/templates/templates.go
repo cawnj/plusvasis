@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"reflect"
 	"text/template"
 )
 
@@ -13,10 +14,18 @@ type NomadJob struct {
 	User    string     `json:"user"`
 	Shell   string     `json:"shell"`
 	Volumes [][]string `json:"volumes"`
+	Env     [][]string `json:"env"`
+}
+
+func last(i int, slice interface{}) bool {
+	v := reflect.ValueOf(slice)
+	return i == v.Len()-1
 }
 
 func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
-	t, err := template.New("").Parse(JOB_TMPL)
+	t, err := template.New("").Funcs(template.FuncMap{
+		"last": last,
+	}).Parse(JOB_TMPL)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +61,8 @@ const JOB_TMPL = `{
         "Meta": {
             "user": "{{.User}}",
 			"shell": "{{.Shell}}",
-			"volumes": "{{range $_, $v := .Volumes}}{{index $v 0}}:{{index $v 1}},{{end}}"
+			"volumes": "{{range $i, $v := .Volumes}}{{index $v 0}}:{{index $v 1}}{{if not (last $i $.Volumes)}},{{end}}{{end}}",
+			"env": "{{range $i, $v := .Env}}{{index $v 0}}={{index $v 1}}{{if not (last $i $.Env)}},{{end}}{{end}}"
         },
 		"TaskGroups": [
 			{
@@ -83,6 +93,11 @@ const JOB_TMPL = `{
 									"target": "/userdata"
 								}
 							]
+						},
+						"Env": {
+							{{range $i, $v := .Env}}
+							"{{index $v 0}}": "{{index $v 1}}"{{if not (last $i $.Env)}},{{end}}
+							{{end}}
 						}
 					}
 				],

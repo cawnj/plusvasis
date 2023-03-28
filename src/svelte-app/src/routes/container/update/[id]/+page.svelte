@@ -33,6 +33,7 @@
 			oldJob.set('dockerImage', data.TaskGroups[0].Tasks[0].Config.image);
 			oldJob.set('shell', data.Meta.shell);
 			oldJob.set('volumes', data.Meta.volumes);
+			oldJob.set('env', data.Meta.env);
 		}
 	});
 
@@ -58,6 +59,7 @@
 		const dockerImage = document.getElementById('dockerImageInput') as HTMLInputElement;
 		const shell = document.getElementById('shellInput') as HTMLInputElement;
 		const volumeStr = document.getElementById('volumesInput') as HTMLInputElement;
+		const envStr = document.getElementById('envInput') as HTMLInputElement;
 
 		const volumes: [string, string][] = [];
 		for (const volume of volumeStr.value.split(',')) {
@@ -66,12 +68,20 @@
 			}
 			volumes.push(volume.split(':') as [string, string]);
 		}
+		const envs: [string, string][] = [];
+		for (const env of envStr.value.split(',')) {
+			if (env === '') {
+				continue;
+			}
+			envs.push(env.split('=') as [string, string]);
+		}
 
 		newJob.containerName = jobName;
 		newJob.dockerImage = dockerImage.value;
 		newJob.user = localStorage.getItem('uid');
 		newJob.shell = shell.value;
 		newJob.volumes = volumes;
+		newJob.env = envs;
 		fetchJobUpdate(newJob);
 	}
 </script>
