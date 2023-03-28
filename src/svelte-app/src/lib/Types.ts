@@ -5,6 +5,7 @@ export type Job = {
 	dockerImage: string;
 	user: string | null;
 	shell: string;
+	volumes: [string, string][];
 };
 
 export type Tab = {

@@ -8,10 +8,11 @@ import (
 )
 
 type NomadJob struct {
-	Name  string `json:"containerName"`
-	Image string `json:"dockerImage"`
-	User  string `json:"user"`
-	Shell string `json:"shell"`
+	Name    string     `json:"containerName"`
+	Image   string     `json:"dockerImage"`
+	User    string     `json:"user"`
+	Shell   string     `json:"shell"`
+	Volumes [][]string `json:"volumes"`
 }
 
 func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
@@ -50,7 +51,8 @@ const JOB_TMPL = `{
 		],
         "Meta": {
             "user": "{{.User}}",
-			"shell": "{{.Shell}}"
+			"shell": "{{.Shell}}",
+			"volumes": "{{range $_, $v := .Volumes}}{{index $v 0}}:{{index $v 1}},{{end}}"
         },
 		"TaskGroups": [
 			{
@@ -66,11 +68,19 @@ const JOB_TMPL = `{
 								"http"
 							],
 							"mount": [
+								{{range $_, $v := .Volumes}}
 								{
-										"type": "volume",
-										"readonly": false,
-										"source": "plusvasis-{{.User}}",
-										"target": "/userdata"
+									"type": "volume",
+									"readonly": false,
+									"source": "plusvasis-{{$.User}}-{{index $v 0}}",
+									"target": "{{index $v 1}}"
+								},
+								{{end}}
+								{
+									"type": "volume",
+									"readonly": false,
+									"source": "plusvasis-{{.User}}",
+									"target": "/userdata"
 								}
 							]
 						}

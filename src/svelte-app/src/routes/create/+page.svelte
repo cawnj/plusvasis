@@ -26,12 +26,22 @@
 		const containerName = document.getElementById('containerNameInput') as HTMLInputElement;
 		const dockerImage = document.getElementById('dockerImageInput') as HTMLInputElement;
 		const shell = document.getElementById('shellInput') as HTMLInputElement;
+		const volumeStr = document.getElementById('volumesInput') as HTMLInputElement;
+
+		const volumes: [string, string][] = [];
+		for (const volume of volumeStr.value.split(',')) {
+			if (volume === '') {
+				continue;
+			}
+			volumes.push(volume.split(':') as [string, string]);
+		}
 
 		const job: Job = {
 			containerName: containerName.value,
 			dockerImage: dockerImage.value,
 			user: localStorage.getItem('uid'),
-			shell: shell.value
+			shell: shell.value,
+			volumes: volumes
 		};
 		fetchJobCreate(job);
 	}
@@ -66,6 +76,16 @@
 		id="shellInput"
 		aria-describedby="shellNameHelp"
 		placeholder="Shell Command"
+	/>
+</div>
+<div class="mb-3">
+	<label for="volumesInput" class="txt-input-label">Volumes</label>
+	<input
+		type="volumes"
+		class="txt-input"
+		id="volumesInput"
+		aria-describedby="volumesHelp"
+		placeholder="Volumes"
 	/>
 </div>
 <button class="mb-4 btn btn-blue" on:click={() => createJob()}>Create Container</button>
