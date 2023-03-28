@@ -33,7 +33,8 @@ const JOB_TMPL = `{
 			"dc1"
 		],
         "Meta": {
-            "user": "{{.User}}"
+            "user": "{{.User}}",
+			"shell": "/bin/sh"
         },
 		"TaskGroups": [
 			{

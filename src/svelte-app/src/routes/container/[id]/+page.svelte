@@ -5,7 +5,7 @@
 	import NomadController from '$lib/NomadController.svelte';
 	import Tabs from '$lib/Tabs.svelte';
 	import type { Tab } from '$lib/Types';
-	import { job } from '../../../stores/nomadStore';
+	import { job, shell } from '../../../stores/nomadStore';
 	import { onMount } from 'svelte';
 	import { hostname } from '../../../stores/environmentStore';
 	import LogController from '$lib/LogController.svelte';
@@ -25,6 +25,12 @@
 		if (res.ok) {
 			const data = await res.json();
 			jobName = data.Name;
+			// set shell if in Meta block, otherwise default to /bin/sh
+			if (data.Meta.shell) {
+				shell.set(data.Meta.shell);
+			} else {
+				shell.set('/bin/sh');
+			}
 		}
 	});
 
