@@ -2,6 +2,8 @@ package templates
 
 import (
 	"bytes"
+	"fmt"
+	"os"
 	"text/template"
 )
 
@@ -22,6 +24,19 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// output for debugging
+	fmt.Printf("%+v\n", job)
+	f, err := os.Create("latest-job.json")
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	_, err = f.Write(buf.Bytes())
+	if err != nil {
+		return nil, err
+	}
+
 	return buf, err
 }
 
