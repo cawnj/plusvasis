@@ -2,33 +2,26 @@ package test
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"github.com/steinfletcher/apitest"
+	"github.com/stretchr/testify/assert"
 )
 
-func testApp() *echo.Echo {
-	app := echo.New()
-	app.GET("/health", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, struct{ Status string }{Status: "OK"})
-	})
-	/*	app.GET("/jobs", nomad.GetJobs)
-		app.POST("/jobs", nomad.CreateJob)
-		app.GET("/job/:id", nomad.ReadJob)
-		app.DELETE("job/:id", nomad.StopJob)
-		app.POST("/job/:id", nomad.UpdateJob)
-		app.GET("/job/:id/allocations", nomad.ReadJobAllocs)
-		app.GET("/job/:id/alloc", nomad.ReadJobAlloc) */
-	return app
+func health(c echo.Context) error {
+	return c.JSON(http.StatusOK, struct{ Status string }{Status: "OK"})
 }
 
 func TestHealth(t *testing.T) {
-	apitest.New().
-		Report(apitest.SequenceDiagram()).
-		Handler(testApp()).
-		Get("/health").
-		Expect(t).
-		Status(http.StatusOK).
-		End()
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/health")
+
+	// Assertions
+	if assert.NoError(t, health(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+	}
 }
