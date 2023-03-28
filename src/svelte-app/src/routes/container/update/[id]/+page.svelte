@@ -84,7 +84,7 @@
 			class="txt-input"
 			id="dockerImageInput"
 			aria-describedby="dockerImageHelp"
-			placeholder="Docker Image"
+			placeholder="alpine:latest"
 			value={oldJob.dockerImage}
 		/>
 	</div>
@@ -95,7 +95,7 @@
 			class="txt-input"
 			id="shellInput"
 			aria-describedby="shellNameHelp"
-			placeholder="Shell Command"
+			placeholder="/bin/bash"
 			value={oldJob.shell}
 		/>
 	</div>
@@ -106,7 +106,7 @@
 			class="txt-input"
 			id="volumesInput"
 			aria-describedby="volumesHelp"
-			placeholder="Volumes"
+			placeholder="docker_volume:/mnt/volume"
 			value={oldJob.volumes}
 		/>
 	</div>

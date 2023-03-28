@@ -55,7 +55,7 @@
 		class="txt-input"
 		id="containerNameInput"
 		aria-describedby="containerNameHelp"
-		placeholder="Container Name"
+		placeholder="alpine"
 	/>
 </div>
 <div class="mb-3">
@@ -65,7 +65,7 @@
 		class="txt-input"
 		id="dockerImageInput"
 		aria-describedby="dockerImageHelp"
-		placeholder="Docker Image"
+		placeholder="alpine:latest"
 	/>
 </div>
 <div class="mb-3">
@@ -75,7 +75,7 @@
 		class="txt-input"
 		id="shellInput"
 		aria-describedby="shellNameHelp"
-		placeholder="Shell Command"
+		placeholder="/bin/bash"
 	/>
 </div>
 <div class="mb-3">
@@ -85,7 +85,7 @@
 		class="txt-input"
 		id="volumesInput"
 		aria-describedby="volumesHelp"
-		placeholder="Volumes"
+		placeholder="docker_volume:/mnt/volume"
 	/>
 </div>
 <button class="mb-4 btn btn-blue" on:click={() => createJob()}>Create Container</button>
