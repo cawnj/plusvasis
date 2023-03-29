@@ -80,9 +80,9 @@ func TestGetJobs(t *testing.T) {
 		},
 	}
 	expectedJson, _ := json.Marshal(expected)
-	code := http.StatusOK
+	expectedCode := http.StatusOK
 	if assert.NoError(t, nomadController.GetJobs(c)) {
-		assert.Equal(t, code, rec.Code)
+		assert.Equal(t, expectedCode, rec.Code)
 		assert.JSONEq(t, string(expectedJson), rec.Body.String())
 	}
 }
@@ -108,9 +108,9 @@ func TestCreateJob(t *testing.T) {
 
 	// Assertions
 	expectedJson := nomadRegisterJson
-	code := http.StatusOK
+	expectedCode := http.StatusOK
 	if assert.NoError(t, nomadController.CreateJob(c)) {
-		assert.Equal(t, code, rec.Code)
+		assert.Equal(t, expectedCode, rec.Code)
 		assert.JSONEq(t, string(expectedJson), rec.Body.String())
 	}
 }
@@ -143,9 +143,9 @@ func TestStopJob(t *testing.T) {
 
 	// Assertions
 	expectedJson := nomadDeregisterJson
-	code := http.StatusOK
+	expectedCode := http.StatusOK
 	if assert.NoError(t, nomadController.StopJob(c)) {
-		assert.Equal(t, code, rec.Code)
+		assert.Equal(t, expectedCode, rec.Code)
 		assert.JSONEq(t, string(expectedJson), rec.Body.String())
 	}
 }
