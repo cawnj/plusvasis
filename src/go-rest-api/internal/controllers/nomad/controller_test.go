@@ -115,10 +115,52 @@ func TestCreateJob(t *testing.T) {
 	}
 }
 
+func TestUpdateJob(t *testing.T) {
+	// Setup
+	jobName := "test"
+	rec, c, nomadClient, nomadController := setup(http.MethodPost, "/job/"+jobName)
+	c.SetParamNames("id")
+	c.SetParamValues(jobName)
+	c.Set("uid", "test")
+
+	// Mocks
+	nomadJobReq := templates.NomadJob{
+		Name: "test",
+		User: "test",
+	}
+	nomadJobReqJson, _ := json.Marshal(nomadJobReq)
+	c.Request().Body = io.NopCloser(bytes.NewBuffer(nomadJobReqJson))
+
+	nomadRegister := nomad.JobRegisterResponse{
+		EvalID:          "test",
+		EvalCreateIndex: 1,
+		JobModifyIndex:  1,
+	}
+	nomadRegisterJson, _ := json.Marshal(nomadRegister)
+	nomadClient.On("Post", "/job/"+jobName, mock.Anything).Return(nomadRegisterJson, nil)
+
+	nomadJobCheckUser := nomad.Job{
+		ID: "test",
+		Meta: map[string]string{
+			"user": "test",
+		},
+	}
+	nomadJobCheckUserJson, _ := json.Marshal(nomadJobCheckUser)
+	nomadClient.On("Get", "/job/"+jobName).Return(nomadJobCheckUserJson, nil)
+
+	// Assertions
+	expectedJson := nomadRegisterJson
+	expectedCode := http.StatusOK
+	if assert.NoError(t, nomadController.UpdateJob(c)) {
+		assert.Equal(t, expectedCode, rec.Code)
+		assert.JSONEq(t, string(expectedJson), rec.Body.String())
+	}
+}
+
 func TestStopJob(t *testing.T) {
 	// Setup
 	jobName := "test"
-	rec, c, nomadClient, nomadController := setup(http.MethodDelete, "/jobs/"+jobName)
+	rec, c, nomadClient, nomadController := setup(http.MethodDelete, "/job/"+jobName)
 	c.SetParamNames("id")
 	c.SetParamValues(jobName)
 	c.Set("uid", "test")
