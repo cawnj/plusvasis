@@ -2,6 +2,7 @@ package routes
 
 import (
 	"log"
+
 	"plusvasis/internal/controllers/nomad"
 	"plusvasis/internal/fauth"
 	"plusvasis/internal/middleware"
