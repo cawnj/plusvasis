@@ -6,9 +6,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Health(e *echo.Echo) {
+func Health(c echo.Context) error {
+	return c.JSON(http.StatusOK, struct{ Status string }{Status: "OK"})
+}
 
-	e.GET("/health", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, struct{ Status string }{ Status: "OK" })
-	})
+func HealthRoutes(e *echo.Echo) {
+	e.GET("/health", Health)
 }
