@@ -144,7 +144,7 @@ func (n *NomadController) StopJob(c echo.Context) error {
 		return err
 	}
 
-	var resp nomad.JobRegisterResponse
+	var resp structs.JobDeregisterResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
 		return err
@@ -207,7 +207,7 @@ func (n *NomadController) ReadJobAlloc(c echo.Context) error {
 }
 
 func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
-	data, err := n.Client.Get((fmt.Sprintf("/job/%s", jobId)))
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s", jobId))
 	if err != nil {
 		return err
 	}

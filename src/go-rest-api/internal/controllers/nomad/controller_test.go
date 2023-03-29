@@ -41,7 +41,7 @@ func TestGetJobs(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("uid", "test")
 
-	// Mock NomadClient
+	// Mock Responses from Nomad
 	nomadJobs := []nomad.JobListStub{
 		{
 			ID: "test",
@@ -58,6 +58,7 @@ func TestGetJobs(t *testing.T) {
 	}
 	jobsJson, _ := json.Marshal(nomadJobs)
 
+	// Mock NomadClient
 	nomadClient := new(MockNomadClient)
 	nomadClient.On("Get", "/jobs?meta=true").Return(jobsJson, nil)
 	nomadController := NomadController{nomadClient}
@@ -93,13 +94,15 @@ func TestCreateJob(t *testing.T) {
 	nomadJobJson, _ := json.Marshal(nomadJob)
 	c.Request().Body = io.NopCloser(bytes.NewBuffer(nomadJobJson))
 
-	// Mock NomadClient
+	// Mock Responses from Nomad
 	nomadRegister := nomad.JobRegisterResponse{
 		EvalID:          "test",
 		EvalCreateIndex: 1,
 		JobModifyIndex:  1,
 	}
 	nomadRegisterJson, _ := json.Marshal(nomadRegister)
+
+	// Mock NomadClient
 	nomadClient := new(MockNomadClient)
 	nomadClient.On("Post", "/jobs", mock.Anything).Return(nomadRegisterJson, nil)
 	nomadController := NomadController{nomadClient}
@@ -108,6 +111,49 @@ func TestCreateJob(t *testing.T) {
 	expectedJson := nomadRegisterJson
 	code := http.StatusOK
 	if assert.NoError(t, nomadController.CreateJob(c)) {
+		assert.Equal(t, code, rec.Code)
+		assert.JSONEq(t, string(expectedJson), rec.Body.String())
+	}
+}
+
+func TestStopJob(t *testing.T) {
+	// Variables
+	jobName := "test"
+
+	// Setup
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodDelete, "/jobs/"+jobName, nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetParamNames("id")
+	c.SetParamValues(jobName)
+	c.Set("uid", "test")
+
+	// Mock Responses from Nomad
+	nomadDeregister := nomad.JobDeregisterResponse{
+		EvalID:          "test",
+		EvalCreateIndex: 1,
+		JobModifyIndex:  1,
+	}
+	nomadDeregisterJson, _ := json.Marshal(nomadDeregister)
+	nomadJob := nomad.Job{
+		ID: "test",
+		Meta: map[string]string{
+			"user": "test",
+		},
+	}
+	nomadJobJson, _ := json.Marshal(nomadJob)
+
+	// Mock NomadClient
+	nomadClient := new(MockNomadClient)
+	nomadClient.On("Get", "/job/"+jobName).Return(nomadJobJson, nil) // CheckUserAllowed mocking
+	nomadClient.On("Delete", "/job/"+jobName+"?purge=true").Return(nomadDeregisterJson, nil)
+	nomadController := NomadController{nomadClient}
+
+	// Assertions
+	expectedJson := nomadDeregisterJson
+	code := http.StatusOK
+	if assert.NoError(t, nomadController.StopJob(c)) {
 		assert.Equal(t, code, rec.Code)
 		assert.JSONEq(t, string(expectedJson), rec.Body.String())
 	}
