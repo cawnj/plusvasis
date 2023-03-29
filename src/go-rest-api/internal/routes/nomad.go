@@ -16,11 +16,13 @@ func NomadJobs(e *echo.Echo) {
 		log.Fatalln("failed to init firebase auth", err)
 	}
 
-	e.GET("/jobs", middleware.IsAuthorised(nomad.GetJobs, client))
-	e.POST("/jobs", middleware.IsAuthorised(nomad.CreateJob, client))
-	e.GET("/job/:id", middleware.IsAuthorised(nomad.ReadJob, client))
-	e.DELETE("job/:id", middleware.IsAuthorised(nomad.StopJob, client))
-	e.POST("/job/:id", middleware.IsAuthorised(nomad.UpdateJob, client))
-	e.GET("/job/:id/allocations", middleware.IsAuthorised(nomad.ReadJobAllocs, client))
-	e.GET("/job/:id/alloc", middleware.IsAuthorised(nomad.ReadJobAlloc, client))
+	controller := nomad.NomadController{Client: &nomad.DefaultNomadClient{}}
+
+	e.GET("/jobs", middleware.IsAuthorised(controller.GetJobs, client))
+	e.POST("/jobs", middleware.IsAuthorised(controller.CreateJob, client))
+	e.GET("/job/:id", middleware.IsAuthorised(controller.ReadJob, client))
+	e.DELETE("job/:id", middleware.IsAuthorised(controller.StopJob, client))
+	e.POST("/job/:id", middleware.IsAuthorised(controller.UpdateJob, client))
+	e.GET("/job/:id/allocations", middleware.IsAuthorised(controller.ReadJobAllocs, client))
+	e.GET("/job/:id/alloc", middleware.IsAuthorised(controller.ReadJobAlloc, client))
 }
