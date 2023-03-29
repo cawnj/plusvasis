@@ -33,15 +33,26 @@ func (m *MockNomadClient) Delete(endpoint string) ([]byte, error) {
 	return args.Get(0).([]byte), args.Error(1)
 }
 
-func TestGetJobs(t *testing.T) {
-	// Setup
+func setup(method string, url string) (
+	*httptest.ResponseRecorder, echo.Context, *MockNomadClient, NomadController,
+) {
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/jobs", nil)
+	req := httptest.NewRequest(method, url, nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+
+	nomadClient := new(MockNomadClient)
+	nomadController := NomadController{nomadClient}
+
+	return rec, c, nomadClient, nomadController
+}
+
+func TestGetJobs(t *testing.T) {
+	// Setup
+	rec, c, nomadClient, nomadController := setup(http.MethodGet, "/jobs")
 	c.Set("uid", "test")
 
-	// Mock Responses from Nomad
+	// Mocks
 	nomadJobs := []nomad.JobListStub{
 		{
 			ID: "test",
@@ -57,11 +68,7 @@ func TestGetJobs(t *testing.T) {
 		},
 	}
 	jobsJson, _ := json.Marshal(nomadJobs)
-
-	// Mock NomadClient
-	nomadClient := new(MockNomadClient)
 	nomadClient.On("Get", "/jobs?meta=true").Return(jobsJson, nil)
-	nomadController := NomadController{nomadClient}
 
 	// Assertions
 	expected := []nomad.JobListStub{
@@ -82,30 +89,22 @@ func TestGetJobs(t *testing.T) {
 
 func TestCreateJob(t *testing.T) {
 	// Setup
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, "/jobs", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+	rec, c, nomadClient, nomadController := setup(http.MethodPost, "/jobs")
 
-	// Mock NomadJob POST body
+	// Mocks
 	nomadJob := templates.NomadJob{
 		Name: "test",
 	}
 	nomadJobJson, _ := json.Marshal(nomadJob)
 	c.Request().Body = io.NopCloser(bytes.NewBuffer(nomadJobJson))
 
-	// Mock Responses from Nomad
 	nomadRegister := nomad.JobRegisterResponse{
 		EvalID:          "test",
 		EvalCreateIndex: 1,
 		JobModifyIndex:  1,
 	}
 	nomadRegisterJson, _ := json.Marshal(nomadRegister)
-
-	// Mock NomadClient
-	nomadClient := new(MockNomadClient)
 	nomadClient.On("Post", "/jobs", mock.Anything).Return(nomadRegisterJson, nil)
-	nomadController := NomadController{nomadClient}
 
 	// Assertions
 	expectedJson := nomadRegisterJson
@@ -117,25 +116,22 @@ func TestCreateJob(t *testing.T) {
 }
 
 func TestStopJob(t *testing.T) {
-	// Variables
-	jobName := "test"
-
 	// Setup
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodDelete, "/jobs/"+jobName, nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+	jobName := "test"
+	rec, c, nomadClient, nomadController := setup(http.MethodDelete, "/jobs/"+jobName)
 	c.SetParamNames("id")
 	c.SetParamValues(jobName)
 	c.Set("uid", "test")
 
-	// Mock Responses from Nomad
+	// Mocks
 	nomadDeregister := nomad.JobDeregisterResponse{
 		EvalID:          "test",
 		EvalCreateIndex: 1,
 		JobModifyIndex:  1,
 	}
 	nomadDeregisterJson, _ := json.Marshal(nomadDeregister)
+	nomadClient.On("Delete", "/job/"+jobName+"?purge=true").Return(nomadDeregisterJson, nil)
+
 	nomadJob := nomad.Job{
 		ID: "test",
 		Meta: map[string]string{
@@ -143,12 +139,7 @@ func TestStopJob(t *testing.T) {
 		},
 	}
 	nomadJobJson, _ := json.Marshal(nomadJob)
-
-	// Mock NomadClient
-	nomadClient := new(MockNomadClient)
 	nomadClient.On("Get", "/job/"+jobName).Return(nomadJobJson, nil) // CheckUserAllowed mocking
-	nomadClient.On("Delete", "/job/"+jobName+"?purge=true").Return(nomadDeregisterJson, nil)
-	nomadController := NomadController{nomadClient}
 
 	// Assertions
 	expectedJson := nomadDeregisterJson
