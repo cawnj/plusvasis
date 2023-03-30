@@ -9,6 +9,7 @@ export type Job = {
 	env: [string, string][];
 	port: number;
 	expose: boolean;
+	[key: string]: string | null | number | [string, string][] | boolean;
 };
 
 type JobField = {

@@ -4,8 +4,8 @@
 	import Nav from '$lib/NavBar.svelte';
 	import NomadController from '$lib/NomadController.svelte';
 	import Tabs from '$lib/Tabs.svelte';
-	import type { Tab } from '$lib/Types';
-	import { job, shell } from '../../../stores/nomadStore';
+	import type { Job, Tab } from '$lib/Types';
+	import { currJobId, currJob } from '../../../stores/nomadStore';
 	import { onMount } from 'svelte';
 	import { hostname } from '../../../stores/environmentStore';
 	import LogController from '$lib/LogController.svelte';
@@ -14,7 +14,7 @@
 	let jobName: string;
 	onMount(async () => {
 		const jobId = $page.params.id;
-		job.set(jobId);
+		currJobId.set(jobId);
 
 		const url = `${hostname}/job/${jobId}`;
 		const res = await fetch(url, {
@@ -25,12 +25,18 @@
 		if (res.ok) {
 			const data = await res.json();
 			jobName = data.Name;
-			// set shell if in Meta block, otherwise default to /bin/sh
-			if (data.Meta.shell) {
-				shell.set(data.Meta.shell);
-			} else {
-				shell.set('/bin/sh');
-			}
+
+			const job: Job = {
+				user: localStorage.getItem('uid'),
+				containerName: data.Name,
+				dockerImage: data.TaskGroups[0].Tasks[0].Config.image,
+				shell: data.Meta.shell,
+				volumes: data.Meta.volumes,
+				env: data.Meta.env,
+				port: data.Meta.port,
+				expose: false
+			};
+			currJob.set(job);
 		}
 	});
 
@@ -53,13 +59,6 @@
 {#if jobName}
 	<Nav />
 	<h1 class="mb-4 text-4xl font-bold font-sans text-white">{jobName}</h1>
-	<div class="mb-2">
-		<button
-			type="button"
-			class="btn-purple"
-			on:click={() => goto('/container/update/' + $page.params.id)}>Update Container</button
-		>
-	</div>
 	<Tabs {tabs} />
 {:else}
 	<h1 class="mb-4 text-4xl font-bold font-sans text-white">Page Not Found</h1>

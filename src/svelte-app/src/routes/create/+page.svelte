@@ -4,8 +4,6 @@
 	import { JobFields, type Job } from '$lib/Types';
 	import { hostname } from '../../stores/environmentStore';
 
-	let job = {} as Job;
-
 	async function fetchJobCreate(job: Job) {
 		const url = `${hostname}/jobs`;
 		const res = await fetch(url, {
@@ -47,13 +45,16 @@
 			envs.push(env.split('=') as [string, string]);
 		}
 
-		job.containerName = containerName.value;
-		job.dockerImage = dockerImage.value;
-		job.user = localStorage.getItem('uid');
-		job.shell = shell.value;
-		job.volumes = volumes;
-		job.env = envs;
-		job.port = Number(port.value);
+		const job: Job = {
+			user: localStorage.getItem('uid'),
+			containerName: containerName.value,
+			dockerImage: dockerImage.value,
+			shell: shell.value,
+			volumes: volumes,
+			env: envs,
+			port: Number(port.value),
+			expose: false
+		};
 		fetchJobCreate(job);
 	}
 </script>
