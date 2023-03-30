@@ -1,114 +1,24 @@
 package nomad
 
 import (
-	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 
 	"plusvasis/internal/templates"
 
+	"github.com/hashicorp/nomad/nomad/structs"
 	nomad "github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
 )
 
-const NOMAD_URL = "https://nomad.local.cawnj.dev/v1"
-
-func checkUserAllowed(uid, jobId string) error {
-	data, err := nomadGet(fmt.Sprintf("/job/%s", jobId))
-	if err != nil {
-		return err
-	}
-
-	var job nomad.Job
-	err = json.Unmarshal(data, &job)
-	if err != nil {
-		return err
-	}
-
-	if job.Meta["user"] != uid {
-		return echo.ErrUnauthorized
-	}
-
-	return nil
+type NomadController struct {
+	Client NomadClient
 }
 
-func nomadGet(endpoint string) ([]byte, error) {
-	url := NOMAD_URL + endpoint
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != 200 {
-		return nil, echo.NewHTTPError(resp.StatusCode)
-	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	return body, nil
-}
-
-func nomadPost(endpoint string, reqBody *bytes.Buffer) ([]byte, error) {
-	url := NOMAD_URL + endpoint
-	resp, err := http.Post(url, "application/json", reqBody)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != 200 {
-		return nil, echo.NewHTTPError(resp.StatusCode)
-	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	return body, nil
-}
-
-func nomadDelete(endpoint string) ([]byte, error) {
-	url := NOMAD_URL + endpoint
-	req, err := http.NewRequest("DELETE", url, nil)
-	if err != nil {
-		return nil, err
-	}
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != 200 {
-		return nil, echo.NewHTTPError(resp.StatusCode)
-	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	return body, nil
-}
-
-func decodeJobJson(job *templates.NomadJob, body io.ReadCloser) error {
-	var unmarshalErr *json.UnmarshalTypeError
-
-	decoder := json.NewDecoder(body)
-	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&job)
-
-	if err != nil {
-		if errors.As(err, &unmarshalErr) {
-			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field)
-		} else {
-			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request "+err.Error())
-		}
-	}
-
-	return nil
-}
-
-func GetJobs(c echo.Context) error {
-	data, err := nomadGet("/jobs?meta=true")
+func (n *NomadController) GetJobs(c echo.Context) error {
+	data, err := n.Client.Get("/jobs?meta=true")
 	if err != nil {
 		log.Println("[nomad/GetJobs]", err)
 		return err
@@ -132,7 +42,7 @@ func GetJobs(c echo.Context) error {
 	return c.JSON(http.StatusOK, filteredJobs)
 }
 
-func CreateJob(c echo.Context) error {
+func (n *NomadController) CreateJob(c echo.Context) error {
 	var job templates.NomadJob
 	err := decodeJobJson(&job, c.Request().Body)
 	if err != nil {
@@ -145,7 +55,7 @@ func CreateJob(c echo.Context) error {
 		return err
 	}
 
-	data, err := nomadPost("/jobs", body)
+	data, err := n.Client.Post("/jobs", body)
 	if err != nil {
 		log.Println("[nomad/CreateJob]", err)
 		return err
@@ -160,7 +70,7 @@ func CreateJob(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-func UpdateJob(c echo.Context) error {
+func (n *NomadController) UpdateJob(c echo.Context) error {
 	var job templates.NomadJob
 	err := decodeJobJson(&job, c.Request().Body)
 	if err != nil {
@@ -176,11 +86,11 @@ func UpdateJob(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
 
-	if err := checkUserAllowed(uid, jobId); err != nil {
+	if err := n.CheckUserAllowed(uid, jobId); err != nil {
 		return err
 	}
 
-	data, err := nomadPost(fmt.Sprintf("/job/%s", jobId), body)
+	data, err := n.Client.Post(fmt.Sprintf("/job/%s", jobId), body)
 	if err != nil {
 		log.Println("[nomad/UpdateJob]", err)
 		return err
@@ -195,11 +105,11 @@ func UpdateJob(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-func ReadJob(c echo.Context) error {
+func (n *NomadController) ReadJob(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
 
-	data, err := nomadGet(fmt.Sprintf("/job/%s", jobId))
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s", jobId))
 	if err != nil {
 		log.Println("[nomad/ReadJob]", err)
 		return err
@@ -212,7 +122,7 @@ func ReadJob(c echo.Context) error {
 		return err
 	}
 
-	// Doing this check here because if we use checkUserAllowed, we will duplicate requests
+	// Doing this check here because if we use n.CheckUserAllowed, we will duplicate requests
 	if job.Meta["user"] != uid {
 		return echo.ErrUnauthorized
 	}
@@ -220,21 +130,21 @@ func ReadJob(c echo.Context) error {
 	return c.JSON(http.StatusOK, job)
 }
 
-func StopJob(c echo.Context) error {
+func (n *NomadController) StopJob(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
 
-	if err := checkUserAllowed(uid, jobId); err != nil {
+	if err := n.CheckUserAllowed(uid, jobId); err != nil {
 		return err
 	}
 
-	data, err := nomadDelete(fmt.Sprintf("/job/%s?purge=true", jobId))
+	data, err := n.Client.Delete(fmt.Sprintf("/job/%s?purge=true", jobId))
 	if err != nil {
 		log.Println("[nomad/StopJob]", err)
 		return err
 	}
 
-	var resp nomad.JobRegisterResponse
+	var resp structs.JobDeregisterResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
 		return err
@@ -243,15 +153,15 @@ func StopJob(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-func ReadJobAllocs(c echo.Context) error {
+func (n *NomadController) ReadJobAllocs(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
 
-	if err := checkUserAllowed(uid, jobId); err != nil {
+	if err := n.CheckUserAllowed(uid, jobId); err != nil {
 		return err
 	}
 
-	data, err := nomadGet(fmt.Sprintf("/job/%s/allocations", jobId))
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
 	if err != nil {
 		log.Println("[nomad/ReadJobAllocs]", err)
 		return err
@@ -267,15 +177,15 @@ func ReadJobAllocs(c echo.Context) error {
 	return c.JSON(http.StatusOK, allocs)
 }
 
-func ReadJobAlloc(c echo.Context) error {
+func (n *NomadController) ReadJobAlloc(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
 
-	if err := checkUserAllowed(uid, jobId); err != nil {
+	if err := n.CheckUserAllowed(uid, jobId); err != nil {
 		return err
 	}
 
-	data, err := nomadGet(fmt.Sprintf("/job/%s/allocations", jobId))
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
 	if err != nil {
 		log.Println("[nomad/ReadJobAllocs]", err)
 		return err
@@ -294,4 +204,23 @@ func ReadJobAlloc(c echo.Context) error {
 	}
 
 	return echo.NewHTTPError(http.StatusNotFound, "No running allocation found")
+}
+
+func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s", jobId))
+	if err != nil {
+		return err
+	}
+
+	var job structs.Job
+	err = json.Unmarshal(data, &job)
+	if err != nil {
+		return err
+	}
+
+	if job.Meta["user"] != uid {
+		return echo.ErrUnauthorized
+	}
+
+	return nil
 }

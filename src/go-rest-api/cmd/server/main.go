@@ -18,7 +18,7 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	routes.Health(e)
+	routes.HealthRoutes(e)
 	routes.NomadJobs(e)
 
 	httpPort := os.Getenv("HTTP_PORT")

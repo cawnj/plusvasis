@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/hashicorp/nomad v1.5.1
 	github.com/labstack/echo/v4 v4.10.0
+	github.com/stretchr/testify v1.8.1
 	google.golang.org/api v0.103.0
 )
 
@@ -78,6 +79,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/zclconf/go-cty v1.12.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
@@ -92,6 +94,7 @@ require (
 	google.golang.org/grpc v1.53.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	oss.indeed.com/go/libtime v1.6.0 // indirect
 )
 
