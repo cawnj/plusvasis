@@ -1,13 +1,17 @@
 <script lang="ts">
 	import ExecController from '$lib/ExecController.svelte';
-	import { job } from '../stores/nomadStore';
+	import { job, shell } from '../stores/nomadStore';
 	import { hostname } from '../stores/environmentStore';
 	import { onMount } from 'svelte';
 
 	let execControllerComponent: ExecController;
 	export let jobId = '';
+	let command = 'sh';
 	job.subscribe((value) => {
 		jobId = value;
+	});
+	shell.subscribe((value) => {
+		command = value;
 	});
 
 	function getAllocExecEndpoint(json: unknown) {
@@ -19,11 +23,10 @@
 		} else {
 			throw new Error('Invalid JSON');
 		}
-		const command = '["/bin/bash"]';
 
 		const url = new URL(`wss://nomad.local.cawnj.dev/v1/client/allocation/${allocId}/exec`);
 		url.searchParams.append('task', taskName);
-		url.searchParams.append('command', command);
+		url.searchParams.append('command', `["${command}"]`);
 		url.searchParams.append('tty', 'true');
 		url.searchParams.append('ws_handshake', 'true');
 

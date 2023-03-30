@@ -11,7 +11,7 @@ import (
 
 	"plusvasis/internal/templates"
 
-	"github.com/hashicorp/nomad/nomad/structs"
+	nomad "github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
 )
 
@@ -23,7 +23,7 @@ func checkUserAllowed(uid, jobId string) error {
 		return err
 	}
 
-	var job structs.Job
+	var job nomad.Job
 	err = json.Unmarshal(data, &job)
 	if err != nil {
 		return err
@@ -114,14 +114,14 @@ func GetJobs(c echo.Context) error {
 		return err
 	}
 
-	var jobs []structs.JobListStub
+	var jobs []nomad.JobListStub
 	err = json.Unmarshal(data, &jobs)
 	if err != nil {
 		log.Println("[nomad/GetJobs]", err)
 		return err
 	}
 
-	var filteredJobs []structs.JobListStub
+	var filteredJobs []nomad.JobListStub
 	uid := c.Get("uid").(string)
 	for _, job := range jobs {
 		if job.Meta["user"] == uid {
@@ -151,7 +151,7 @@ func CreateJob(c echo.Context) error {
 		return err
 	}
 
-	var resp structs.JobRegisterResponse
+	var resp nomad.JobRegisterResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
 		return err
@@ -186,7 +186,7 @@ func UpdateJob(c echo.Context) error {
 		return err
 	}
 
-	var resp structs.JobRegisterResponse
+	var resp nomad.JobRegisterResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
 		return err
@@ -205,7 +205,7 @@ func ReadJob(c echo.Context) error {
 		return err
 	}
 
-	var job structs.Job
+	var job nomad.Job
 	err = json.Unmarshal(data, &job)
 	if err != nil {
 		log.Println("[nomad/ReadJob]", err)
@@ -234,7 +234,7 @@ func StopJob(c echo.Context) error {
 		return err
 	}
 
-	var resp structs.JobRegisterResponse
+	var resp nomad.JobRegisterResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
 		return err
@@ -257,7 +257,7 @@ func ReadJobAllocs(c echo.Context) error {
 		return err
 	}
 
-	var allocs []structs.AllocListStub
+	var allocs []nomad.AllocListStub
 	err = json.Unmarshal(data, &allocs)
 	if err != nil {
 		log.Println("[nomad/ReadJobAllocs]", err)
@@ -281,14 +281,14 @@ func ReadJobAlloc(c echo.Context) error {
 		return err
 	}
 
-	var allocs []structs.AllocListStub
+	var allocs []nomad.AllocListStub
 	err = json.Unmarshal(data, &allocs)
 	if err != nil {
 		log.Println("[nomad/ReadJobAllocs]", err)
 		return err
 	}
 	for _, alloc := range allocs {
-		if alloc.ClientStatus == "running" {
+		if alloc.ClientStatus == "running" || alloc.ClientStatus == "pending" {
 			return c.JSON(http.StatusOK, alloc)
 		}
 	}
