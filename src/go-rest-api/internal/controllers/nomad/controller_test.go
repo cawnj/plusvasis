@@ -157,6 +157,33 @@ func TestUpdateJob(t *testing.T) {
 	}
 }
 
+func TestReadJob(t *testing.T) {
+	// Setup
+	jobName := "test"
+	rec, c, nomadClient, nomadController := setup(http.MethodGet, "/job/"+jobName)
+	c.SetParamNames("id")
+	c.SetParamValues(jobName)
+	c.Set("uid", "test")
+
+	// Mocks
+	nomadJob := nomad.Job{
+		ID: "test",
+		Meta: map[string]string{
+			"user": "test",
+		},
+	}
+
+	jobJson, _ := json.Marshal(nomadJob)
+	nomadClient.On("Get", "/job/"+jobName).Return(jobJson, nil)
+
+	// Assertions
+	expectedCode := http.StatusOK
+	if assert.NoError(t, nomadController.ReadJob(c)) {
+		assert.Equal(t, expectedCode, rec.Code)
+		assert.JSONEq(t, string(jobJson), rec.Body.String())
+	}
+}
+
 func TestStopJob(t *testing.T) {
 	// Setup
 	jobName := "test"
