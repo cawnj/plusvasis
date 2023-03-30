@@ -3,12 +3,13 @@
 	import { job, alloc, task } from '../stores/nomadStore';
 	import ExecController from '$lib/ExecController.svelte';
 	import { onMount } from 'svelte';
+	import { error } from '@sveltejs/kit';
 
 	export let jobId = '';
 	export let allocId = '';
 	export let taskName = '';
-
-	let execControllerComponent: ExecController;
+	export let stdOutLogs = '';
+	export let stdErrLogs = '';
 
 	job.subscribe((value) => {
 		jobId = value;
@@ -20,8 +21,8 @@
 		taskName = value;
 	});
 
-	export async function fetchLogs() {
-		const url = `${hostname}/logs/${jobId}/${allocId}/${taskName}/stdout`;
+	export async function fetchLogs(type: string) {
+		const url = `${hostname}/logs/${jobId}/${allocId}/${taskName}/${type}`;
 		const res = await fetch(url, {
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -30,15 +31,21 @@
 
 		if (res.ok) {
 			const json = await res.json();
-			execControllerComponent.write(atob(json.data));
+			if (type == 'stdout') {
+				stdOutLogs = atob(json.Data);
+			} else {
+				stdErrLogs = atob(json.Data);
+			}
 		} else {
-			execControllerComponent.write('Error fetching container logs');
+			return error;
 		}
 	}
 
 	onMount(async () => {
-		fetchLogs();
+		fetchLogs('stdout');
+		fetchLogs('stderr');
 	});
 </script>
 
-<ExecController bind:this={execControllerComponent} />
+<div class="text-white">${stdOutLogs}</div>
+<div class="text-white mt-6">${stdErrLogs}</div>
