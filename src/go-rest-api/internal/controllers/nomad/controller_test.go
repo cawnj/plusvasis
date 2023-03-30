@@ -218,3 +218,37 @@ func TestStopJob(t *testing.T) {
 		assert.JSONEq(t, string(expectedJson), rec.Body.String())
 	}
 }
+
+func TestReadJobAllocs(t *testing.T) {
+	// Setup
+	jobName := "test"
+	rec, c, nomadClient, nomadController := setup(http.MethodGet, "/job/"+jobName+"/allocations")
+	c.SetParamNames("id")
+	c.SetParamValues(jobName)
+	c.Set("uid", "test")
+
+	// Mocks
+	nomadJobAllocs := []nomad.AllocListStub{
+		{
+			ID: "test",
+		},
+	}
+	allocsJson, _ := json.Marshal(nomadJobAllocs)
+	nomadClient.On("Get", "/job/"+jobName+"/allocations").Return(allocsJson, nil)
+
+	nomadJob := nomad.Job{
+		ID: "test",
+		Meta: map[string]string{
+			"user": "test",
+		},
+	}
+	nomadJobJson, _ := json.Marshal(nomadJob)
+	nomadClient.On("Get", "/job/"+jobName).Return(nomadJobJson, nil) // CheckUserAllowed mocking
+
+	// Assertions
+	expectedCode := http.StatusOK
+	if assert.NoError(t, nomadController.ReadJobAllocs(c)) {
+		assert.Equal(t, expectedCode, rec.Code)
+		assert.JSONEq(t, string(allocsJson), rec.Body.String())
+	}
+}
