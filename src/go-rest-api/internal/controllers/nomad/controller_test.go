@@ -172,7 +172,6 @@ func TestReadJob(t *testing.T) {
 			"user": "test",
 		},
 	}
-
 	jobJson, _ := json.Marshal(nomadJob)
 	nomadClient.On("Get", "/job/"+jobName).Return(jobJson, nil)
 
@@ -291,7 +290,6 @@ func TestReadJobAlloc(t *testing.T) {
 			ClientStatus: "running",
 		},
 	}
-
 	expectedJson, _ := json.Marshal(expected[0])
 	expectedCode := http.StatusOK
 	if assert.NoError(t, nomadController.ReadJobAlloc(c)) {
