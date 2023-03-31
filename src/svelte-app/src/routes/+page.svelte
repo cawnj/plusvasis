@@ -23,12 +23,12 @@
 </script>
 
 <Nav />
-<div class="">
+<div class="px-8 md:px-16">
 	<Button color="blue" href="/create">Create Container</Button>
 	{#if jobs}
 		{#each jobs as job}
 			<a href="/container/{job.ID}">
-				<div class="div-container mt-3">
+				<div class="div-container my-3">
 					<div class="flex items-center">
 						<Fa icon={faTerminal} color="white" class="pr-6" />
 						<span class="text-xl text-white">{job.Name}</span>

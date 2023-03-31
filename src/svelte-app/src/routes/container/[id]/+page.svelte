@@ -57,11 +57,13 @@
 	];
 </script>
 
-{#if jobName}
-	<Nav />
-	<h1 class="mb-4 text-4xl font-bold font-sans text-white">{jobName}</h1>
-	<Tabs {tabs} />
-{:else}
-	<h1 class="mb-4 text-4xl font-bold font-sans text-white">Page Not Found</h1>
-	<Button color="blue" href="/">Return to Homepage</Button>
-{/if}
+<Nav />
+<div class="px-8 md:px-16">
+	{#if jobName}
+		<h1 class="mb-4 text-4xl font-bold font-sans text-white">{jobName}</h1>
+		<Tabs {tabs} />
+	{:else}
+		<h1 class="mb-4 text-4xl font-bold font-sans text-white">Page Not Found</h1>
+		<Button color="blue" href="/">Return to Homepage</Button>
+	{/if}
+</div>
