@@ -17,13 +17,6 @@ type NomadController struct {
 	Client NomadClient
 }
 
-type StreamFile struct {
-	Offset    int64  `json:"offset"`
-	Data      []byte `json:"data"`
-	File      string `json:"file"`
-	FileEvent string `json:"fileEvent"`
-}
-
 func (n *NomadController) GetJobs(c echo.Context) error {
 	data, err := n.Client.Get("/jobs?meta=true")
 	if err != nil {
@@ -211,33 +204,6 @@ func (n *NomadController) ReadJobAlloc(c echo.Context) error {
 	}
 
 	return echo.NewHTTPError(http.StatusNotFound, "No running allocation found")
-}
-
-func (n *NomadController) ReadJobAllocLogs(c echo.Context) error {
-	uid := c.Get("uid").(string)
-	jobId := c.Param("id")
-	allocId := c.Param("allocId")
-	task := c.Param("task")
-	logType := c.Param("type")
-
-	if err := n.CheckUserAllowed(uid, jobId); err != nil {
-		return err
-	}
-
-	data, err := n.Client.Get("/client/fs/logs/" + allocId + "?task=" + task + "&type=" + logType)
-	if err != nil {
-		log.Println("[nomad/ReadJobAllocLogs]", err)
-		return err
-	}
-
-	var stream StreamFile
-	err = json.Unmarshal(data, &stream)
-	if err != nil {
-		log.Println("[nomad/ReadJobAllocLogs]", err)
-		return err
-	}
-
-	return c.JSON(http.StatusOK, stream)
 }
 
 func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
