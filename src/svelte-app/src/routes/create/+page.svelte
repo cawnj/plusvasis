@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import NavBar from '$lib/NavBar.svelte';
-	import { JobFields, type Job } from '$lib/Types';
+	import type { Job } from '$lib/Types';
 	import { hostname } from '../../stores/environmentStore';
 	import { Button } from 'flowbite-svelte';
+	import JobForm from '$lib/JobForm.svelte';
 
 	async function fetchJobCreate(job: Job) {
 		const url = `${hostname}/jobs`;
@@ -61,17 +62,5 @@
 </script>
 
 <NavBar />
-{#each JobFields as { key, value }}
-	<div class="mb-3 mt-3">
-		<label for="{key}Input" class="txt-input-label">{value.title}</label>
-		<input
-			type={key}
-			class="txt-input"
-			id="{key}Input"
-			aria-describedby="{key}Help"
-			placeholder={value.placeholder}
-		/>
-		<p class="text-sm text-gray-400">{value.info}</p>
-	</div>
-{/each}
+<JobForm />
 <Button color="blue" on:click={createJob}>Create Container</Button>

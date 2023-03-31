@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { JobFields, type Job } from '$lib/Types';
+	import type { Job } from '$lib/Types';
 	import { currJobId, currJob } from '../stores/nomadStore';
 	import { hostname } from '../stores/environmentStore';
 	import { Button } from 'flowbite-svelte';
+	import JobForm from './JobForm.svelte';
 
 	let jobId: string;
 	let job: Job;
@@ -67,20 +68,5 @@
 	};
 </script>
 
-{#each JobFields as { key, value }}
-	{#if key !== 'containerName'}
-		<div class="mb-3 mt-3">
-			<label for="{key}Input" class="txt-input-label">{value.title}</label>
-			<input
-				type={key}
-				class="txt-input"
-				id="{key}Input"
-				aria-describedby="{key}Help"
-				placeholder={value.placeholder}
-				value={job[key]}
-			/>
-			<p class="text-sm text-gray-400">{value.info}</p>
-		</div>
-	{/if}
-{/each}
+<JobForm />
 <Button color="blue" on:click={updateJob}>Update Container</Button>
