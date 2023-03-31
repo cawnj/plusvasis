@@ -3,9 +3,10 @@
 	import { onMount, afterUpdate } from 'svelte';
 	import { b64decode } from './Base64Util';
 
-	export let jobId = '';
-	export let allocId = '';
-	export let taskName = '';
+	let jobId: string;
+	let allocId: string;
+	let taskName: string;
+	let type: string = 'stdout';
 
 	job.subscribe((value) => {
 		jobId = value;
@@ -19,6 +20,7 @@
 
 	let logs = '';
 	let preEl: HTMLPreElement;
+	let reader: ReadableStreamDefaultReader<Uint8Array>;
 
 	// https://github.com/hashicorp/nomad/blob/main/ui/app/utils/stream-frames.js
 	function decode(chunk: string): { offset: number; message: string } | null {
@@ -39,7 +41,7 @@
 	const fetchLogs = async () => {
 		const urlBuilder = new URL(`https://nomad.local.cawnj.dev/v1/client/fs/logs/${allocId}`);
 		urlBuilder.searchParams.append('task', taskName);
-		urlBuilder.searchParams.append('type', 'stdout');
+		urlBuilder.searchParams.append('type', type);
 		urlBuilder.searchParams.append('follow', 'true');
 		urlBuilder.searchParams.append('offset', '50000');
 		urlBuilder.searchParams.append('origin', 'end');
@@ -60,7 +62,7 @@
 		}
 
 		// https://github.com/hashicorp/nomad/blob/main/ui/app/utils/classes/stream-logger.js
-		const reader = readerResponse.body.getReader();
+		reader = readerResponse.body.getReader();
 		let streamClosed = false;
 		let buffer = '';
 		const decoder = new TextDecoder();
@@ -86,6 +88,14 @@
 		}
 	};
 
+	const handleChange = async () => {
+		logs = '';
+		if (reader) {
+			reader.cancel();
+		}
+		await fetchLogs();
+	};
+
 	onMount(() => {
 		fetchLogs();
 	});
@@ -96,6 +106,17 @@
 		}
 	});
 </script>
+
+<div class="relative inline-flex pb-4">
+	<select
+		class="pl-2 pr-4 py-2 w-full h-full bg-gray-800 border border-gray-600 rounded-md text-white"
+		bind:value={type}
+		on:change={handleChange}
+	>
+		<option value="stdout">stdout</option>
+		<option value="stderr">stderr</option>
+	</select>
+</div>
 
 <pre
 	class="bg-gray-900 text-white p-4 font-mono whitespace-pre-wrap max-h-96 overflow-y-scroll"
