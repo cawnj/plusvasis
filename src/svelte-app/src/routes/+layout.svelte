@@ -2,7 +2,6 @@
 	import '../app.css';
 	/* eslint-disable @typescript-eslint/no-unused-vars */
 	import App from '$lib/fb';
-	import { isLoggedIn } from '../stores/authStore';
 	import { onMount } from 'svelte';
 	import { getAuth, onAuthStateChanged } from 'firebase/auth';
 	import { goto } from '$app/navigation';
@@ -12,10 +11,8 @@
 		onAuthStateChanged(auth, (user) => {
 			if (user) {
 				console.log('Welcome to PlusVasis');
-				isLoggedIn.update(() => true);
 			} else {
 				goto('/login');
-				isLoggedIn.update(() => false);
 			}
 		});
 	});

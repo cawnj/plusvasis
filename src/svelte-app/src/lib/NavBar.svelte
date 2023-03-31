@@ -1,6 +1,5 @@
 <script>
 	import logo from '$lib/assets/logo.png';
-	import { isLoggedIn } from '../stores/authStore';
 	import { logout } from '$lib/fb';
 </script>
 
@@ -21,14 +20,12 @@
 			>
 				<a class="text-white hover:text-blue-400" href="/">Home</a>
 				<a class="text-white hover:text-blue-400" href="/">About</a>
-				{#if $isLoggedIn}
-					<a
-						class="text-white hover:text-blue-400"
-						on:click|preventDefault={logout}
-						target="_blank"
-						href="/">Sign Out</a
-					>
-				{/if}
+				<a
+					class="text-white hover:text-blue-400"
+					on:click|preventDefault={logout}
+					target="_blank"
+					href="/">Sign Out</a
+				>
 			</div>
 		</nav>
 	</div>
