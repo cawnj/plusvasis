@@ -3,6 +3,8 @@
 	import { Label, Input, Helper, Select, Toggle, Button } from 'flowbite-svelte';
 	import type { Job } from '$lib/Types';
 	import { currJob } from '../stores/nomadStore';
+	import { MakeJob } from '$lib/MakeJob';
+	import { fetchJobCreate, fetchJobUpdate } from '$lib/NomadClient';
 
 	export let type: string;
 
@@ -10,11 +12,38 @@
 	currJob.subscribe((value) => {
 		job = value;
 	});
+
+	function handleSubmit(event: Event) {
+		let formData: FormData;
+		if (event.target instanceof HTMLFormElement) {
+			formData = new FormData(event.target);
+		} else {
+			console.log('Error');
+			return;
+		}
+
+		const newJob: Job = MakeJob(formData);
+		if (type === 'update') {
+			newJob.containerName = job.containerName;
+		}
+
+		submitJob(newJob);
+	}
+
+	function submitJob(job: Job) {
+		console.log(job);
+		if (type === 'create') {
+			fetchJobCreate(job);
+		} else if (type === 'update') {
+			fetchJobUpdate(job);
+		}
+	}
 </script>
 
-<div class="mb-6">
+<form on:submit|preventDefault={(event) => handleSubmit(event)}>
 	{#each JobFields as { key, value }}
-		{#if key !== 'containerName'}
+		<!-- don't show containerName field on update -->
+		{#if !(key === 'containerName' && type === 'update')}
 			<div class="mb-3 mt-3">
 				<Label class="block mb-2">{value.title}</Label>
 				{#if value.type === 'input'}
@@ -28,11 +57,7 @@
 			</div>
 		{/if}
 	{/each}
-</div>
-<div>
-	{#if type === 'update'}
-		<Button color="blue" on:click={() => {}}>Update Container</Button>
-	{:else if type === 'create'}
-		<Button color="blue" on:click={() => {}}>Create Container</Button>
-	{/if}
-</div>
+	<Button color="blue" type="submit"
+		>{type === 'create' ? 'Create Container' : 'Update Container'}</Button
+	>
+</form>

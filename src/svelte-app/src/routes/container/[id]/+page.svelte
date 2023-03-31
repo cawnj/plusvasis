@@ -35,7 +35,7 @@
 				volumes: data.Meta.volumes,
 				env: data.Meta.env,
 				port: data.Meta.port,
-				expose: false
+				expose: false // TODO: Add field to backend Meta
 			};
 			currJob.set(job);
 		}
