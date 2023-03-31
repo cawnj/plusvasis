@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { job, alloc, task } from '../stores/nomadStore';
-	import { onMount } from 'svelte';
+	import { onMount, afterUpdate } from 'svelte';
 	import { b64decode } from './Base64Util';
 
 	export let jobId = '';
@@ -18,17 +18,9 @@
 	});
 
 	let logs = '';
-	let reader: ReadableStreamReader<Uint8Array> | null = null;
+	let preEl: HTMLPreElement;
 
-	const logFetch = async (url: string) => {
-		const response = await fetch(url);
-		if (response.ok) {
-			return response;
-		} else {
-			throw new Error(response.statusText);
-		}
-	};
-
+	// https://github.com/hashicorp/nomad/blob/main/ui/app/utils/stream-frames.js
 	function decode(chunk: string): { offset: number; message: string } | null {
 		const lines = chunk.replace(/\}\{/g, '}\n{').split('\n').filter(Boolean);
 		const frames = lines.map((line) => JSON.parse(line)).filter((frame) => frame.Data);
@@ -53,11 +45,22 @@
 		urlBuilder.searchParams.append('origin', 'end');
 		const url = urlBuilder.toString();
 
+		const logFetch = async (url: string) => {
+			const response = await fetch(url);
+			if (response.ok) {
+				return response;
+			} else {
+				throw new Error(response.statusText);
+			}
+		};
+
 		const readerResponse = await logFetch(url);
 		if (!readerResponse.body) {
 			throw new Error('No response body');
 		}
-		reader = readerResponse.body.getReader();
+
+		// https://github.com/hashicorp/nomad/blob/main/ui/app/utils/classes/stream-logger.js
+		const reader = readerResponse.body.getReader();
 		let streamClosed = false;
 		let buffer = '';
 		const decoder = new TextDecoder();
@@ -86,17 +89,16 @@
 	onMount(() => {
 		fetchLogs();
 	});
+
+	afterUpdate(() => {
+		if (preEl) {
+			preEl.scrollTop = preEl.scrollHeight;
+		}
+	});
 </script>
 
-<pre class="text-white">{logs}</pre>
-
-<style>
-	pre {
-		background-color: #0d1117;
-		color: white;
-		padding: 1rem;
-		font-family: monospace;
-		white-space: pre-wrap;
-		word-wrap: break-word;
-	}
-</style>
+<pre
+	class="bg-gray-900 text-white p-4 font-mono whitespace-pre-wrap max-h-96 overflow-y-scroll"
+	bind:this={preEl}>
+	{logs}
+</pre>
