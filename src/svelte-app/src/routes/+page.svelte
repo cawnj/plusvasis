@@ -6,6 +6,7 @@
 	import { faTerminal } from '@fortawesome/free-solid-svg-icons';
 	import { logout } from '$lib/fb';
 	import { Button } from 'flowbite-svelte';
+	import { goto } from '$app/navigation';
 
 	let jobs: object[] = [];
 	onMount(async () => {
@@ -27,14 +28,22 @@
 	<Button color="blue" href="/create">Create Container</Button>
 	{#if jobs}
 		{#each jobs as job}
-			<a href="/container/{job.ID}">
-				<div class="div-container my-3">
+			<div
+				class="div-container my-3 cursor-pointer"
+				on:click={() => goto(`/container/${job.ID}`)}
+				on:keydown={(event) => {
+					if (event.key === 'Enter' || event.key === ' ') {
+						goto(`/container/${job.ID}`);
+					}
+				}}
+			>
+				<button>
 					<div class="flex items-center">
 						<Fa icon={faTerminal} color="white" class="pr-6" />
 						<span class="text-xl text-white">{job.Name}</span>
 					</div>
-				</div>
-			</a>
+				</button>
+			</div>
 		{/each}
 	{/if}
 </div>
