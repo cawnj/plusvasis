@@ -102,17 +102,11 @@
 </script>
 
 <div class="relative inline-flex pb-4">
-	<select
-		class="pl-2 pr-4 py-2 w-full h-full bg-gray-800 border border-gray-600 rounded-md text-white"
-		bind:value={type}
-		on:change={handleChange}
-	>
+	<select class="select-logs" bind:value={type} on:change={handleChange}>
 		<option value="stdout">stdout</option>
 		<option value="stderr">stderr</option>
 	</select>
 </div>
 
-<pre
-	class="bg-gray-900 text-white p-4 whitespace-pre-wrap max-h-96 overflow-auto scrollbar-hide"
-	bind:this={preEl}>{logs}
+<pre class="pre-logs" bind:this={preEl}>{logs}
 </pre>
