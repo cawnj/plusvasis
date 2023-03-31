@@ -8,15 +8,20 @@ import (
 
 	"plusvasis/internal/templates"
 
-	api "github.com/hashicorp/nomad/api"
 	"github.com/hashicorp/nomad/nomad/structs"
 	nomad "github.com/hashicorp/nomad/nomad/structs"
-
 	"github.com/labstack/echo/v4"
 )
 
 type NomadController struct {
 	Client NomadClient
+}
+
+type StreamFile struct {
+	Offset    int64  `json:"offset"`
+	Data      []byte `json:"data"`
+	File      string `json:"file"`
+	FileEvent string `json:"fileEvent"`
 }
 
 func (n *NomadController) GetJobs(c echo.Context) error {
@@ -225,7 +230,7 @@ func (n *NomadController) ReadJobAllocLogs(c echo.Context) error {
 		return err
 	}
 
-	var stream api.StreamFrame
+	var stream StreamFile
 	err = json.Unmarshal(data, &stream)
 	if err != nil {
 		log.Println("[nomad/ReadJobAllocLogs]", err)
