@@ -114,6 +114,5 @@
 
 <pre
 	class="bg-gray-900 text-white p-4 whitespace-pre-wrap max-h-96 overflow-auto scrollbar-hide"
-	bind:this={preEl}>
-	{logs}
+	bind:this={preEl}>{logs}
 </pre>
