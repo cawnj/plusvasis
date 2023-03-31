@@ -1,3 +1,4 @@
+import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import type { ComponentType } from 'svelte';
 
 export type Job = {
@@ -94,4 +95,5 @@ export const JobFields: { key: string; value: JobField }[] = [
 export type Tab = {
 	name: string;
 	component: ComponentType;
+	icon: IconDefinition;
 };

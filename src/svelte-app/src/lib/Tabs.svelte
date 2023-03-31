@@ -1,39 +1,19 @@
 <script lang="ts">
 	import type { Tab } from '$lib/Types';
+	import { Tabs, TabItem } from 'flowbite-svelte';
+	import Fa from 'svelte-fa';
 
 	export let tabs: Tab[];
-	export let activeTab = 0;
-
-	const handleClicked = (index: number) => () => {
-		activeTab = index;
-	};
 </script>
 
-<div>
-	<ul class="flex">
-		{#each tabs as tab, index}
-			<li
-				class="text-sm font-semibold text-white bg-gray-800 rounded-t-lg"
-				class:active={index === activeTab}
-			>
-				<button class="px-6 py-3 bg-gray-800 hover:bg-gray-600" on:click={handleClicked(index)}
-					>{tab.name}</button
-				>
-			</li>
-		{/each}
-	</ul>
+<Tabs style="underline">
 	{#each tabs as tab, index}
-		{#if index === activeTab}
-			<div class="p-4 bg-gray-800 rounded-b-lg">
-				<svelte:component this={tab.component} />
+		<TabItem open={index === 0}>
+			<div slot="title" class="flex items-center gap-2">
+				<Fa icon={tab.icon} color="white" />
+				{tab.name}
 			</div>
-		{/if}
+			<svelte:component this={tab.component} />
+		</TabItem>
 	{/each}
-</div>
-
-<style>
-	li.active > button {
-		color: rgb(31 41 55);
-		background-color: white;
-	}
-</style>
+</Tabs>

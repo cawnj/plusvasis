@@ -11,6 +11,7 @@
 	import LogController from '$lib/LogController.svelte';
 	import SettingsController from '$lib/SettingsController.svelte';
 	import { Button } from 'flowbite-svelte';
+	import { faTerminal, faFileAlt, faCog } from '@fortawesome/free-solid-svg-icons';
 
 	let jobName: string;
 	onMount(async () => {
@@ -44,15 +45,18 @@
 	const tabs: Tab[] = [
 		{
 			name: 'Shell',
-			component: NomadController
+			component: NomadController,
+			icon: faTerminal
 		},
 		{
 			name: 'Logs',
-			component: LogController
+			component: LogController,
+			icon: faFileAlt
 		},
 		{
 			name: 'Settings',
-			component: SettingsController
+			component: SettingsController,
+			icon: faCog
 		}
 	];
 </script>
