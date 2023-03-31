@@ -10,6 +10,7 @@
 	import { hostname } from '../../../stores/environmentStore';
 	import LogController from '$lib/LogController.svelte';
 	import SettingsController from '$lib/SettingsController.svelte';
+	import { Button } from 'flowbite-svelte';
 
 	let jobName: string;
 	onMount(async () => {
@@ -62,5 +63,5 @@
 	<Tabs {tabs} />
 {:else}
 	<h1 class="mb-4 text-4xl font-bold font-sans text-white">Page Not Found</h1>
-	<button class="mb-4 btn btn-blue" on:click={() => goto('/')}>Return to Homepage</button>
+	<Button color="blue" href="/">Return to Homepage</Button>
 {/if}

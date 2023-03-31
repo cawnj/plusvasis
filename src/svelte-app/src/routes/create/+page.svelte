@@ -3,6 +3,7 @@
 	import NavBar from '$lib/NavBar.svelte';
 	import { JobFields, type Job } from '$lib/Types';
 	import { hostname } from '../../stores/environmentStore';
+	import { Button } from 'flowbite-svelte';
 
 	async function fetchJobCreate(job: Job) {
 		const url = `${hostname}/jobs`;
@@ -22,7 +23,7 @@
 		goto('/');
 	}
 
-	async function createJob() {
+	const createJob = () => {
 		const containerName = document.getElementById('containerNameInput') as HTMLInputElement;
 		const dockerImage = document.getElementById('dockerImageInput') as HTMLInputElement;
 		const shell = document.getElementById('shellInput') as HTMLInputElement;
@@ -56,7 +57,7 @@
 			expose: false
 		};
 		fetchJobCreate(job);
-	}
+	};
 </script>
 
 <NavBar />
@@ -73,4 +74,4 @@
 		<p class="text-sm text-gray-400">{value.info}</p>
 	</div>
 {/each}
-<button class="mb-4 btn btn-blue" on:click={() => createJob()}>Create Container</button>
+<Button color="blue" on:click={createJob}>Create Container</Button>

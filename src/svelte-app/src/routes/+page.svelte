@@ -6,6 +6,7 @@
 	import Fa from 'svelte-fa';
 	import { faTerminal } from '@fortawesome/free-solid-svg-icons';
 	import { logout } from '$lib/fb';
+	import { Button } from 'flowbite-svelte';
 
 	let jobs: object[] = [];
 	onMount(async () => {
@@ -24,7 +25,7 @@
 
 <Nav />
 <div class="">
-	<button class="mb-4 btn btn-blue" on:click={() => goto('/create')}>Create Container</button>
+	<Button color="blue" href="/create">Create Container</Button>
 	{#if jobs}
 		{#each jobs as job}
 			<a href="/container/{job.ID}">

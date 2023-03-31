@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { JobFields, type Job } from '$lib/Types';
 	import { currJobId, currJob } from '../stores/nomadStore';
-	import { onMount } from 'svelte';
 	import { hostname } from '../stores/environmentStore';
+	import { Button } from 'flowbite-svelte';
 
 	let jobId: string;
 	let job: Job;
@@ -30,7 +30,7 @@
 		}
 	}
 
-	async function updateJob() {
+	const updateJob = () => {
 		const dockerImage = document.getElementById('dockerImageInput') as HTMLInputElement;
 		const shell = document.getElementById('shellInput') as HTMLInputElement;
 		const volumeStr = document.getElementById('volumesInput') as HTMLInputElement;
@@ -64,7 +64,7 @@
 		};
 		fetchJobUpdate(newJob);
 		window.location.reload();
-	}
+	};
 </script>
 
 {#each JobFields as { key, value }}
@@ -83,4 +83,4 @@
 		</div>
 	{/if}
 {/each}
-<button class="mb-4 btn btn-blue" on:click={() => updateJob()}>Update Container</button>
+<Button color="blue" on:click={updateJob}>Update Container</Button>
