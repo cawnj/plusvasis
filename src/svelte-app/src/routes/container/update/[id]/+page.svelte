@@ -12,7 +12,7 @@
 		jobId = value;
 	});
 
-	let oldJob = new Map<string, any>();
+	let oldJob = new Map<string, string>();
 	let newJob = {} as Job;
 
 	let jobName: string;

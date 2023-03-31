@@ -1,11 +1,13 @@
 <script lang="ts">
 	import ExecController from '$lib/ExecController.svelte';
-	import { job, shell } from '../stores/nomadStore';
+	import { job, shell, alloc, task } from '../stores/nomadStore';
 	import { hostname } from '../stores/environmentStore';
 	import { onMount } from 'svelte';
 
 	let execControllerComponent: ExecController;
 	export let jobId = '';
+	export let allocId = '';
+	export let taskName = '';
 	let command = 'sh';
 	job.subscribe((value) => {
 		jobId = value;
@@ -15,11 +17,12 @@
 	});
 
 	function getAllocExecEndpoint(json: unknown) {
-		let allocId: string;
-		let taskName: string;
 		if (typeof json === 'object' && json !== null) {
 			allocId = (json as { ID: string })['ID'];
 			taskName = Object.keys((json as { TaskStates: Record<string, unknown> })['TaskStates'])[0];
+
+			alloc.set(allocId);
+			task.set(taskName);
 		} else {
 			throw new Error('Invalid JSON');
 		}
