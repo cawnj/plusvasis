@@ -3,8 +3,13 @@
 	import NavBar from '$lib/NavBar.svelte';
 	import type { Job } from '$lib/Types';
 	import { hostname } from '../../stores/environmentStore';
-	import { Button } from 'flowbite-svelte';
 	import JobForm from '$lib/JobForm.svelte';
+	import { currJob } from '../../stores/nomadStore';
+
+	// default job configuration
+	currJob.set({
+		shell: '/bin/sh'
+	} as Job);
 
 	async function fetchJobCreate(job: Job) {
 		const url = `${hostname}/jobs`;
@@ -62,5 +67,4 @@
 </script>
 
 <NavBar />
-<JobForm />
-<Button color="blue" on:click={createJob}>Create Container</Button>
+<JobForm type="create" />

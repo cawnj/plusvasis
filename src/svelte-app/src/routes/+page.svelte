@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import Nav from '$lib/NavBar.svelte';
 	import { onMount } from 'svelte';
 	import { hostname } from '../stores/environmentStore';

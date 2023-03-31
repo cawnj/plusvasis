@@ -68,5 +68,4 @@
 	};
 </script>
 
-<JobForm />
-<Button color="blue" on:click={updateJob}>Update Container</Button>
+<JobForm type="update" />

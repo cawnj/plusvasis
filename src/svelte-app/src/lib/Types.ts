@@ -16,7 +16,7 @@ type JobField = {
 	title: string;
 	type: string;
 	options?: { value: string; name: string }[];
-	placeholder: string;
+	placeholder: string | boolean;
 	info: string;
 };
 
@@ -77,7 +77,16 @@ export const JobFields: { key: string; value: JobField }[] = [
 			title: 'Port',
 			type: 'input',
 			placeholder: '8080',
-			info: 'The port to expose to the host.'
+			info: 'The port on which the service runs on.'
+		}
+	},
+	{
+		key: 'expose',
+		value: {
+			title: 'Expose',
+			type: 'toggle',
+			placeholder: true,
+			info: 'If checked, the port will be exposed to the host.',
 		}
 	}
 ];
