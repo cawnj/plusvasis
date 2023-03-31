@@ -45,9 +45,9 @@ export const JobFields: { key: string; value: JobField }[] = [
 			title: 'Shell',
 			type: 'option',
 			options: [
-				{value:"/bin/sh", name:"/bin/sh"},
-				{value:"/bin/bash", name:"/bin/bash"},
-				{value:"/bin/zsh", name:"/bin/zsh"},
+				{ value: '/bin/sh', name: '/bin/sh' },
+				{ value: '/bin/bash', name: '/bin/bash' },
+				{ value: '/bin/zsh', name: '/bin/zsh' }
 			],
 			placeholder: '/bin/sh',
 			info: 'The shell to use when executing commands within the container.'
@@ -86,7 +86,7 @@ export const JobFields: { key: string; value: JobField }[] = [
 			title: 'Expose',
 			type: 'toggle',
 			placeholder: true,
-			info: 'If checked, the port will be exposed to the host.',
+			info: 'If checked, the port will be exposed to the host.'
 		}
 	}
 ];
