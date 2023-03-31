@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Nav from '$lib/NavBar.svelte';
 	import NomadController from '$lib/NomadController.svelte';

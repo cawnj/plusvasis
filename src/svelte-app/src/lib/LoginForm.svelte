@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Card, Button, Label, Input, Checkbox } from 'flowbite-svelte';
+	import { Card, Button, Label, Input } from 'flowbite-svelte';
 	import {
 		getAuth,
 		signInWithEmailAndPassword,
@@ -58,7 +58,7 @@
 	<form class="flex flex-col space-y-6" on:submit|preventDefault={login}>
 		<div class="flex items-center">
 			<img alt="The project logo" src={logo} class="mr-3 h-6 sm:h-9 float-left" />
-			<h5 class="h5">PlusVasis {title}</h5>
+			<h5 class="text-xl font-medium text-gray-900 dark:text-white">PlusVasis {title}</h5>
 		</div>
 		<Label class="space-y-2">
 			<span>Email</span>

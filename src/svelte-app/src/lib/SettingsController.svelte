@@ -1,8 +1,6 @@
 <script lang="ts">
 	import type { Job } from '$lib/Types';
 	import { currJobId, currJob } from '../stores/nomadStore';
-	import { hostname } from '../stores/environmentStore';
-	import { Button } from 'flowbite-svelte';
 	import JobForm from './JobForm.svelte';
 
 	let jobId: string;

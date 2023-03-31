@@ -1,18 +1,6 @@
 <script>
 	import logo from '$lib/assets/logo.png';
-	import { logout } from '$lib/fb';
-	import {
-		Navbar,
-		NavBrand,
-		NavLi,
-		NavUl,
-		NavHamburger,
-		Avatar,
-		Dropdown,
-		DropdownItem,
-		DropdownHeader,
-		DropdownDivider
-	} from 'flowbite-svelte';
+	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
 </script>
 
 <div class="mx-3 my-2 w-screen">
