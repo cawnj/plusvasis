@@ -1,16 +1,13 @@
 <script lang="ts">
-	import { job, alloc, task } from '../stores/nomadStore';
+	import { alloc, task } from '../stores/nomadStore';
 	import { onMount, afterUpdate } from 'svelte';
 	import { b64decode } from './Base64Util';
+	import type { ReadableStreamDefaultReader } from 'web-streams-polyfill/ponyfill';
 
-	let jobId: string;
 	let allocId: string;
 	let taskName: string;
-	let type: string = 'stdout';
+	let type = 'stdout';
 
-	job.subscribe((value) => {
-		jobId = value;
-	});
 	alloc.subscribe((value) => {
 		allocId = value;
 	});
@@ -66,7 +63,6 @@
 		let streamClosed = false;
 		let buffer = '';
 		const decoder = new TextDecoder();
-		let endOffset = 0;
 
 		while (!streamClosed) {
 			const { done, value } = await reader.read();
@@ -79,9 +75,7 @@
 					buffer = newBuffer;
 					const result = decode(chunk);
 					if (result) {
-						const { offset, message } = result;
-						endOffset = offset;
-						logs += message;
+						logs += result.message;
 					}
 				}
 			}
