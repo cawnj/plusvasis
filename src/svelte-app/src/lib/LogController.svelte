@@ -3,6 +3,7 @@
 	import { onMount, afterUpdate } from 'svelte';
 	import { b64decode } from './Base64Util';
 	import type { ReadableStreamDefaultReader } from 'web-streams-polyfill/ponyfill';
+	import { Button, Dropdown, Chevron, Radio } from 'flowbite-svelte';
 
 	let allocId: string;
 	let taskName: string;
@@ -101,11 +102,16 @@
 	});
 </script>
 
-<div class="relative inline-flex pb-4">
-	<select class="select-logs" bind:value={type} on:change={handleChange}>
-		<option value="stdout">stdout</option>
-		<option value="stderr">stderr</option>
-	</select>
+<div class="pb-4">
+	<Button><Chevron>{type}</Chevron></Button>
+	<Dropdown class="w-32 p-3 space-y-3 text-sm">
+		<li>
+			<Radio name="type" bind:group={type} value={'stdout'} on:change={handleChange}>stdout</Radio>
+		</li>
+		<li>
+			<Radio name="type" bind:group={type} value={'stderr'} on:change={handleChange}>stderr</Radio>
+		</li>
+	</Dropdown>
 </div>
 
 <pre class="pre-logs" bind:this={preEl}>{logs}
