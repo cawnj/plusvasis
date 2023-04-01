@@ -40,3 +40,30 @@ export async function fetchJobUpdate(job: Job) {
 		console.log('Error');
 	}
 }
+
+export async function fetchJob(jobId: string) {
+	const url = `${hostname}/job/${jobId}`;
+	const res = await fetch(url, {
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem('token')}`
+		}
+	});
+	if (res.ok) {
+		const data = await res.json();
+
+		const job: Job = {
+			user: localStorage.getItem('uid'),
+			containerName: data.Name,
+			dockerImage: data.TaskGroups[0].Tasks[0].Config.image,
+			shell: data.Meta.shell,
+			volumes: data.Meta.volumes,
+			env: data.Meta.env,
+			port: data.Meta.port,
+			expose: false // TODO: Add field to backend Meta
+		};
+		return job;
+	} else {
+		console.log('Error');
+		return null;
+	}
+}
