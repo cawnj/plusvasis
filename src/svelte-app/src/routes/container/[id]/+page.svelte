@@ -45,7 +45,7 @@
 </script>
 
 <Nav />
-<div class="px-8 md:px-16">
+<div class="px-8 md:px-16 mb-4">
 	{#if jobName}
 		<h1 class="mb-4 text-4xl font-bold font-sans text-white">{jobName}</h1>
 		<Tabs {tabs} />

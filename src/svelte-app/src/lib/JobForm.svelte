@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { JobFields } from '$lib/Types';
-	import { Label, Input, Helper, Select, Toggle, Button } from 'flowbite-svelte';
+	import { Label, Input, Helper, Select, Toggle, Button, Spinner } from 'flowbite-svelte';
 	import type { Job } from '$lib/Types';
 	import { currJob } from '../stores/nomadStore';
 	import { MakeJob } from '$lib/MakeJob';
 	import { fetchJobCreate, fetchJobUpdate } from '$lib/NomadClient';
+	import { goto } from '$app/navigation';
 
 	export let type: string;
+	let loading = false;
 
 	let job: Job;
 	currJob.subscribe((value) => {
@@ -28,6 +30,7 @@
 		}
 
 		submitJob(newJob);
+		reroute();
 	}
 
 	function submitJob(job: Job) {
@@ -37,6 +40,13 @@
 		} else if (type === 'update') {
 			fetchJobUpdate(job);
 		}
+	}
+
+	function reroute() {
+		loading = true;
+		setTimeout(() => {
+			goto('/');
+		}, 1000);
 	}
 </script>
 
@@ -57,7 +67,11 @@
 			</div>
 		{/if}
 	{/each}
-	<Button color="blue" type="submit"
-		>{type === 'create' ? 'Create Container' : 'Update Container'}</Button
-	>
+	<Button color="blue" type="submit">
+		{#if loading}
+			<Spinner class="mr-3" size="4" color="white" />Loading ...
+		{:else}
+			{type === 'create' ? 'Create Container' : 'Update Container'}
+		{/if}
+	</Button>
 </form>
