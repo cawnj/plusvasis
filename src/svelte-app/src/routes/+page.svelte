@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import Nav from '$lib/NavBar.svelte';
 	import { onMount } from 'svelte';
 	import { hostname } from '../stores/environmentStore';
 	import Fa from 'svelte-fa';
 	import { faTerminal } from '@fortawesome/free-solid-svg-icons';
 	import { logout } from '$lib/fb';
+	import { Button } from 'flowbite-svelte';
+	import { goto } from '$app/navigation';
 
 	let jobs: object[] = [];
 	onMount(async () => {
@@ -23,18 +24,26 @@
 </script>
 
 <Nav />
-<div class="">
-	<button class="mb-4 btn btn-blue" on:click={() => goto('/create')}>Create Container</button>
+<div class="px-8 md:px-16">
+	<Button color="blue" href="/create">Create Container</Button>
 	{#if jobs}
 		{#each jobs as job}
-			<a href="/container/{job.ID}">
-				<div class="div-container mt-3">
+			<div
+				class="div-container my-3 cursor-pointer"
+				on:click={() => goto(`/container/${job.ID}`)}
+				on:keydown={(event) => {
+					if (event.key === 'Enter' || event.key === ' ') {
+						goto(`/container/${job.ID}`);
+					}
+				}}
+			>
+				<button>
 					<div class="flex items-center">
 						<Fa icon={faTerminal} color="white" class="pr-6" />
 						<span class="text-xl text-white">{job.Name}</span>
 					</div>
-				</div>
-			</a>
+				</button>
+			</div>
 		{/each}
 	{/if}
 </div>

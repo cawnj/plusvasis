@@ -1,35 +1,23 @@
 <script>
 	import logo from '$lib/assets/logo.png';
-	import { isLoggedIn } from '../stores/authStore';
-	import { logout } from '$lib/fb';
+	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
 </script>
 
-<div>
-	<div>
-		<nav class="container mb-8 w-screen md:flex md:justify-between md:items-center">
-			<a href="/">
-				<div class="flex items-center justify-between">
-					<img alt="The project logo" src={logo} class="mr-3 h-6 sm:h-9 float-left" />
-					<span class="text-xl font-bold text-white md:text-2xl hover:text-blue-400"
-						>PlusVasis
-					</span>
-				</div>
-			</a>
-
-			<div
-				class="flex-col mt-8 space-y-4 md:flex md:space-y-0 md:flex-row md:items-center md:space-x-10 md:mt-0"
+<div class="mx-3 my-2 w-screen">
+	<Navbar let:hidden let:toggle>
+		<NavBrand href="/">
+			<img src={logo} class="mr-3 h-6 sm:h-9" alt="PlusVasis Logo" />
+			<span
+				class="self-center whitespace-nowrap text-xl font-bold md:text-2xl dark:text-white hover:text-blue-400"
 			>
-				<a class="text-white hover:text-blue-400" href="/">Home</a>
-				<a class="text-white hover:text-blue-400" href="/">About</a>
-				{#if $isLoggedIn}
-					<a
-						class="text-white hover:text-blue-400"
-						on:click|preventDefault={logout}
-						target="_blank"
-						href="/">Sign Out</a
-					>
-				{/if}
-			</div>
-		</nav>
-	</div>
+				PlusVasis
+			</span>
+		</NavBrand>
+		<NavHamburger on:click={toggle} />
+		<NavUl {hidden}>
+			<NavLi href="/" nonActiveClass="hover:text-blue-400 text-xl">Home</NavLi>
+			<NavLi href="/about" nonActiveClass="hover:text-blue-400 text-xl">About</NavLi>
+			<NavLi href="/logout" nonActiveClass="hover:text-blue-400 text-xl">Sign Out</NavLi>
+		</NavUl>
+	</Navbar>
 </div>
