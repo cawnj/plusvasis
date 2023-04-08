@@ -5,25 +5,19 @@
 	import Tabs from '$lib/Tabs.svelte';
 	import type { Tab } from '$lib/Types';
 	import { currJobId, currJob } from '../../../stores/nomadStore';
-	import { onMount } from 'svelte';
 	import LogController from '$lib/LogController.svelte';
 	import SettingsController from '$lib/SettingsController.svelte';
-	import { Button } from 'flowbite-svelte';
+	import { Button, Modal, Spinner } from 'flowbite-svelte';
 	import { faTerminal, faFileAlt, faCog } from '@fortawesome/free-solid-svg-icons';
 	import { fetchJob } from '$lib/NomadClient';
 
-	let jobName: string;
-	onMount(async () => {
-		const jobId = $page.params.id;
-		currJobId.set(jobId);
-		const job = await fetchJob(jobId);
-		console.log(job);
-		if (!job) {
-			return;
-		}
-		jobName = job.containerName as string;
+	const fetchAndSetJob = async () => {
+		const job = await fetchJob($page.params.id);
+		if (!job) throw new Error('Job not found');
+		currJobId.set($page.params.id);
 		currJob.set(job);
-	});
+		return job;
+	};
 
 	const tabs: Tab[] = [
 		{
@@ -46,11 +40,21 @@
 
 <Nav />
 <div class="px-8 md:px-16 mb-4">
-	{#if jobName}
-		<h1 class="mb-4 text-4xl font-bold font-sans text-white">{jobName}</h1>
+	{#await fetchAndSetJob()}
+		<div class="grid h-96 place-items-center">
+			<Spinner />
+		</div>
+	{:then job}
+		<h1 class="mb-4 text-4xl font-bold font-sans text-white">{job.containerName}</h1>
 		<Tabs {tabs} />
-	{:else}
-		<h1 class="mb-4 text-4xl font-bold font-sans text-white">Page Not Found</h1>
-		<Button color="blue" href="/">Return to Homepage</Button>
-	{/if}
+	{:catch error}
+		<Modal title="Error" open={true}>
+			<div class="grid justify-center w-40">
+				<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">{error.message}</p>
+				<div class="flex justify-center mt-4">
+					<Button color="blue" href="/">Return</Button>
+				</div>
+			</div>
+		</Modal>
+	{/await}
 </div>
