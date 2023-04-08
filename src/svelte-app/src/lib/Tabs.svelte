@@ -7,13 +7,19 @@
 </script>
 
 <Tabs style="underline">
-	{#each tabs as tab, index}
-		<TabItem open={index === 0}>
-			<div slot="title" class="flex items-center gap-2">
-				<Fa icon={tab.icon} color="white" />
-				{tab.name}
-			</div>
-			<svelte:component this={tab.component} />
+	{#if !tabs || tabs.length === 0}
+		<TabItem open>
+			<div slot="title">No tabs</div>
 		</TabItem>
-	{/each}
+	{:else}
+		{#each tabs as tab, index}
+			<TabItem open={index === 0}>
+				<div slot="title" class="flex items-center gap-2">
+					<Fa icon={tab.icon} color="white" />
+					{tab.name}
+				</div>
+				<svelte:component this={tab.component} />
+			</TabItem>
+		{/each}
+	{/if}
 </Tabs>
