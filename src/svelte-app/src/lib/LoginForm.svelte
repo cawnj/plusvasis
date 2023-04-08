@@ -7,12 +7,13 @@
 		createUserWithEmailAndPassword
 	} from 'firebase/auth';
 	import logo from '$lib/assets/logo.png';
+	import app from '$lib/fb';
 
 	export let title: string;
 	let email: string;
 	let password: string;
 
-	const auth = getAuth();
+	const auth = getAuth(app);
 
 	function login(event: Event) {
 		if (event.target instanceof HTMLFormElement) {
