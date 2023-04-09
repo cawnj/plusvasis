@@ -13,9 +13,12 @@ const config: UserConfig & { test: VitestConfig['test'] } = {
 		globals: true,
 		environment: 'jsdom',
 		includeSource: ['src/**/*.{js,ts,svelte}'],
-		setupFiles: ['./setupTest.ts'],
+		setupFiles: ['./setupTest.ts', 'src/mocks/setup.ts'],
 		coverage: {
-			exclude: ['setupTest.ts']
+			exclude: ['setupTest.ts', 'src/mocks']
+		},
+		deps: {
+			inline: [/msw/]
 		},
 		// Exclude playwright tests folder
 		exclude: [...configDefaults.exclude, 'tests']
