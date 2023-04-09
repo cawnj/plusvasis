@@ -14,7 +14,7 @@
 			</span>
 		</NavBrand>
 		<NavHamburger on:click={toggle} />
-		<NavUl {hidden}>
+		<NavUl data-testid="navbar-ul" {hidden}>
 			<NavLi href="/" nonActiveClass="hover:text-blue-400 text-xl">Home</NavLi>
 			<NavLi href="/about" nonActiveClass="hover:text-blue-400 text-xl">About</NavLi>
 			<NavLi href="/logout" nonActiveClass="hover:text-blue-400 text-xl">Sign Out</NavLi>
