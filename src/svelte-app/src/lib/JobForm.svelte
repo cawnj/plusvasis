@@ -54,7 +54,7 @@
 	}
 </script>
 
-<form on:submit|preventDefault={(event) => handleSubmit(event)}>
+<form on:submit|preventDefault={(event) => handleSubmit(event)} data-testid="job-form" {type}>
 	{#each JobFields as { key, value }}
 		<!-- don't show containerName field on update -->
 		{#if !(key === 'containerName' && type === 'update')}
