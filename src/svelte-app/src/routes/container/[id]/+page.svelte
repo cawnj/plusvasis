@@ -15,7 +15,8 @@
 		faPlay,
 		faStop,
 		faTrash,
-		faRefresh
+		faRefresh,
+		faExternalLink
 	} from '@fortawesome/free-solid-svg-icons';
 	import { fetchJob } from '$lib/NomadClient';
 	import Fa from 'svelte-fa';
@@ -55,7 +56,16 @@
 		</div>
 	{:then job}
 		<div class="flex justify-between items-center">
-			<h1 class="mb-4 text-4xl font-bold font-sans text-white">{job.containerName}</h1>
+			<div class="flex items-center">
+				<h1 class="mb-4 text-4xl font-bold font-sans text-white align-middle">
+					{job.containerName}
+				</h1>
+				{#if job.port}
+					<a class="align-middle mb-2" href="https://{$currJobId}.local.plusvasis.xyz">
+						<Fa icon={faExternalLink} color="white" class="ml-2" />
+					</a>
+				{/if}
+			</div>
 			<ButtonGroup>
 				<Button>
 					<Fa icon={faPlay} color="green" class="mr-2" />
