@@ -7,9 +7,18 @@
 	import { currJobId, currJob } from '../../../stores/nomadStore';
 	import LogController from '$lib/LogController.svelte';
 	import SettingsController from '$lib/SettingsController.svelte';
-	import { Button, Modal, Spinner } from 'flowbite-svelte';
-	import { faTerminal, faFileAlt, faCog } from '@fortawesome/free-solid-svg-icons';
+	import { Button, ButtonGroup, Modal, Spinner } from 'flowbite-svelte';
+	import {
+		faTerminal,
+		faFileAlt,
+		faCog,
+		faPlay,
+		faStop,
+		faTrash,
+		faRefresh
+	} from '@fortawesome/free-solid-svg-icons';
 	import { fetchJob } from '$lib/NomadClient';
+	import Fa from 'svelte-fa';
 
 	const fetchAndSetJob = async () => {
 		const job = await fetchJob($page.params.id);
@@ -45,7 +54,27 @@
 			<Spinner />
 		</div>
 	{:then job}
-		<h1 class="mb-4 text-4xl font-bold font-sans text-white">{job.containerName}</h1>
+		<div class="flex justify-between items-center">
+			<h1 class="mb-4 text-4xl font-bold font-sans text-white">{job.containerName}</h1>
+			<ButtonGroup>
+				<Button>
+					<Fa icon={faPlay} color="green" class="mr-2" />
+					Start
+				</Button>
+				<Button>
+					<Fa icon={faRefresh} color="orange" class="mr-2" />
+					Restart
+				</Button>
+				<Button>
+					<Fa icon={faStop} color="red" class="mr-2" />
+					Stop
+				</Button>
+				<Button>
+					<Fa icon={faTrash} class="mr-2" />
+					Delete
+				</Button>
+			</ButtonGroup>
+		</div>
 		<Tabs {tabs} />
 	{:catch error}
 		<Modal title="Error" open={true}>
