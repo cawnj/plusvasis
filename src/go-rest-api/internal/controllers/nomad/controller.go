@@ -133,12 +133,17 @@ func (n *NomadController) ReadJob(c echo.Context) error {
 func (n *NomadController) StopJob(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
+	purge := c.QueryParam("purge")
 
 	if err := n.CheckUserAllowed(uid, jobId); err != nil {
 		return err
 	}
 
-	data, err := n.Client.Delete(fmt.Sprintf("/job/%s?purge=true", jobId))
+	url := fmt.Sprintf("/job/%s", jobId)
+	if purge == "true" {
+		url += "?purge=true"
+	}
+	data, err := n.Client.Delete(url)
 	if err != nil {
 		log.Println("[nomad/StopJob]", err)
 		return err

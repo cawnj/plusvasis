@@ -198,7 +198,7 @@ func TestStopJob(t *testing.T) {
 		JobModifyIndex:  1,
 	}
 	nomadDeregisterJson, _ := json.Marshal(nomadDeregister)
-	nomadClient.On("Delete", "/job/"+jobName+"?purge=true").Return(nomadDeregisterJson, nil)
+	nomadClient.On("Delete", "/job/"+jobName).Return(nomadDeregisterJson, nil)
 
 	nomadJob := nomad.Job{
 		ID: "test",
