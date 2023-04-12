@@ -214,25 +214,44 @@ func (n *NomadController) ReadJobAlloc(c echo.Context) error {
 func (n *NomadController) RestartJob(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
-	allocId := c.Param("allocId")
-	task := c.Param("task")
+	allocId := ""
+	task := ""
 
 	if err := n.CheckUserAllowed(uid, jobId); err != nil {
 		fmt.Println(err)
 		return err
 	}
 
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
+	if err != nil {
+		log.Println("[nomad/ReadJobAllocs]", err)
+		return err
+	}
+
+	var allocs []nomad.AllocListStub
+	err = json.Unmarshal(data, &allocs)
+	if err != nil {
+		log.Println("[nomad/ReadJobAllocs]", err)
+		return err
+	}
+	for _, alloc := range allocs {
+		if alloc.ClientStatus == "running" || alloc.ClientStatus == "pending" {
+			allocId = alloc.ID
+			task = alloc.TaskGroup
+		}
+	}
+
 	body := []byte(`{
 		"TaskName": "` + task + `"
 	}`)
 
-	data, err := n.Client.Post(fmt.Sprintf("/client/allocation/%s/restart", allocId), bytes.NewBuffer(body))
+	resp, err := n.Client.Post(fmt.Sprintf("/client/allocation/%s/restart", allocId), bytes.NewBuffer(body))
 	if err != nil {
 		log.Println("[nomad/RestartJob]", err)
 		return err
 	}
 
-	return c.JSON(http.StatusOK, bytes.NewBuffer(data))
+	return c.JSON(http.StatusOK, bytes.NewBuffer(resp))
 }
 
 func (n *NomadController) CheckUserAllowed(uid, jobId string) error {

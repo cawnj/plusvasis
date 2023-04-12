@@ -339,11 +339,9 @@ func TestReadJobAlloc(t *testing.T) {
 func TestRestartJob(t *testing.T) {
 	// Setup
 	jobName := "test"
-	allocId := "abcdTest123"
-	task := "test"
-	rec, c, nomadClient, nomadController := setup(http.MethodPost, "/job/"+jobName+"/"+allocId+"/"+task+"/restart")
-	c.SetParamNames("id", "allocId", "task")
-	c.SetParamValues(jobName, allocId, task)
+	rec, c, nomadClient, nomadController := setup(http.MethodPost, "/job/"+jobName+"/restart")
+	c.SetParamNames("id")
+	c.SetParamValues(jobName)
 	c.Set("uid", "test")
 
 	// Mocks
@@ -358,7 +356,20 @@ func TestRestartJob(t *testing.T) {
 	nomadJobJson, _ := json.Marshal(nomadJob)
 	nomadClient.On("Get", "/job/"+jobName).Return(nomadJobJson, nil) // CheckUserAllowed mocking
 
-	nomadClient.On("Post", "/client/allocation/"+allocId+"/restart", mock.Anything).Return(data, nil)
+	nomadJobAllocs := []nomad.AllocListStub{
+		{
+			ID:           "test",
+			ClientStatus: "running",
+		},
+		{
+			ID:           "test2",
+			ClientStatus: "walking",
+		},
+	}
+	allocsJson, _ := json.Marshal(nomadJobAllocs)
+	nomadClient.On("Get", "/job/"+jobName+"/allocations").Return(allocsJson, nil)
+
+	nomadClient.On("Post", "/client/allocation/test/restart", mock.Anything).Return(data, nil)
 
 	// Assertions
 	expectedCode := http.StatusOK
