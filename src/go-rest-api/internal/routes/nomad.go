@@ -25,4 +25,5 @@ func NomadJobs(e *echo.Echo) {
 	e.POST("/job/:id", middleware.IsAuthorised(controller.UpdateJob, client))
 	e.GET("/job/:id/allocations", middleware.IsAuthorised(controller.ReadJobAllocs, client))
 	e.GET("/job/:id/alloc", middleware.IsAuthorised(controller.ReadJobAlloc, client))
+	e.POST("/job/:id/:allocId/:task/restart", middleware.IsAuthorised(controller.RestartJob, client))
 }

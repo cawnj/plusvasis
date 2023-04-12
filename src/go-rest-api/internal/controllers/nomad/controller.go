@@ -1,6 +1,7 @@
 package nomad
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -208,6 +209,30 @@ func (n *NomadController) ReadJobAlloc(c echo.Context) error {
 	}
 
 	return echo.NewHTTPError(http.StatusNotFound, "No running allocation found")
+}
+
+func (n *NomadController) RestartJob(c echo.Context) error {
+	uid := c.Get("uid").(string)
+	jobId := c.Param("id")
+	allocId := c.Param("allocId")
+	task := c.Param("task")
+
+	if err := n.CheckUserAllowed(uid, jobId); err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	body := []byte(`{
+		"TaskName": "` + task + `"
+	}`)
+
+	data, err := n.Client.Post(fmt.Sprintf("/client/allocation/%s/restart", allocId), bytes.NewBuffer(body))
+	if err != nil {
+		log.Println("[nomad/RestartJob]", err)
+		return err
+	}
+
+	return c.JSON(http.StatusOK, bytes.NewBuffer(data))
 }
 
 func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
