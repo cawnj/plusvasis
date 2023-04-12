@@ -8,7 +8,6 @@ import (
 
 	"plusvasis/internal/templates"
 
-	"github.com/hashicorp/nomad/nomad/structs"
 	nomad "github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
 )
@@ -149,7 +148,7 @@ func (n *NomadController) StopJob(c echo.Context) error {
 		return err
 	}
 
-	var resp structs.JobDeregisterResponse
+	var resp nomad.JobDeregisterResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
 		return err
@@ -217,7 +216,7 @@ func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
 		return err
 	}
 
-	var job structs.Job
+	var job nomad.Job
 	err = json.Unmarshal(data, &job)
 	if err != nil {
 		return err
