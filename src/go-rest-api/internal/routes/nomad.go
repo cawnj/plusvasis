@@ -11,7 +11,6 @@ import (
 )
 
 func NomadJobs(e *echo.Echo) {
-
 	client, err := fauth.InitAuth()
 	if err != nil {
 		log.Fatalln("failed to init firebase auth", err)

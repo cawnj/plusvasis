@@ -24,10 +24,12 @@ func (m *MockNomadClient) Get(endpoint string) ([]byte, error) {
 	args := m.Called(endpoint)
 	return args.Get(0).([]byte), args.Error(1)
 }
+
 func (m *MockNomadClient) Post(endpoint string, reqBody *bytes.Buffer) ([]byte, error) {
 	args := m.Called(endpoint, reqBody)
 	return args.Get(0).([]byte), args.Error(1)
 }
+
 func (m *MockNomadClient) Delete(endpoint string) ([]byte, error) {
 	args := m.Called(endpoint)
 	return args.Get(0).([]byte), args.Error(1)
