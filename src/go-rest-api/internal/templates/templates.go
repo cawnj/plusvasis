@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strings"
 	"text/template"
 )
 
@@ -24,13 +25,26 @@ func last(i int, slice interface{}) bool {
 	return i == v.Len()-1
 }
 
-func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
+func CreateJobJson(job NomadJob, otherJobs []string) (*bytes.Buffer, error) {
 	t, err := template.New("").Funcs(template.FuncMap{
 		"last": last,
 	}).Parse(JOB_TMPL)
 	if err != nil {
 		return nil, err
 	}
+
+	if len(job.Env) != 0 && len(otherJobs) != 0 {
+		for _, env := range job.Env {
+			value := env[1]
+			for _, otherJob := range otherJobs {
+				if strings.Contains(value, otherJob) {
+					newValue := fmt.Sprintf("%s-%s", job.User, otherJob)
+					fmt.Println("Replacing", value, "with", newValue)
+				}
+			}
+		}
+	}
+
 	buf := &bytes.Buffer{}
 	err = t.Execute(buf, job)
 	if err != nil {
@@ -38,7 +52,6 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 	}
 
 	// output for debugging
-	fmt.Printf("%+v\n", job)
 	f, err := os.Create("latest-job.json")
 	if err != nil {
 		return nil, err

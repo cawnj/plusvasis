@@ -49,7 +49,13 @@ func (n *NomadController) CreateJob(c echo.Context) error {
 		return err
 	}
 
-	body, err := templates.CreateJobJson(job)
+	uid := c.Get("uid").(string)
+	existingJobs, err := n.GetExistingJobNames(uid)
+	if err != nil {
+		return err
+	}
+
+	body, err := templates.CreateJobJson(job, existingJobs)
 	if err != nil {
 		log.Println("[nomad/CreateJob]", err)
 		return err
@@ -77,15 +83,19 @@ func (n *NomadController) UpdateJob(c echo.Context) error {
 		return err
 	}
 
-	body, err := templates.CreateJobJson(job)
+	uid := c.Get("uid").(string)
+	existingJobs, err := n.GetExistingJobNames(uid)
+	if err != nil {
+		return err
+	}
+
+	body, err := templates.CreateJobJson(job, existingJobs)
 	if err != nil {
 		log.Println("[nomad/UpdateJob]", err)
 		return err
 	}
 
-	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
-
 	if err := n.CheckUserAllowed(uid, jobId); err != nil {
 		return err
 	}
@@ -316,4 +326,26 @@ func (n *NomadController) ParseRunningAlloc(jobId string) (*nomad.AllocListStub,
 	}
 
 	return nil, fmt.Errorf("no running alloc found for job %s", jobId)
+}
+
+func (n *NomadController) GetExistingJobNames(uid string) ([]string, error) {
+	data, err := n.Client.Get("/jobs?meta=true")
+	if err != nil {
+		return nil, err
+	}
+
+	var jobs []*nomad.JobListStub
+	err = json.Unmarshal(data, &jobs)
+	if err != nil {
+		return nil, err
+	}
+
+	var jobNames []string
+	for _, job := range jobs {
+		if job.Meta["user"] == uid {
+			jobNames = append(jobNames, job.Name)
+		}
+	}
+
+	return jobNames, nil
 }
