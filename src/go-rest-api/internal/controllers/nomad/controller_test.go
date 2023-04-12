@@ -218,6 +218,42 @@ func TestStopJob(t *testing.T) {
 	}
 }
 
+func TestPurgeJob(t *testing.T) {
+	// Setup
+	jobName := "test"
+	rec, c, nomadClient, nomadController := setup(http.MethodDelete, "/job/"+jobName)
+	c.SetParamNames("id")
+	c.SetParamValues(jobName)
+	c.Set("uid", "test")
+	c.QueryParams().Add("purge", "true")
+
+	// Mocks
+	nomadDeregister := nomad.JobDeregisterResponse{
+		EvalID:          "test",
+		EvalCreateIndex: 1,
+		JobModifyIndex:  1,
+	}
+	nomadDeregisterJson, _ := json.Marshal(nomadDeregister)
+	nomadClient.On("Delete", "/job/"+jobName+"?purge=true").Return(nomadDeregisterJson, nil)
+
+	nomadJob := nomad.Job{
+		ID: "test",
+		Meta: map[string]string{
+			"user": "test",
+		},
+	}
+	nomadJobJson, _ := json.Marshal(nomadJob)
+	nomadClient.On("Get", "/job/"+jobName).Return(nomadJobJson, nil) // CheckUserAllowed mocking
+
+	// Assertions
+	expectedJson := nomadDeregisterJson
+	expectedCode := http.StatusOK
+	if assert.NoError(t, nomadController.StopJob(c)) {
+		assert.Equal(t, expectedCode, rec.Code)
+		assert.JSONEq(t, string(expectedJson), rec.Body.String())
+	}
+}
+
 func TestReadJobAllocs(t *testing.T) {
 	// Setup
 	jobName := "test"
