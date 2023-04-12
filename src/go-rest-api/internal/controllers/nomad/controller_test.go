@@ -335,3 +335,35 @@ func TestReadJobAlloc(t *testing.T) {
 		assert.JSONEq(t, string(expectedJson), rec.Body.String())
 	}
 }
+
+func TestRestartJob(t *testing.T) {
+	// Setup
+	jobName := "test"
+	allocId := "abcdTest123"
+	task := "test"
+	rec, c, nomadClient, nomadController := setup(http.MethodPost, "/job/"+jobName+"/"+allocId+"/"+task+"/restart")
+	c.SetParamNames("id", "allocId", "task")
+	c.SetParamValues(jobName, allocId, task)
+	c.Set("uid", "test")
+
+	// Mocks
+	data := []byte(`{}`)
+
+	nomadJob := nomad.Job{
+		ID: "test",
+		Meta: map[string]string{
+			"user": "test",
+		},
+	}
+	nomadJobJson, _ := json.Marshal(nomadJob)
+	nomadClient.On("Get", "/job/"+jobName).Return(nomadJobJson, nil) // CheckUserAllowed mocking
+
+	nomadClient.On("Post", "/client/allocation/"+allocId+"/restart", mock.Anything).Return(data, nil)
+
+	// Assertions
+	expectedCode := http.StatusOK
+	if assert.NoError(t, nomadController.RestartJob(c)) {
+		assert.Equal(t, expectedCode, rec.Code)
+		assert.JSONEq(t, string(data), rec.Body.String())
+	}
+}
