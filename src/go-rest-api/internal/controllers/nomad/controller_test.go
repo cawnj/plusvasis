@@ -345,8 +345,6 @@ func TestRestartJob(t *testing.T) {
 	c.Set("uid", "test")
 
 	// Mocks
-	data := []byte(`{}`)
-
 	nomadJob := nomad.Job{
 		ID: "test",
 		Meta: map[string]string{
@@ -369,12 +367,15 @@ func TestRestartJob(t *testing.T) {
 	allocsJson, _ := json.Marshal(nomadJobAllocs)
 	nomadClient.On("Get", "/job/"+jobName+"/allocations").Return(allocsJson, nil)
 
-	nomadClient.On("Post", "/client/allocation/test/restart", mock.Anything).Return(data, nil)
+	restart := nomad.GenericResponse{}
+	restartJson, _ := json.Marshal(restart)
+	nomadClient.On("Post", "/client/allocation/test/restart", mock.Anything).Return(restartJson, nil)
 
 	// Assertions
+	expectedJson := restartJson
 	expectedCode := http.StatusOK
 	if assert.NoError(t, nomadController.RestartJob(c)) {
 		assert.Equal(t, expectedCode, rec.Code)
-		assert.JSONEq(t, string(data), rec.Body.String())
+		assert.JSONEq(t, string(expectedJson), rec.Body.String())
 	}
 }
