@@ -18,8 +18,9 @@
 		faRefresh,
 		faExternalLink
 	} from '@fortawesome/free-solid-svg-icons';
-	import { fetchJob } from '$lib/NomadClient';
+	import { fetchJob, fetchJobStop, fetchJobDelete, fetchJobRestart } from '$lib/NomadClient';
 	import Fa from 'svelte-fa';
+	import { goto } from '$app/navigation';
 
 	const fetchAndSetJob = async () => {
 		const job = await fetchJob($page.params.id);
@@ -68,18 +69,22 @@
 			</div>
 			<ButtonGroup>
 				<Button>
+					<!-- need a jobStart route -->
 					<Fa icon={faPlay} color="green" class="mr-2" />
 					Start
 				</Button>
-				<Button>
+				<Button on:click={() => fetchJobRestart()}>
+					<!-- add a confirmation -->
 					<Fa icon={faRefresh} color="orange" class="mr-2" />
 					Restart
 				</Button>
-				<Button>
+				<Button on:click={() => fetchJobStop()}>
+					<!-- add a confirmation -->
 					<Fa icon={faStop} color="red" class="mr-2" />
 					Stop
 				</Button>
-				<Button>
+				<Button on:click={() => fetchJobDelete().then(() => goto('/'))}>
+					<!-- add a confirmation -->
 					<Fa icon={faTrash} class="mr-2" />
 					Delete
 				</Button>
