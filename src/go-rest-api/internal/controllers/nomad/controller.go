@@ -190,25 +190,12 @@ func (n *NomadController) ReadJobAlloc(c echo.Context) error {
 		return err
 	}
 
-	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
+	alloc, err := n.ParseRunningAlloc(jobId)
 	if err != nil {
-		log.Println("[nomad/ReadJobAllocs]", err)
+		log.Println("[nomad/ReadJobAlloc]", err)
 		return err
 	}
-
-	var allocs []nomad.AllocListStub
-	err = json.Unmarshal(data, &allocs)
-	if err != nil {
-		log.Println("[nomad/ReadJobAllocs]", err)
-		return err
-	}
-	for _, alloc := range allocs {
-		if alloc.ClientStatus == "running" || alloc.ClientStatus == "pending" {
-			return c.JSON(http.StatusOK, alloc)
-		}
-	}
-
-	return echo.NewHTTPError(http.StatusNotFound, "No running allocation found")
+	return c.JSON(http.StatusOK, alloc)
 }
 
 func (n *NomadController) RestartJob(c echo.Context) error {
@@ -222,24 +209,14 @@ func (n *NomadController) RestartJob(c echo.Context) error {
 		return err
 	}
 
-	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
+	alloc, err := n.ParseRunningAlloc(jobId)
 	if err != nil {
-		log.Println("[nomad/ReadJobAllocs]", err)
+		log.Println("[nomad/RestartJob]", err)
 		return err
 	}
 
-	var allocs []nomad.AllocListStub
-	err = json.Unmarshal(data, &allocs)
-	if err != nil {
-		log.Println("[nomad/ReadJobAllocs]", err)
-		return err
-	}
-	for _, alloc := range allocs {
-		if alloc.ClientStatus == "running" || alloc.ClientStatus == "pending" {
-			allocId = alloc.ID
-			task = alloc.TaskGroup
-		}
-	}
+	allocId = alloc.ID
+	task = alloc.TaskGroup
 
 	body := []byte(`{
 		"TaskName": "` + task + `"
@@ -271,4 +248,27 @@ func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
 	}
 
 	return nil
+}
+
+func (n *NomadController) ParseRunningAlloc(jobId string) (nomad.AllocListStub, error) {
+	var alloc nomad.AllocListStub
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
+	if err != nil {
+		log.Println("[nomad/ReadJobAllocs]", err)
+		return alloc, err
+	}
+
+	var allocs []nomad.AllocListStub
+	err = json.Unmarshal(data, &allocs)
+	if err != nil {
+		log.Println("[nomad/ReadJobAllocs]", err)
+		return alloc, err
+	}
+	for _, al := range allocs {
+		if al.ClientStatus == "running" || al.ClientStatus == "pending" {
+			alloc = al
+		}
+	}
+
+	return alloc, nil
 }
