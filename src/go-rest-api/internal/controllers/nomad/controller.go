@@ -201,8 +201,6 @@ func (n *NomadController) ReadJobAlloc(c echo.Context) error {
 func (n *NomadController) RestartJob(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
-	allocId := ""
-	task := ""
 
 	if err := n.CheckUserAllowed(uid, jobId); err != nil {
 		fmt.Println(err)
@@ -215,20 +213,21 @@ func (n *NomadController) RestartJob(c echo.Context) error {
 		return err
 	}
 
-	allocId = alloc.ID
-	task = alloc.TaskGroup
-
-	body := []byte(`{
-		"TaskName": "` + task + `"
-	}`)
-
-	resp, err := n.Client.Post(fmt.Sprintf("/client/allocation/%s/restart", allocId), bytes.NewBuffer(body))
+	body := bytes.NewBuffer([]byte{})
+	data, err := n.Client.Post(fmt.Sprintf("/client/allocation/%s/restart", alloc.ID), body)
 	if err != nil {
 		log.Println("[nomad/RestartJob]", err)
 		return err
 	}
 
-	return c.JSON(http.StatusOK, bytes.NewBuffer(resp))
+	var resp nomad.GenericResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		log.Println("[nomad/RestartJob]", err)
+		return err
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
@@ -250,25 +249,22 @@ func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
 	return nil
 }
 
-func (n *NomadController) ParseRunningAlloc(jobId string) (nomad.AllocListStub, error) {
-	var alloc nomad.AllocListStub
+func (n *NomadController) ParseRunningAlloc(jobId string) (*nomad.AllocListStub, error) {
 	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
 	if err != nil {
-		log.Println("[nomad/ReadJobAllocs]", err)
-		return alloc, err
+		return nil, err
 	}
 
 	var allocs []nomad.AllocListStub
 	err = json.Unmarshal(data, &allocs)
 	if err != nil {
-		log.Println("[nomad/ReadJobAllocs]", err)
-		return alloc, err
+		return nil, err
 	}
-	for _, al := range allocs {
-		if al.ClientStatus == "running" || al.ClientStatus == "pending" {
-			alloc = al
+	for _, alloc := range allocs {
+		if alloc.ClientStatus == "running" || alloc.ClientStatus == "pending" {
+			return &alloc, nil
 		}
 	}
 
-	return alloc, nil
+	return nil, fmt.Errorf("no running alloc found for job %s", jobId)
 }
