@@ -10,14 +10,15 @@ import (
 )
 
 type NomadJob struct {
-	Name    string     `json:"containerName"`
-	Image   string     `json:"dockerImage"`
-	User    string     `json:"user"`
-	Shell   string     `json:"shell"`
-	Volumes [][]string `json:"volumes"`
-	Env     [][]string `json:"env"`
-	Port    int        `json:"port"`
-	Expose  bool       `json:"expose"`
+	Name         string     `json:"containerName"`
+	Image        string     `json:"dockerImage"`
+	User         string     `json:"user"`
+	Shell        string     `json:"shell"`
+	Volumes      [][]string `json:"volumes"`
+	Env          [][]string `json:"env"`
+	TemplatedEnv string     `json:"templatedEnv"`
+	Port         int        `json:"port"`
+	Expose       bool       `json:"expose"`
 }
 
 func last(i int, slice interface{}) bool {
@@ -63,6 +64,10 @@ func CreateJobJson(job NomadJob, otherJobs []string) (*bytes.Buffer, error) {
 	}
 
 	return buf, err
+}
+
+func BuildTemplatedEnvStr() string {
+	return ""
 }
 
 const JOB_TMPL = `{
@@ -114,7 +119,14 @@ const JOB_TMPL = `{
                             {{range $i, $v := .Env}}
                             "{{index $v 0}}": "{{index $v 1}}"{{if not (last $i $.Env)}},{{end}}
                             {{end}}
-                        }
+                        },
+                        "Templates": [
+                            {
+                                "DestPath": "secrets/config.env",
+                                "EmbeddedTmpl": "{{.TemplatedEnv}}",
+                                "Envvars": true
+                            }
+                        ]
                     }
                 ],
                 "Networks": [
