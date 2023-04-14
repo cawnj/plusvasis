@@ -37,4 +37,4 @@
 	}
 </script>
 
-<div id="terminal" bind:this={terminalElement} />
+<div id="terminal" data-testid="exec-controller" bind:this={terminalElement} />

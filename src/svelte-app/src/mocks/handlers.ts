@@ -10,5 +10,8 @@ export const handlers = [
 	}),
 	rest.get(`https://nomad.local.cawnj.dev/v1/client/fs/logs/alloc-id-123`, (req, res, ctx) => {
 		return res(ctx.status(200), ctx.json(''));
+	}),
+	rest.get(`${hostname}/job/job123/alloc`, (req, res, ctx) => {
+		return res(ctx.status(200), ctx.json(''));
 	})
 ];
