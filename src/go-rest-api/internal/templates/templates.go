@@ -111,7 +111,8 @@ const JOB_TMPL = `{
             "shell": "{{.Shell}}",
             "volumes": "{{range $i, $v := .Volumes}}{{index $v 0}}:{{index $v 1}}{{if not (last $i $.Volumes)}},{{end}}{{end}}",
             "env": "{{range $i, $v := .Env}}{{index $v 0}}={{index $v 1}}{{if not (last $i $.Env)}},{{end}}{{end}}",
-            "port": "{{.Port}}"
+            "port": "{{.Port}}",
+            "expose": "{{.Expose}}"
         },
         "TaskGroups": [
             {
