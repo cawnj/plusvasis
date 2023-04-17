@@ -76,22 +76,21 @@
 			<ButtonGroup>
 				<Button
 					disabled={!$currJobStopped}
-					on:click={() => fetchJobStart().then(() => (window.location.href = window.location.href))}
+					on:click={() => fetchJobStart().then(() => window.location.reload())}
 				>
 					<Fa icon={faPlay} color="green" class="mr-2" />
 					Start
 				</Button>
 				<Button
 					disabled={$currJobStopped}
-					on:click={() =>
-						fetchJobRestart().then(() => (window.location.href = window.location.href))}
+					on:click={() => fetchJobRestart().then(() => window.location.reload())}
 				>
 					<Fa icon={faRefresh} color="orange" class="mr-2" />
 					Restart
 				</Button>
 				<Button
 					disabled={$currJobStopped}
-					on:click={() => fetchJobStop().then(() => (window.location.href = window.location.href))}
+					on:click={() => fetchJobStop().then(() => window.location.reload())}
 				>
 					<Fa icon={faStop} color="red" class="mr-2" />
 					Stop
