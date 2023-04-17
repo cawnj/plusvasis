@@ -17,7 +17,8 @@ type NomadJob struct {
 	Shell        string     `json:"shell"`
 	Volumes      [][]string `json:"volumes"`
 	Env          [][]string `json:"env"`
-	TemplatedEnv string     `json:"templatedEnv"`
+	TemplatedEnv [][]string `json:"templatedEnv"`
+	EnvString    string     `json:"envString"`
 	Port         int        `json:"port"`
 	Expose       bool       `json:"expose"`
 }
@@ -35,7 +36,7 @@ func CreateJobJson(job NomadJob, otherJobs []string) (*bytes.Buffer, error) {
 		return nil, err
 	}
 
-	if len(job.Env) != 0 && len(otherJobs) != 0 {
+	if len(job.TemplatedEnv) != 0 && len(otherJobs) != 0 {
 		// sort otherJobs by length in descending order
 		// to avoid replacing substrings of jobs
 		// e.g. replace "hedgedoc-db" if it exists before "hedgedoc"
@@ -43,23 +44,16 @@ func CreateJobJson(job NomadJob, otherJobs []string) (*bytes.Buffer, error) {
 			return len(otherJobs[i]) > len(otherJobs[j])
 		})
 
-		newEnv := make([][]string, 0)
-		for _, env := range job.Env {
+		for _, env := range job.TemplatedEnv {
 			key := env[0]
 			value := env[1]
-			found := false
 			for _, otherJob := range otherJobs {
 				if strings.Contains(value, otherJob) {
-					job.TemplatedEnv += generateTemplatedEnv(key, value, otherJob)
-					found = true
+					job.EnvString += generateTemplatedEnv(key, value, otherJob)
 					break
 				}
 			}
-			if !found {
-				newEnv = append(newEnv, env)
-			}
 		}
-		job.Env = newEnv
 	}
 
 	buf := &bytes.Buffer{}
@@ -113,6 +107,7 @@ const JOB_TMPL = `{
             "shell": "{{.Shell}}",
             "volumes": "{{range $i, $v := .Volumes}}{{index $v 0}}:{{index $v 1}}{{if not (last $i $.Volumes)}},{{end}}{{end}}",
             "env": "{{range $i, $v := .Env}}{{index $v 0}}={{index $v 1}}{{if not (last $i $.Env)}},{{end}}{{end}}",
+            "templatedEnv": "{{range $i, $v := .TemplatedEnv}}{{index $v 0}}={{index $v 1}}{{if not (last $i $.TemplatedEnv)}},{{end}}{{end}}",
             "port": "{{.Port}}"
         },
         "TaskGroups": [
@@ -152,11 +147,11 @@ const JOB_TMPL = `{
                             {{end}}
                         }
                         {{end}}
-                        {{if .TemplatedEnv}},
+                        {{if .EnvString}},
                         "Templates": [
                             {
                                 "DestPath": "secrets/config.env",
-                                "EmbeddedTmpl": "{{.TemplatedEnv}}",
+                                "EmbeddedTmpl": "{{.EnvString}}",
                                 "Envvars": true
                             }
                         ]
