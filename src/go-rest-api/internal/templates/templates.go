@@ -5,18 +5,21 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"regexp"
+	"strings"
 	"text/template"
 )
 
 type NomadJob struct {
-	Name    string     `json:"containerName"`
-	Image   string     `json:"dockerImage"`
-	User    string     `json:"user"`
-	Shell   string     `json:"shell"`
-	Volumes [][]string `json:"volumes"`
-	Env     [][]string `json:"env"`
-	Port    int        `json:"port"`
-	Expose  bool       `json:"expose"`
+	Name      string     `json:"containerName"`
+	Image     string     `json:"dockerImage"`
+	User      string     `json:"user"`
+	Shell     string     `json:"shell"`
+	Volumes   [][]string `json:"volumes"`
+	Env       [][]string `json:"env"`
+	EnvString string     `json:"envString"`
+	Port      int        `json:"port"`
+	Expose    bool       `json:"expose"`
 }
 
 func last(i int, slice interface{}) bool {
@@ -31,6 +34,14 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if len(job.Env) != 0 {
+		err = parseEnv(&job)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	buf := &bytes.Buffer{}
 	err = t.Execute(buf, job)
 	if err != nil {
@@ -38,7 +49,6 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 	}
 
 	// output for debugging
-	fmt.Printf("%+v\n", job)
 	f, err := os.Create("latest-job.json")
 	if err != nil {
 		return nil, err
@@ -51,6 +61,50 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 
 	return buf, err
 }
+
+func parseEnv(job *NomadJob) error {
+	for _, env := range job.Env {
+		key := env[0]
+		value := env[1]
+
+		fmt.Printf("key: %s, value: %s\n", key, value)
+
+		fieldRegex := regexp.MustCompile(`{{\s*(.*?)\s*}}`)
+		fields := fieldRegex.FindAllStringSubmatch(value, -1)
+
+		fmt.Printf("fields: %v\n", fields)
+		if len(fields) > 0 {
+			// ensure fields[i][1] are all equal
+			fieldVal := fields[0][1]
+			for _, field := range fields {
+				if field[1] != fieldVal {
+					return fmt.Errorf("only one other job can be referenced in a templated env var")
+				}
+			}
+
+			job.EnvString += generateTemplatedEnv(key, value, fieldVal)
+		}
+	}
+	return nil
+}
+
+func generateTemplatedEnv(key, value, otherJob string) string {
+	// replace every instance of otherJob
+	newValue := strings.ReplaceAll(value, fmt.Sprintf("{{%s}}", otherJob), "{{ .Address }}:{{ .Port }}")
+	templatedEnv := fmt.Sprintf(ENV_TMPL, otherJob, key, newValue)
+
+	// escape newline characters and double quotes
+	// so that the template can be embedded in a JSON string
+	templatedEnv = strings.ReplaceAll(templatedEnv, "\n", "\\n")
+	templatedEnv = strings.ReplaceAll(templatedEnv, "\"", "\\\"")
+
+	return templatedEnv
+}
+
+const ENV_TMPL = `{{ range nomadService "%s" }}
+%s="%s"
+{{ end }}
+`
 
 const JOB_TMPL = `{
     "Job": {
@@ -65,7 +119,8 @@ const JOB_TMPL = `{
             "shell": "{{.Shell}}",
             "volumes": "{{range $i, $v := .Volumes}}{{index $v 0}}:{{index $v 1}}{{if not (last $i $.Volumes)}},{{end}}{{end}}",
             "env": "{{range $i, $v := .Env}}{{index $v 0}}={{index $v 1}}{{if not (last $i $.Env)}},{{end}}{{end}}",
-            "port": "{{.Port}}"
+            "port": "{{.Port}}",
+            "expose": "{{.Expose}}"
         },
         "TaskGroups": [
             {
@@ -78,7 +133,7 @@ const JOB_TMPL = `{
                         "Config": {
                             "image": "{{.Image}}",
                             "ports": [
-                                "http"
+                                "port"
                             ],
                             "mount": [
                                 {{range $_, $v := .Volumes}}
@@ -96,12 +151,23 @@ const JOB_TMPL = `{
                                     "target": "/userdata"
                                 }
                             ]
-                        },
+                        }
+                        {{if .Env}},
                         "Env": {
                             {{range $i, $v := .Env}}
                             "{{index $v 0}}": "{{index $v 1}}"{{if not (last $i $.Env)}},{{end}}
                             {{end}}
                         }
+                        {{end}}
+                        {{if .EnvString}},
+                        "Templates": [
+                            {
+                                "DestPath": "secrets/config.env",
+                                "EmbeddedTmpl": "{{.EnvString}}",
+                                "Envvars": true
+                            }
+                        ]
+                        {{end}}
                     }
                 ],
                 "Networks": [
@@ -109,7 +175,7 @@ const JOB_TMPL = `{
                         "Mode": "host",
                         "DynamicPorts": [
                             {
-                                "Label": "http",
+                                "Label": "port",
                                 "To": {{.Port}}
                             }
                         ]
@@ -118,13 +184,13 @@ const JOB_TMPL = `{
                 "Services": [
                     {
                         "Name": "{{.Name}}",
-                        "PortLabel": "http",
+                        "PortLabel": "port",
                         {{if .Expose}}
                         "Tags": [
                             "traefik.enable=true",
                             "traefik.http.routers.{{.User}}-{{.Name}}.entrypoints=https",
                             "traefik.http.routers.{{.User}}-{{.Name}}.rule=Host(` + "`" + `{{.User}}-{{.Name}}.local.plusvasis.xyz` + "`" + `)",
-                            "traefik.port=${NOMAD_PORT_http}"
+                            "traefik.port=${NOMAD_PORT_port}"
                         ],
                         {{end}}
                         "Provider": "nomad"

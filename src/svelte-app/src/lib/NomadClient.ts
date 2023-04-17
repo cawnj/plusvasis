@@ -59,7 +59,7 @@ export async function fetchJob(jobId: string) {
 			volumes: data.Meta.volumes,
 			env: data.Meta.env,
 			port: data.Meta.port,
-			expose: false // TODO: Add field to backend Meta
+			expose: data.Meta.expose
 		};
 		return job;
 	} else {
