@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ExecController from '$lib/ExecController.svelte';
-	import { currJobId, currJob, alloc, task } from '../stores/nomadStore';
+	import { currJobId, currJob, alloc, task, currJobStopped } from '../stores/nomadStore';
 	import { hostname } from '../stores/environmentStore';
 	import { onMount } from 'svelte';
 	import type { Job } from '$lib/Types';
@@ -11,11 +11,15 @@
 
 	let jobId: string;
 	let job: Job;
+	let isStopped: boolean;
 	currJobId.subscribe((value) => {
 		jobId = value;
 	});
 	currJob.subscribe((value) => {
 		job = value;
+	});
+	currJobStopped.subscribe((value) => {
+		isStopped = value;
 	});
 
 	function getAllocExecEndpoint(json: unknown) {
@@ -51,11 +55,14 @@
 			const url = getAllocExecEndpoint(json);
 			execControllerComponent.connectTerm(url);
 		} else {
-			execControllerComponent.write('Error starting container ' + jobId);
+			execControllerComponent.write('Error fetching allocations');
 		}
 	}
 
 	onMount(async () => {
+		if (isStopped) {
+			return;
+		}
 		fetchJobIdAllocations();
 	});
 </script>
