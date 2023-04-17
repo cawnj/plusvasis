@@ -35,15 +35,23 @@ func CreateJobJson(job NomadJob, otherJobs []string) (*bytes.Buffer, error) {
 	}
 
 	if len(job.Env) != 0 && len(otherJobs) != 0 {
+		newEnv := make([][]string, 0)
 		for _, env := range job.Env {
+			key := env[0]
 			value := env[1]
+			found := false
 			for _, otherJob := range otherJobs {
 				if strings.Contains(value, otherJob) {
-					newValue := fmt.Sprintf("%s-%s", job.User, otherJob)
-					fmt.Println("Replacing", value, "with", newValue)
+					job.TemplatedEnv += generateTemplatedEnv(key, value, otherJob)
+					found = true
+					break
 				}
 			}
+			if !found {
+				newEnv = append(newEnv, env)
+			}
 		}
+		job.Env = newEnv
 	}
 
 	buf := &bytes.Buffer{}
@@ -66,9 +74,22 @@ func CreateJobJson(job NomadJob, otherJobs []string) (*bytes.Buffer, error) {
 	return buf, err
 }
 
-func BuildTemplatedEnvStr() string {
-	return ""
+func generateTemplatedEnv(key, value, otherJob string) string {
+	// replace every instance of otherJob in value with "{{ .Address }}:{{ .Port }}"
+	newValue := strings.ReplaceAll(value, otherJob, "{{ .Address }}:{{ .Port }}")
+	templatedEnv := fmt.Sprintf(ENV_TMPL, otherJob, key, newValue)
+
+	// escape newline characters
+	templatedEnv = strings.ReplaceAll(templatedEnv, "\n", "\\n")
+	// escape double quotes
+	templatedEnv = strings.ReplaceAll(templatedEnv, "\"", "\\\"")
+	return templatedEnv
 }
+
+const ENV_TMPL = `{{ range nomadService "%s" }}
+%s="%s"
+{{ end }}
+`
 
 const JOB_TMPL = `{
     "Job": {
