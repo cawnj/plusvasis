@@ -36,27 +36,9 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 	}
 
 	if len(job.Env) != 0 {
-		for _, env := range job.Env {
-			key := env[0]
-			value := env[1]
-
-			fmt.Printf("key: %s, value: %s\n", key, value)
-
-			fieldRegex := regexp.MustCompile(`{{\s*(.*?)\s*}}`)
-			fields := fieldRegex.FindAllStringSubmatch(value, -1)
-
-			fmt.Printf("fields: %v\n", fields)
-			if len(fields) > 0 {
-				// ensure fields[i][1] are all equal
-				fieldVal := fields[0][1]
-				for _, field := range fields {
-					if field[1] != fieldVal {
-						return nil, fmt.Errorf("only one other job can be referenced in a templated env var")
-					}
-				}
-
-				job.EnvString += generateTemplatedEnv(key, value, fieldVal)
-			}
+		err = parseEnv(&job)
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -78,6 +60,32 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 	}
 
 	return buf, err
+}
+
+func parseEnv(job *NomadJob) error {
+	for _, env := range job.Env {
+		key := env[0]
+		value := env[1]
+
+		fmt.Printf("key: %s, value: %s\n", key, value)
+
+		fieldRegex := regexp.MustCompile(`{{\s*(.*?)\s*}}`)
+		fields := fieldRegex.FindAllStringSubmatch(value, -1)
+
+		fmt.Printf("fields: %v\n", fields)
+		if len(fields) > 0 {
+			// ensure fields[i][1] are all equal
+			fieldVal := fields[0][1]
+			for _, field := range fields {
+				if field[1] != fieldVal {
+					return fmt.Errorf("only one other job can be referenced in a templated env var")
+				}
+			}
+
+			job.EnvString += generateTemplatedEnv(key, value, fieldVal)
+		}
+	}
+	return nil
 }
 
 func generateTemplatedEnv(key, value, otherJob string) string {
