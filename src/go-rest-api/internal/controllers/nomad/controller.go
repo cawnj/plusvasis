@@ -49,13 +49,9 @@ func (n *NomadController) CreateJob(c echo.Context) error {
 		return err
 	}
 
-	uid := c.Get("uid").(string)
-	existingJobs, err := n.GetExistingJobNames(uid)
-	if err != nil {
-		return err
-	}
+	// TODO: Check if job already exists before continuing
 
-	body, err := templates.CreateJobJson(job, existingJobs)
+	body, err := templates.CreateJobJson(job)
 	if err != nil {
 		log.Println("[nomad/CreateJob]", err)
 		return err
@@ -83,18 +79,13 @@ func (n *NomadController) UpdateJob(c echo.Context) error {
 		return err
 	}
 
-	uid := c.Get("uid").(string)
-	existingJobs, err := n.GetExistingJobNames(uid)
-	if err != nil {
-		return err
-	}
-
-	body, err := templates.CreateJobJson(job, existingJobs)
+	body, err := templates.CreateJobJson(job)
 	if err != nil {
 		log.Println("[nomad/UpdateJob]", err)
 		return err
 	}
 
+	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
 	if err := n.CheckUserAllowed(uid, jobId); err != nil {
 		return err

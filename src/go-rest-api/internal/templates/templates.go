@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"sort"
+	"regexp"
 	"strings"
 	"text/template"
 )
@@ -28,7 +28,7 @@ func last(i int, slice interface{}) bool {
 	return i == v.Len()-1
 }
 
-func CreateJobJson(job NomadJob, otherJobs []string) (*bytes.Buffer, error) {
+func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 	t, err := template.New("").Funcs(template.FuncMap{
 		"last": last,
 	}).Parse(JOB_TMPL)
@@ -36,23 +36,30 @@ func CreateJobJson(job NomadJob, otherJobs []string) (*bytes.Buffer, error) {
 		return nil, err
 	}
 
-	if len(job.TemplatedEnv) != 0 && len(otherJobs) != 0 {
-		// sort otherJobs by length in descending order
-		// to avoid replacing substrings of jobs
-		// e.g. replace "hedgedoc-db" if it exists before "hedgedoc"
-		sort.Slice(otherJobs, func(i, j int) bool {
-			return len(otherJobs[i]) > len(otherJobs[j])
-		})
-
+	if len(job.TemplatedEnv) != 0 {
 		for _, env := range job.TemplatedEnv {
 			key := env[0]
 			value := env[1]
-			for _, otherJob := range otherJobs {
-				if strings.Contains(value, otherJob) {
-					job.EnvString += generateTemplatedEnv(key, value, otherJob)
-					break
+
+			fmt.Printf("key: %s, value: %s\n", key, value)
+
+			fieldRegex := regexp.MustCompile(`{{\s*(.*?)\s*}}`)
+			fields := fieldRegex.FindAllStringSubmatch(value, -1)
+
+			fmt.Printf("fields: %v\n", fields)
+			if len(fields) == 0 {
+				return nil, fmt.Errorf("no other jobs referenced in templated env var")
+			}
+
+			// ensure fields[i][1] are all equal
+			fieldVal := fields[0][1]
+			for _, field := range fields {
+				if field[1] != fieldVal {
+					return nil, fmt.Errorf("only one other job can be referenced in a templated env var")
 				}
 			}
+
+			job.EnvString += generateTemplatedEnv(key, value, fieldVal)
 		}
 	}
 
@@ -77,8 +84,8 @@ func CreateJobJson(job NomadJob, otherJobs []string) (*bytes.Buffer, error) {
 }
 
 func generateTemplatedEnv(key, value, otherJob string) string {
-	// replace every instance of otherJob in value with "{{ .Address }}:{{ .Port }}"
-	newValue := strings.ReplaceAll(value, otherJob, "{{ .Address }}:{{ .Port }}")
+	// replace every instance of otherJob
+	newValue := strings.ReplaceAll(value, fmt.Sprintf("{{%s}}", otherJob), "{{ .Address }}:{{ .Port }}")
 	templatedEnv := fmt.Sprintf(ENV_TMPL, otherJob, key, newValue)
 
 	// escape newline characters and double quotes
