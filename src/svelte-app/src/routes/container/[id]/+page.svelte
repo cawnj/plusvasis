@@ -4,7 +4,7 @@
 	import NomadController from '$lib/NomadController.svelte';
 	import Tabs from '$lib/Tabs.svelte';
 	import type { Tab } from '$lib/Types';
-	import { currJobId, currJob } from '../../../stores/nomadStore';
+	import { currJobId, currJob, currJobStopped } from '../../../stores/nomadStore';
 	import LogController from '$lib/LogController.svelte';
 	import SettingsController from '$lib/SettingsController.svelte';
 	import { Button, ButtonGroup, Modal, Spinner } from 'flowbite-svelte';
@@ -18,7 +18,13 @@
 		faRefresh,
 		faExternalLink
 	} from '@fortawesome/free-solid-svg-icons';
-	import { fetchJob, fetchJobStop, fetchJobDelete, fetchJobRestart } from '$lib/NomadClient';
+	import {
+		fetchJob,
+		fetchJobStop,
+		fetchJobDelete,
+		fetchJobRestart,
+		fetchJobStart
+	} from '$lib/NomadClient';
 	import Fa from 'svelte-fa';
 	import { goto } from '$app/navigation';
 
@@ -68,23 +74,29 @@
 				{/if}
 			</div>
 			<ButtonGroup>
-				<Button>
-					<!-- need a jobStart route -->
+				<Button
+					disabled={!$currJobStopped}
+					on:click={() => fetchJobStart().then(() => (window.location.href = window.location.href))}
+				>
 					<Fa icon={faPlay} color="green" class="mr-2" />
 					Start
 				</Button>
-				<Button on:click={() => fetchJobRestart()}>
-					<!-- add a confirmation -->
+				<Button
+					disabled={$currJobStopped}
+					on:click={() =>
+						fetchJobRestart().then(() => (window.location.href = window.location.href))}
+				>
 					<Fa icon={faRefresh} color="orange" class="mr-2" />
 					Restart
 				</Button>
-				<Button on:click={() => fetchJobStop()}>
-					<!-- add a confirmation -->
+				<Button
+					disabled={$currJobStopped}
+					on:click={() => fetchJobStop().then(() => (window.location.href = window.location.href))}
+				>
 					<Fa icon={faStop} color="red" class="mr-2" />
 					Stop
 				</Button>
 				<Button on:click={() => fetchJobDelete().then(() => goto('/'))}>
-					<!-- add a confirmation -->
 					<Fa icon={faTrash} class="mr-2" />
 					Delete
 				</Button>
