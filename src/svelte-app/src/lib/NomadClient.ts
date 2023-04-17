@@ -58,7 +58,6 @@ export async function fetchJob(jobId: string) {
 			shell: data.Meta.shell,
 			volumes: data.Meta.volumes,
 			env: data.Meta.env,
-			templatedEnv: data.Meta.templatedEnv,
 			port: data.Meta.port,
 			expose: false // TODO: Add field to backend Meta
 		};

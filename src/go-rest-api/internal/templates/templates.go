@@ -11,16 +11,15 @@ import (
 )
 
 type NomadJob struct {
-	Name         string     `json:"containerName"`
-	Image        string     `json:"dockerImage"`
-	User         string     `json:"user"`
-	Shell        string     `json:"shell"`
-	Volumes      [][]string `json:"volumes"`
-	Env          [][]string `json:"env"`
-	TemplatedEnv [][]string `json:"templatedEnv"`
-	EnvString    string     `json:"envString"`
-	Port         int        `json:"port"`
-	Expose       bool       `json:"expose"`
+	Name      string     `json:"containerName"`
+	Image     string     `json:"dockerImage"`
+	User      string     `json:"user"`
+	Shell     string     `json:"shell"`
+	Volumes   [][]string `json:"volumes"`
+	Env       [][]string `json:"env"`
+	EnvString string     `json:"envString"`
+	Port      int        `json:"port"`
+	Expose    bool       `json:"expose"`
 }
 
 func last(i int, slice interface{}) bool {
@@ -36,8 +35,8 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 		return nil, err
 	}
 
-	if len(job.TemplatedEnv) != 0 {
-		for _, env := range job.TemplatedEnv {
+	if len(job.Env) != 0 {
+		for _, env := range job.Env {
 			key := env[0]
 			value := env[1]
 
@@ -47,19 +46,17 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 			fields := fieldRegex.FindAllStringSubmatch(value, -1)
 
 			fmt.Printf("fields: %v\n", fields)
-			if len(fields) == 0 {
-				return nil, fmt.Errorf("no other jobs referenced in templated env var")
-			}
-
-			// ensure fields[i][1] are all equal
-			fieldVal := fields[0][1]
-			for _, field := range fields {
-				if field[1] != fieldVal {
-					return nil, fmt.Errorf("only one other job can be referenced in a templated env var")
+			if len(fields) > 0 {
+				// ensure fields[i][1] are all equal
+				fieldVal := fields[0][1]
+				for _, field := range fields {
+					if field[1] != fieldVal {
+						return nil, fmt.Errorf("only one other job can be referenced in a templated env var")
+					}
 				}
-			}
 
-			job.EnvString += generateTemplatedEnv(key, value, fieldVal)
+				job.EnvString += generateTemplatedEnv(key, value, fieldVal)
+			}
 		}
 	}
 
@@ -114,7 +111,6 @@ const JOB_TMPL = `{
             "shell": "{{.Shell}}",
             "volumes": "{{range $i, $v := .Volumes}}{{index $v 0}}:{{index $v 1}}{{if not (last $i $.Volumes)}},{{end}}{{end}}",
             "env": "{{range $i, $v := .Env}}{{index $v 0}}={{index $v 1}}{{if not (last $i $.Env)}},{{end}}{{end}}",
-            "templatedEnv": "{{range $i, $v := .TemplatedEnv}}{{index $v 0}}={{index $v 1}}{{if not (last $i $.TemplatedEnv)}},{{end}}{{end}}",
             "port": "{{.Port}}"
         },
         "TaskGroups": [
