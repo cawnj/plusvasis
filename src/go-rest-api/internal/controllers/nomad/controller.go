@@ -1,6 +1,7 @@
 package nomad
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -8,7 +9,6 @@ import (
 
 	"plusvasis/internal/templates"
 
-	"github.com/hashicorp/nomad/nomad/structs"
 	nomad "github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
 )
@@ -133,18 +133,23 @@ func (n *NomadController) ReadJob(c echo.Context) error {
 func (n *NomadController) StopJob(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
+	purge := c.QueryParam("purge")
 
 	if err := n.CheckUserAllowed(uid, jobId); err != nil {
 		return err
 	}
 
-	data, err := n.Client.Delete(fmt.Sprintf("/job/%s?purge=true", jobId))
+	url := fmt.Sprintf("/job/%s", jobId)
+	if purge == "true" {
+		url += "?purge=true"
+	}
+	data, err := n.Client.Delete(url)
 	if err != nil {
 		log.Println("[nomad/StopJob]", err)
 		return err
 	}
 
-	var resp structs.JobDeregisterResponse
+	var resp nomad.JobDeregisterResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
 		return err
@@ -185,25 +190,93 @@ func (n *NomadController) ReadJobAlloc(c echo.Context) error {
 		return err
 	}
 
-	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
+	alloc, err := n.ParseRunningAlloc(jobId)
 	if err != nil {
-		log.Println("[nomad/ReadJobAllocs]", err)
+		log.Println("[nomad/ReadJobAlloc]", err)
+		return err
+	}
+	return c.JSON(http.StatusOK, alloc)
+}
+
+func (n *NomadController) RestartJob(c echo.Context) error {
+	uid := c.Get("uid").(string)
+	jobId := c.Param("id")
+
+	if err := n.CheckUserAllowed(uid, jobId); err != nil {
+		fmt.Println(err)
 		return err
 	}
 
-	var allocs []nomad.AllocListStub
-	err = json.Unmarshal(data, &allocs)
+	alloc, err := n.ParseRunningAlloc(jobId)
 	if err != nil {
-		log.Println("[nomad/ReadJobAllocs]", err)
+		log.Println("[nomad/RestartJob]", err)
 		return err
 	}
-	for _, alloc := range allocs {
-		if alloc.ClientStatus == "running" || alloc.ClientStatus == "pending" {
-			return c.JSON(http.StatusOK, alloc)
-		}
+
+	body := bytes.NewBuffer([]byte{})
+	data, err := n.Client.Post(fmt.Sprintf("/client/allocation/%s/restart", alloc.ID), body)
+	if err != nil {
+		log.Println("[nomad/RestartJob]", err)
+		return err
 	}
 
-	return echo.NewHTTPError(http.StatusNotFound, "No running allocation found")
+	var resp nomad.GenericResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		log.Println("[nomad/RestartJob]", err)
+		return err
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}
+
+func (n *NomadController) StartJob(c echo.Context) error {
+	uid := c.Get("uid").(string)
+	jobId := c.Param("id")
+
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s", jobId))
+	if err != nil {
+		log.Println("[nomad/StartJob]", err)
+		return err
+	}
+
+	var job nomad.Job
+	err = json.Unmarshal(data, &job)
+	if err != nil {
+		log.Println("[nomad/StartJob]", err)
+		return err
+	}
+
+	if job.Meta["user"] != uid {
+		return echo.ErrUnauthorized
+	}
+
+	// Nomad doesn't have a start job endpoint, and this
+	// is exactly how they do it in their Web UI
+	// It's a bit hacky, but it works
+	job.Stop = false
+	var jobRequest nomad.JobRegisterRequest
+	jobRequest.Job = &job
+
+	body, err := json.Marshal(jobRequest)
+	if err != nil {
+		log.Println("[nomad/StartJob]", err)
+		return err
+	}
+
+	data, err = n.Client.Post(fmt.Sprintf("/job/%s", jobId), bytes.NewBuffer(body))
+	if err != nil {
+		log.Println("[nomad/UpdateJob]", err)
+		return err
+	}
+
+	var resp nomad.JobRegisterResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
@@ -212,7 +285,7 @@ func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
 		return err
 	}
 
-	var job structs.Job
+	var job nomad.Job
 	err = json.Unmarshal(data, &job)
 	if err != nil {
 		return err
@@ -223,4 +296,24 @@ func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
 	}
 
 	return nil
+}
+
+func (n *NomadController) ParseRunningAlloc(jobId string) (*nomad.AllocListStub, error) {
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
+	if err != nil {
+		return nil, err
+	}
+
+	var allocs []nomad.AllocListStub
+	err = json.Unmarshal(data, &allocs)
+	if err != nil {
+		return nil, err
+	}
+	for _, alloc := range allocs {
+		if alloc.ClientStatus == "running" || alloc.ClientStatus == "pending" {
+			return &alloc, nil
+		}
+	}
+
+	return nil, fmt.Errorf("no running alloc found for job %s", jobId)
 }

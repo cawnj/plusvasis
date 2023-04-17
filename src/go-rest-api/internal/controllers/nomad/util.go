@@ -17,7 +17,6 @@ func decodeJobJson(job *templates.NomadJob, body io.ReadCloser) error {
 	decoder := json.NewDecoder(body)
 	decoder.DisallowUnknownFields()
 	err := decoder.Decode(&job)
-
 	if err != nil {
 		if errors.As(err, &unmarshalErr) {
 			return echo.NewHTTPError(http.StatusBadRequest, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field)

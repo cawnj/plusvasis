@@ -11,7 +11,6 @@ import (
 )
 
 func NomadJobs(e *echo.Echo) {
-
 	client, err := fauth.InitAuth()
 	if err != nil {
 		log.Fatalln("failed to init firebase auth", err)
@@ -26,4 +25,6 @@ func NomadJobs(e *echo.Echo) {
 	e.POST("/job/:id", middleware.IsAuthorised(controller.UpdateJob, client))
 	e.GET("/job/:id/allocations", middleware.IsAuthorised(controller.ReadJobAllocs, client))
 	e.GET("/job/:id/alloc", middleware.IsAuthorised(controller.ReadJobAlloc, client))
+	e.POST("/job/:id/restart", middleware.IsAuthorised(controller.RestartJob, client))
+	e.GET("/job/:id/start", middleware.IsAuthorised(controller.StartJob, client))
 }
