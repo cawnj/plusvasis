@@ -1,5 +1,5 @@
 import { hostname } from '../stores/environmentStore';
-import { currJobId } from '../stores/nomadStore';
+import { currJobId, currJobStopped } from '../stores/nomadStore';
 import type { Job } from '$lib/Types';
 
 let jobId: string;
@@ -58,12 +58,77 @@ export async function fetchJob(jobId: string) {
 			shell: data.Meta.shell,
 			volumes: data.Meta.volumes,
 			env: data.Meta.env,
-			port: data.Meta.port,
+			port: parseInt(data.Meta.port),
 			expose: data.Meta.expose
 		};
+		currJobStopped.set(data.Status === 'dead');
 		return job;
 	} else {
 		console.log('Error');
 		return null;
+	}
+}
+
+export async function fetchJobStop() {
+	const url = `${hostname}/job/${jobId}`;
+	const res = await fetch(url, {
+		method: 'DELETE',
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem('token')}`
+		}
+	});
+
+	if (res.ok) {
+		console.log('Container Stopped');
+	} else {
+		console.log('Error');
+	}
+}
+
+export async function fetchJobDelete() {
+	const url = `${hostname}/job/${jobId}?purge=true`;
+	const res = await fetch(url, {
+		method: 'DELETE',
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem('token')}`
+		}
+	});
+
+	if (res.ok) {
+		console.log('Container Deleted');
+	} else {
+		console.log('Error');
+	}
+}
+
+export async function fetchJobRestart() {
+	const url = `${hostname}/job/${jobId}/restart`;
+	const res = await fetch(url, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem('token')}`
+		}
+	});
+
+	if (res.ok) {
+		console.log('Container Restarted');
+	} else {
+		console.log('Error');
+	}
+}
+
+export async function fetchJobStart() {
+	const url = `${hostname}/job/${jobId}/start`;
+	const res = await fetch(url, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem('token')}`
+		}
+	});
+
+	if (res.ok) {
+		console.log('Container Started');
+	} else {
+		console.log('Error');
 	}
 }

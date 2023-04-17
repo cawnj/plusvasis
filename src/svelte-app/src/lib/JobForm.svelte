@@ -45,7 +45,11 @@
 	function reroute() {
 		loading = true;
 		setTimeout(() => {
-			goto('/');
+			if (type === 'create') {
+				goto('/');
+			} else if (type === 'update') {
+				window.location.reload();
+			}
 		}, 1000);
 	}
 </script>
