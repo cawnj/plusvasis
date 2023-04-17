@@ -8,6 +8,7 @@ export type Job = {
 	shell: string;
 	volumes: [string, string][];
 	env: [string, string][];
+	templatedEnv: [string, string][];
 	port: number;
 	expose: boolean;
 	[key: string]: string | null | number | [string, string][] | boolean;
@@ -70,6 +71,15 @@ export const JobFields: { key: string; value: JobField }[] = [
 			type: 'input',
 			placeholder: 'ENV_VAR=VALUE',
 			info: 'These will be passed to the container. You can add multiple environment variables by separating them with a comma.'
+		}
+	},
+	{
+		key: 'templatedEnv',
+		value: {
+			title: 'Templated Environment Variables',
+			type: 'input',
+			placeholder: 'POSTGRES_DB=service-db',
+			info: 'Same as above, but you can refer to other jobs with their name.'
 		}
 	},
 	{

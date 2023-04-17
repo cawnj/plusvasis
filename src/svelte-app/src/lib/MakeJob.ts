@@ -6,6 +6,7 @@ export function MakeJob(formData: FormData) {
 	const shell = formData.get('shell') as string;
 	const volumeStr = formData.get('volumes') as string;
 	const envStr = formData.get('env') as string;
+	const templatedEnvStr = formData.get('templatedEnv') as string;
 	const port = formData.get('port') as string;
 	const exposeStr = formData.get('expose') as string;
 
@@ -25,6 +26,14 @@ export function MakeJob(formData: FormData) {
 		envs.push(env.split('=') as [string, string]);
 	}
 
+	const templatedEnvs: [string, string][] = [];
+	for (const templatedEnv of templatedEnvStr.split(',')) {
+		if (templatedEnv === '') {
+			continue;
+		}
+		templatedEnvs.push(templatedEnv.split('=') as [string, string]);
+	}
+
 	const expose: boolean = exposeStr != null;
 
 	const job: Job = {
@@ -34,6 +43,7 @@ export function MakeJob(formData: FormData) {
 		shell: shell,
 		volumes: volumes,
 		env: envs,
+		templatedEnv: templatedEnvs,
 		port: Number(port),
 		expose: expose
 	};
