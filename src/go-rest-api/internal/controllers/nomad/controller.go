@@ -230,6 +230,55 @@ func (n *NomadController) RestartJob(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
+func (n *NomadController) StartJob(c echo.Context) error {
+	uid := c.Get("uid").(string)
+	jobId := c.Param("id")
+
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s", jobId))
+	if err != nil {
+		log.Println("[nomad/StartJob]", err)
+		return err
+	}
+
+	var job nomad.Job
+	err = json.Unmarshal(data, &job)
+	if err != nil {
+		log.Println("[nomad/StartJob]", err)
+		return err
+	}
+
+	if job.Meta["user"] != uid {
+		return echo.ErrUnauthorized
+	}
+
+	// Nomad doesn't have a start job endpoint, and this
+	// is exactly how they do it in their Web UI
+	// It's a bit hacky, but it works
+	job.Stop = false
+	var jobRequest nomad.JobRegisterRequest
+	jobRequest.Job = &job
+
+	body, err := json.Marshal(jobRequest)
+	if err != nil {
+		log.Println("[nomad/StartJob]", err)
+		return err
+	}
+
+	data, err = n.Client.Post(fmt.Sprintf("/job/%s", jobId), bytes.NewBuffer(body))
+	if err != nil {
+		log.Println("[nomad/UpdateJob]", err)
+		return err
+	}
+
+	var resp nomad.JobRegisterResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}
+
 func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
 	data, err := n.Client.Get(fmt.Sprintf("/job/%s", jobId))
 	if err != nil {
