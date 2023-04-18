@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { alloc, task } from '../stores/nomadStore';
+	import { alloc, task, currJobId } from '../stores/nomadStore';
 	import { onMount, afterUpdate } from 'svelte';
 	import { b64decode } from './Base64Util';
 	import type { ReadableStreamDefaultReader } from 'web-streams-polyfill/ponyfill';
 	import { Button, Dropdown, Chevron, Radio } from 'flowbite-svelte';
+	import { hostname } from '../stores/environmentStore';
 
 	let allocId: string;
 	let taskName: string;
+	let jobId: string;
 	let type = 'stdout';
 
 	alloc.subscribe((value) => {
@@ -14,6 +16,9 @@
 	});
 	task.subscribe((value) => {
 		taskName = value;
+	});
+	currJobId.subscribe((value) => {
+		jobId = value;
 	});
 
 	let logs = '';
@@ -37,7 +42,7 @@
 	}
 
 	const fetchLogs = async () => {
-		const urlBuilder = new URL(`https://nomad.local.cawnj.dev/v1/client/fs/logs/${allocId}`);
+		const urlBuilder = new URL(`${hostname}/job/${jobId}/logs`);
 		urlBuilder.searchParams.append('task', taskName);
 		urlBuilder.searchParams.append('type', type);
 		urlBuilder.searchParams.append('follow', 'true');
