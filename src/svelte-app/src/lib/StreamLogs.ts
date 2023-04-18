@@ -2,7 +2,6 @@ import { currJob, currJobId } from '../stores/nomadStore';
 import { hostname } from '../stores/environmentStore';
 import type { Job } from './Types';
 import { b64decode } from './Base64Util';
-import { ReadableStreamDefaultReader as PolyfilledReadableStreamDefaultReader } from 'web-streams-polyfill/ponyfill';
 
 let job: Job;
 let jobId: string;
@@ -29,7 +28,7 @@ export function decode(chunk: string): { offset: number; message: string } | nul
 	return null;
 }
 
-export async function getReader(type: string): Promise<PolyfilledReadableStreamDefaultReader> {
+export async function getStream(type: string) {
 	const urlBuilder = new URL(`${hostname}/job/${jobId}/logs`);
 	urlBuilder.searchParams.append('task', job.containerName);
 	urlBuilder.searchParams.append('type', type);
@@ -45,5 +44,5 @@ export async function getReader(type: string): Promise<PolyfilledReadableStreamD
 		throw new Error('No response body');
 	}
 
-	return response.body.getReader();
+	return response.body as ReadableStream;
 }

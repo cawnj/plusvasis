@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Button, Dropdown, Chevron, Radio } from 'flowbite-svelte';
-	import { decode, getReader } from './StreamLogs';
-	import type { ReadableStreamDefaultReader as PolyfilledReadableStreamDefaultReader } from 'web-streams-polyfill/ponyfill';
+	import { decode, getStream } from './StreamLogs';
 	import { currJobStopped } from '../stores/nomadStore';
 
 	let isStopped: boolean;
@@ -14,7 +13,7 @@
 	let logs = '';
 
 	let preEl: HTMLPreElement;
-	let reader: PolyfilledReadableStreamDefaultReader;
+	let stream: ReadableStream;
 
 	// https://github.com/hashicorp/nomad/blob/main/ui/app/utils/classes/stream-logger.js
 	async function readLogs() {
@@ -22,6 +21,7 @@
 		let streamClosed = false;
 		let buffer = '';
 		const decoder = new TextDecoder();
+		const reader = stream.getReader();
 
 		while (!streamClosed) {
 			const { done, value } = await reader.read();
@@ -42,16 +42,16 @@
 	}
 
 	async function changeType() {
-		if (reader) reader.cancel();
+		if (stream) stream.cancel();
 		if (!isStopped) {
-			reader = await getReader(type);
+			stream = await getStream(type);
 			readLogs();
 		}
 	}
 
 	onMount(async () => {
 		if (!isStopped) {
-			reader = await getReader(type);
+			stream = await getStream(type);
 			readLogs();
 		}
 	});
