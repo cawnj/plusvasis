@@ -78,12 +78,21 @@ vi.mock('$app/stores', (): typeof stores => {
 
 // Custom mocks
 
-window.matchMedia = window.matchMedia || function (query) {
-    return {
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: function () {return},
-      removeListener: function () {return}
-    };
-  };
+window.matchMedia =
+	window.matchMedia ||
+	function (query) {
+		return {
+			addListener: function () {
+				return;
+			},
+		};
+	};
+
+class CanvasRenderingContext2DMock {
+	createLinearGradient() {
+		return {};
+	}
+}
+Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+	value: () => new CanvasRenderingContext2DMock()
+});
