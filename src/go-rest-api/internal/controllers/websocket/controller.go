@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -16,6 +17,8 @@ var (
 		},
 	}
 )
+
+const idleTimeout = 30 * time.Second
 
 func AllocExec(c echo.Context) error {
 	id := c.Param("id")
@@ -31,24 +34,26 @@ func AllocExec(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusBadGateway, "Error connecting to Nomad")
 	}
+	nomadConn.SetReadDeadline(time.Now().Add(idleTimeout))
 	defer nomadConn.Close()
 
 	clientConn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		return c.String(http.StatusBadRequest, "Error upgrading request to WebSocket")
 	}
+	clientConn.SetReadDeadline(time.Now().Add(idleTimeout))
 	defer clientConn.Close()
 
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
 		log.Printf("Forwarding messages from client to nomad for alloc %s", id)
-		forwardMessages(clientConn, nomadConn)
+		forwardMessages(clientConn, nomadConn, "client")
 		wg.Done()
 	}()
 	go func() {
 		log.Printf("Forwarding messages from nomad to client for alloc %s", id)
-		forwardMessages(nomadConn, clientConn)
+		forwardMessages(nomadConn, clientConn, "nomad")
 		wg.Done()
 	}()
 	wg.Wait()
@@ -57,7 +62,7 @@ func AllocExec(c echo.Context) error {
 	return nil
 }
 
-func forwardMessages(srcConn, dstConn *websocket.Conn) {
+func forwardMessages(srcConn, dstConn *websocket.Conn, name string) {
 	for {
 		msgType, msg, err := srcConn.ReadMessage()
 		if err != nil {
@@ -67,5 +72,7 @@ func forwardMessages(srcConn, dstConn *websocket.Conn) {
 		if err != nil {
 			break
 		}
+		log.Printf("%s: %s\n", name, msg)
+		srcConn.SetReadDeadline(time.Now().Add(idleTimeout))
 	}
 }
