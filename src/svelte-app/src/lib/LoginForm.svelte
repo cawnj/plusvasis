@@ -8,7 +8,7 @@
 	} from 'firebase/auth';
 	import logo from '$lib/assets/logo.png';
 	import app from '$lib/fb';
-	import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+	import { faArrowLeft, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 
 	export let title: string;
@@ -57,7 +57,13 @@
 <Card>
 	<form class="flex flex-col space-y-6" on:submit|preventDefault={login}>
 		<div class="flex items-center">
-			<img alt="The project logo" src={logo} class="mr-3 h-6 sm:h-9 float-left" />
+			{#if title === 'Login'}
+				<img alt="The project logo" src={logo} class="mr-3 h-8 w-8" />
+			{:else}
+				<Button pill={true} class="!p-2 mr-3 h-8 w-8" on:click={() => history.back()}>
+					<Fa icon={faArrowLeft} size="lg" />
+				</Button>
+			{/if}
 			<h5 class="text-xl font-medium text-gray-900 dark:text-white">PlusVasis {title}</h5>
 		</div>
 		<Label class="space-y-2">
