@@ -21,6 +21,7 @@
 		isStopped = value;
 	});
 
+	// TODO: Remove references to alloc and task once LogController has a proxy too
 	function getAllocExecEndpoint(json: unknown) {
 		if (json?.ID && json?.TaskStates) {
 			allocId = json.ID;
@@ -33,7 +34,7 @@
 			throw new Error('Invalid JSON');
 		}
 
-		const url = new URL(`${hostname}/alloc/${allocId}/exec`);
+		const url = new URL(`${hostname}/job/${jobId}/exec`);
 		url.protocol = url.protocol.replace('http', 'ws');
 		url.searchParams.append('task', taskName);
 		url.searchParams.append('command', `["${job.shell}"]`);
