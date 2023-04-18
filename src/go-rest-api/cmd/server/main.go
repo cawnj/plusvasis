@@ -20,6 +20,7 @@ func main() {
 
 	routes.HealthRoutes(e)
 	routes.NomadJobs(e)
+	routes.Websocket(e)
 
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
