@@ -2,6 +2,6 @@
 	import Login from '$lib/LoginForm.svelte';
 </script>
 
-<div class="px-8 py-8 md:px-16 md:py-16">
+<div class="px-4 py-4 md:px-16 md:py-16">
 	<Login title="Login" />
 </div>

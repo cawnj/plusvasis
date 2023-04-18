@@ -30,7 +30,7 @@
 </script>
 
 <Nav />
-<div class="px-8 md:px-16">
+<div class="px-4 md:px-16">
 	{#await fetchJobs()}
 		<div class="grid h-96 place-items-center">
 			<Spinner />

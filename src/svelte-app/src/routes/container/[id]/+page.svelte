@@ -41,7 +41,7 @@
 </script>
 
 <Nav />
-<div class="px-8 md:px-16 mb-4">
+<div class="px-4 md:px-16 mb-4">
 	{#await fetchAndSetJob()}
 		<div class="grid h-96 place-items-center">
 			<Spinner />
