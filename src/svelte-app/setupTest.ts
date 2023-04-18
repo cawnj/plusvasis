@@ -84,7 +84,7 @@ window.matchMedia =
 		return {
 			addListener: function () {
 				return;
-			},
+			}
 		};
 	};
 

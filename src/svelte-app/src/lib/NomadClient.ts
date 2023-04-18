@@ -2,6 +2,16 @@ import { hostname } from '../stores/environmentStore';
 import { currJobId, currJobStopped } from '../stores/nomadStore';
 import type { Job } from '$lib/Types';
 
+async function getFetch() {
+	if (typeof window === 'undefined') {
+		const { default: fetch } = await import('node-fetch');
+		return fetch;
+	}
+	return window.fetch;
+}
+
+const fetch = await getFetch();
+
 let jobId: string;
 currJobId.subscribe((value) => {
 	jobId = value;
