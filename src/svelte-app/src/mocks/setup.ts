@@ -1,6 +1,12 @@
 // src/mocks/setup.ts
-import { server } from './server';
+import { setupServer } from 'msw/node';
+import { handlers } from './handlers';
+
+const server = setupServer(...handlers);
+server.listen();
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
-afterAll(() => server.close());
 afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+
+export { server };

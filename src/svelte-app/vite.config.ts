@@ -13,7 +13,7 @@ const config: UserConfig & { test: VitestConfig['test'] } = {
 		globals: true,
 		environment: 'jsdom',
 		includeSource: ['src/**/*.{js,ts,svelte}'],
-		setupFiles: ['./setupTest.ts', 'src/mocks/setup.ts'],
+		setupFiles: ['./setupTest.ts', './src/mocks/setup.ts'],
 		coverage: {
 			exclude: ['setupTest.ts', 'src/mocks']
 		},
