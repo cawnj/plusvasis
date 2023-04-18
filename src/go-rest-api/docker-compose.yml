@@ -9,7 +9,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.plusvasis-api.entrypoints=https"
-      - "traefik.http.routers.plusvasis-api.rule=Host(`api.local.plusvasis.xyz`)"
+      - "traefik.http.routers.plusvasis-api.rule=Host(`api.plusvasis.xyz`)"
       - "traefik.http.services.plusvasis-api.loadbalancer.server.port=8080"
     networks:
       - proxy
