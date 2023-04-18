@@ -33,7 +33,8 @@
 			throw new Error('Invalid JSON');
 		}
 
-		const url = new URL(`wss://nomad.local.cawnj.dev/v1/client/allocation/${allocId}/exec`);
+		const url = new URL(`${hostname}/alloc/${allocId}/exec`);
+		url.protocol = url.protocol.replace('http', 'ws');
 		url.searchParams.append('task', taskName);
 		url.searchParams.append('command', `["${job.shell}"]`);
 		url.searchParams.append('tty', 'true');
