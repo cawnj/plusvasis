@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"log"
 	"net/http"
 	"sync"
 
@@ -41,15 +42,18 @@ func AllocExec(c echo.Context) error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
+		log.Printf("Forwarding messages from client to nomad for alloc %s", id)
 		forwardMessages(clientConn, nomadConn)
 		wg.Done()
 	}()
 	go func() {
+		log.Printf("Forwarding messages from nomad to client for alloc %s", id)
 		forwardMessages(nomadConn, clientConn)
 		wg.Done()
 	}()
 	wg.Wait()
 
+	log.Printf("Closing connections for alloc %s", id)
 	return nil
 }
 
