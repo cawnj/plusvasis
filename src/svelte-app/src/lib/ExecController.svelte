@@ -25,6 +25,9 @@
 		termFit.fit();
 	}
 	export function connectTerm(url: string) {
+		if (!terminal) {
+			setTimeout(() => connectTerm(url), 100);
+		}
 		new ExecSocketAdapter(terminal, url);
 	}
 	onMount(async () => {

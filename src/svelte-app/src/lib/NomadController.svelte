@@ -23,13 +23,19 @@
 	});
 
 	function getAllocExecEndpoint(json: unknown) {
-		if (typeof json === 'object' && json !== null) {
+		if (
+			typeof json === 'object' &&
+			json !== null &&
+			json.hasOwnProperty('ID') &&
+			json.hasOwnProperty('TaskStates')
+		) {
 			allocId = (json as { ID: string })['ID'];
 			taskName = Object.keys((json as { TaskStates: Record<string, unknown> })['TaskStates'])[0];
 
 			alloc.set(allocId);
 			task.set(taskName);
 		} else {
+			console.log(json);
 			throw new Error('Invalid JSON');
 		}
 
@@ -52,19 +58,18 @@
 
 		if (res.ok) {
 			const json = await res.json();
-			const url = getAllocExecEndpoint(json);
-			execControllerComponent.connectTerm(url);
+			return json;
 		} else {
-			execControllerComponent.write('Error fetching allocations');
+			throw new Error('Failed to fetch allocations');
 		}
 	}
 
-	onMount(async () => {
-		if (isStopped) {
-			return;
-		}
-		fetchJobIdAllocations();
-	});
+	$: if (job && !isStopped && execControllerComponent) {
+		fetchJobIdAllocations().then((json) => {
+			const url = getAllocExecEndpoint(json);
+			execControllerComponent.connectTerm(url);
+		});
+	}
 </script>
 
 <ExecController bind:this={execControllerComponent} />

@@ -12,6 +12,10 @@ export class ExecSocketAdapter {
 		this.terminal = terminal;
 		this.socket = new WebSocket(url);
 
+		if (!this.terminal) {
+			throw new Error('Terminal is not defined.');
+		}
+
 		this.socket.onopen = () => {
 			this.sendWsHandshake();
 			this.sendTtySize();
