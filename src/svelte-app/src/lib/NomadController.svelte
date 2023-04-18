@@ -1,12 +1,12 @@
 <script lang="ts">
 	import ExecController from '$lib/ExecController.svelte';
-	import { currJobId, currJob, alloc, task, currJobStopped } from '../stores/nomadStore';
+	import { currJobId, currJob, currJobStopped } from '../stores/nomadStore';
+	import { hostname } from '../stores/environmentStore';
 	import type { Job } from '$lib/Types';
 	import { fetchJobIdAllocations } from '$lib/NomadClient';
 
 	let execControllerComponent: ExecController;
-	let allocId: string;
-	let taskName: string;
+	let wsUrl: string;
 
 	let jobId: string;
 	let job: Job;
@@ -21,35 +21,19 @@
 		isStopped = value;
 	});
 
-	// TODO: Remove references to alloc and task once LogController has a proxy too
-	function getAllocExecEndpoint(json: unknown) {
-		if (json?.ID && json?.TaskStates) {
-			allocId = json.ID;
-			taskName = Object.keys(json.TaskStates)[0];
-
-			alloc.set(allocId);
-			task.set(taskName);
-		} else {
-			console.log(json);
-			throw new Error('Invalid JSON');
-		}
-
+	function setExecUrl() {
 		const url = new URL(`${hostname}/job/${jobId}/exec`);
 		url.protocol = url.protocol.replace('http', 'ws');
-		url.searchParams.append('task', taskName);
+		url.searchParams.append('task', job.containerName);
 		url.searchParams.append('command', `["${job.shell}"]`);
 		url.searchParams.append('tty', 'true');
 		url.searchParams.append('ws_handshake', 'true');
-
-		return url.toString();
+		wsUrl = url.toString();
 	}
 
-	let url: string;
-	$: if (job && !isStopped && execControllerComponent) {
-		fetchJobIdAllocations().then((json) => {
-			url = getAllocExecEndpoint(json);
-		});
+	$: if (!isStopped && jobId && job) {
+		setExecUrl();
 	}
 </script>
 
-<ExecController bind:this={execControllerComponent} {url} />
+<ExecController bind:this={execControllerComponent} {wsUrl} />

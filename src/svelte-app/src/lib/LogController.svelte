@@ -1,24 +1,21 @@
 <script lang="ts">
-	import { alloc, task, currJobId } from '../stores/nomadStore';
+	import { currJobId, currJob } from '../stores/nomadStore';
 	import { onMount, afterUpdate } from 'svelte';
 	import { b64decode } from './Base64Util';
 	import type { ReadableStreamDefaultReader } from 'web-streams-polyfill/ponyfill';
 	import { Button, Dropdown, Chevron, Radio } from 'flowbite-svelte';
 	import { hostname } from '../stores/environmentStore';
+	import type { Job } from './Types';
 
-	let allocId: string;
-	let taskName: string;
 	let jobId: string;
+	let job: Job;
 	let type = 'stdout';
 
-	alloc.subscribe((value) => {
-		allocId = value;
-	});
-	task.subscribe((value) => {
-		taskName = value;
-	});
 	currJobId.subscribe((value) => {
 		jobId = value;
+	});
+	currJob.subscribe((value) => {
+		job = value;
 	});
 
 	let logs = '';
@@ -43,7 +40,7 @@
 
 	const fetchLogs = async () => {
 		const urlBuilder = new URL(`${hostname}/job/${jobId}/logs`);
-		urlBuilder.searchParams.append('task', taskName);
+		urlBuilder.searchParams.append('task', job.containerName);
 		urlBuilder.searchParams.append('type', type);
 		urlBuilder.searchParams.append('follow', 'true');
 		urlBuilder.searchParams.append('offset', '50000');

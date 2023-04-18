@@ -5,7 +5,7 @@
 	import type { FitAddon } from 'xterm-addon-fit';
 	import { ExecSocketAdapter } from './ExecSocketAdapter';
 
-	export let url: string;
+	export let wsUrl: string;
 	let width: number;
 	let fontSize = 14;
 
@@ -35,7 +35,7 @@
 		terminal.loadAddon(termFit);
 	}
 	function connectTerm() {
-		execSocketAdapter = new ExecSocketAdapter(terminal, url);
+		execSocketAdapter = new ExecSocketAdapter(terminal, wsUrl);
 	}
 	export function write(content: string) {
 		terminal.write(content);
@@ -59,6 +59,9 @@
 		terminal.dispose();
 		execSocketAdapter.close();
 	});
+	$: if (wsUrl && terminal) {
+		connectTerm();
+	}
 </script>
 
 <svelte:window bind:innerWidth={width} />
