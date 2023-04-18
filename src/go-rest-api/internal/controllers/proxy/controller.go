@@ -1,4 +1,4 @@
-package websocket
+package proxy
 
 import (
 	"encoding/json"
@@ -15,8 +15,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type WebsocketController struct {
-	NomadClient nomad.NomadClient
+type NomadProxyController struct {
+	Client nomad.NomadClient
 }
 
 var (
@@ -29,14 +29,14 @@ var (
 
 const idleTimeout = 30 * time.Second
 
-func (w *WebsocketController) AllocExec(c echo.Context) error {
+func (n *NomadProxyController) AllocExec(c echo.Context) error {
 	id := c.Param("id")
 	rawQuery := c.Request().URL.RawQuery
 	if rawQuery == "" {
 		return c.String(http.StatusBadRequest, "Missing params")
 	}
 
-	alloc, err := w.parseRunningAlloc(id)
+	alloc, err := n.parseRunningAlloc(id)
 	if err != nil {
 		return c.String(http.StatusNotFound, "Allocation not found")
 	}
@@ -62,12 +62,12 @@ func (w *WebsocketController) AllocExec(c echo.Context) error {
 	wg.Add(2)
 	go func() {
 		log.Printf("Forwarding messages from client to nomad for job %s", id)
-		w.forwardMessages(clientConn, nomadConn, "client")
+		n.forwardMessages(clientConn, nomadConn, "client")
 		wg.Done()
 	}()
 	go func() {
 		log.Printf("Forwarding messages from nomad to client for job %s", id)
-		w.forwardMessages(nomadConn, clientConn, "nomad")
+		n.forwardMessages(nomadConn, clientConn, "nomad")
 		wg.Done()
 	}()
 	wg.Wait()
@@ -76,7 +76,7 @@ func (w *WebsocketController) AllocExec(c echo.Context) error {
 	return nil
 }
 
-func (w *WebsocketController) forwardMessages(srcConn, dstConn *websocket.Conn, name string) {
+func (n *NomadProxyController) forwardMessages(srcConn, dstConn *websocket.Conn, name string) {
 	for {
 		msgType, msg, err := srcConn.ReadMessage()
 		if err != nil {
@@ -91,8 +91,8 @@ func (w *WebsocketController) forwardMessages(srcConn, dstConn *websocket.Conn, 
 	}
 }
 
-func (w *WebsocketController) parseRunningAlloc(jobId string) (*structs.AllocListStub, error) {
-	data, err := w.NomadClient.Get(fmt.Sprintf("/job/%s/allocations", jobId))
+func (n *NomadProxyController) parseRunningAlloc(jobId string) (*structs.AllocListStub, error) {
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
 	if err != nil {
 		return nil, err
 	}
