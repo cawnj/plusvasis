@@ -1,9 +1,8 @@
 <script lang="ts">
 	import ExecController from '$lib/ExecController.svelte';
 	import { currJobId, currJob, alloc, task, currJobStopped } from '../stores/nomadStore';
-	import { hostname } from '../stores/environmentStore';
-	import { onMount } from 'svelte';
 	import type { Job } from '$lib/Types';
+	import { fetchJobIdAllocations } from '$lib/NomadClient';
 
 	let execControllerComponent: ExecController;
 	let allocId: string;
@@ -23,13 +22,14 @@
 	});
 
 	function getAllocExecEndpoint(json: unknown) {
-		if (typeof json === 'object' && json !== null) {
-			allocId = (json as { ID: string })['ID'];
-			taskName = Object.keys((json as { TaskStates: Record<string, unknown> })['TaskStates'])[0];
+		if (json?.ID && json?.TaskStates) {
+			allocId = json.ID;
+			taskName = Object.keys(json.TaskStates)[0];
 
 			alloc.set(allocId);
 			task.set(taskName);
 		} else {
+			console.log(json);
 			throw new Error('Invalid JSON');
 		}
 
@@ -42,29 +42,12 @@
 		return url.toString();
 	}
 
-	async function fetchJobIdAllocations() {
-		const url = `${hostname}/job/${jobId}/alloc`;
-		const res = await fetch(url, {
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`
-			}
+	let url: string;
+	$: if (job && !isStopped && execControllerComponent) {
+		fetchJobIdAllocations().then((json) => {
+			url = getAllocExecEndpoint(json);
 		});
-
-		if (res.ok) {
-			const json = await res.json();
-			const url = getAllocExecEndpoint(json);
-			execControllerComponent.connectTerm(url);
-		} else {
-			execControllerComponent.write('Error fetching allocations');
-		}
 	}
-
-	onMount(async () => {
-		if (isStopped) {
-			return;
-		}
-		fetchJobIdAllocations();
-	});
 </script>
 
-<ExecController bind:this={execControllerComponent} />
+<ExecController bind:this={execControllerComponent} {url} />

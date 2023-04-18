@@ -2,6 +2,16 @@ import { hostname } from '../stores/environmentStore';
 import { currJobId, currJobStopped } from '../stores/nomadStore';
 import type { Job } from '$lib/Types';
 
+async function getFetch() {
+	if (typeof window === 'undefined') {
+		const { default: fetch } = await import('node-fetch');
+		return fetch;
+	}
+	return window.fetch;
+}
+
+const fetch = await getFetch();
+
 let jobId: string;
 currJobId.subscribe((value) => {
 	jobId = value;
@@ -130,5 +140,21 @@ export async function fetchJobStart() {
 		console.log('Container Started');
 	} else {
 		console.log('Error');
+	}
+}
+
+export async function fetchJobIdAllocations() {
+	const url = `${hostname}/job/${jobId}/alloc`;
+	const res = await fetch(url, {
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem('token')}`
+		}
+	});
+
+	if (res.ok) {
+		const json = await res.json();
+		return json;
+	} else {
+		throw new Error('Failed to fetch allocations');
 	}
 }

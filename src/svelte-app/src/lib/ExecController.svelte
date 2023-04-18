@@ -5,6 +5,8 @@
 	import type { FitAddon } from 'xterm-addon-fit';
 	import { ExecSocketAdapter } from './ExecSocketAdapter';
 
+	export let url: string;
+
 	type xtermType = typeof import('xterm');
 	type fitType = typeof import('xterm-addon-fit');
 	let xterm: xtermType;
@@ -21,20 +23,32 @@
 		});
 		termFit = new fit.FitAddon();
 		terminal.loadAddon(termFit);
-		terminal.open(terminalElement);
-		termFit.fit();
 	}
-	export function connectTerm(url: string) {
+	function connectTerm() {
+		if (!url) {
+			setTimeout(() => connectTerm(), 100);
+			return;
+		}
 		new ExecSocketAdapter(terminal, url);
+	}
+	function postInit() {
+		if (terminalElement && terminal) {
+			terminal.open(terminalElement);
+			termFit.fit();
+			connectTerm();
+		} else {
+			setTimeout(() => postInit(), 100);
+		}
 	}
 	onMount(async () => {
 		xterm = await import('xterm');
 		fit = await import('xterm-addon-fit');
 		initalizeXterm();
+		postInit();
 	});
 	export function write(content: string) {
 		terminal.write(content);
 	}
 </script>
 
-<div id="terminal" bind:this={terminalElement} />
+<div id="terminal" data-testid="exec-controller" bind:this={terminalElement} />
