@@ -1,14 +1,23 @@
 package websocket
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 
+	"plusvasis/internal/controllers/nomad"
+
 	"github.com/gorilla/websocket"
+	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
 )
+
+type WebsocketController struct {
+	NomadClient nomad.NomadClient
+}
 
 var (
 	upgrader = websocket.Upgrader{
@@ -20,14 +29,19 @@ var (
 
 const idleTimeout = 30 * time.Second
 
-func AllocExec(c echo.Context) error {
+func (w *WebsocketController) AllocExec(c echo.Context) error {
 	id := c.Param("id")
 	rawQuery := c.Request().URL.RawQuery
 	if rawQuery == "" {
 		return c.String(http.StatusBadRequest, "Missing params")
 	}
 
-	nomadURL := "wss://nomad.local.cawnj.dev/v1/client/allocation/" + id + "/exec"
+	alloc, err := w.parseRunningAlloc(id)
+	if err != nil {
+		return c.String(http.StatusNotFound, "Allocation not found")
+	}
+
+	nomadURL := "wss://nomad.local.cawnj.dev/v1/client/allocation/" + alloc.ID + "/exec"
 	nomadURL += "?" + rawQuery
 
 	nomadConn, _, err := websocket.DefaultDialer.Dial(nomadURL, nil)
@@ -47,22 +61,22 @@ func AllocExec(c echo.Context) error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
-		log.Printf("Forwarding messages from client to nomad for alloc %s", id)
-		forwardMessages(clientConn, nomadConn, "client")
+		log.Printf("Forwarding messages from client to nomad for job %s", id)
+		w.forwardMessages(clientConn, nomadConn, "client")
 		wg.Done()
 	}()
 	go func() {
-		log.Printf("Forwarding messages from nomad to client for alloc %s", id)
-		forwardMessages(nomadConn, clientConn, "nomad")
+		log.Printf("Forwarding messages from nomad to client for job %s", id)
+		w.forwardMessages(nomadConn, clientConn, "nomad")
 		wg.Done()
 	}()
 	wg.Wait()
 
-	log.Printf("Closing connections for alloc %s", id)
+	log.Printf("Closing connections for job %s", id)
 	return nil
 }
 
-func forwardMessages(srcConn, dstConn *websocket.Conn, name string) {
+func (w *WebsocketController) forwardMessages(srcConn, dstConn *websocket.Conn, name string) {
 	for {
 		msgType, msg, err := srcConn.ReadMessage()
 		if err != nil {
@@ -75,4 +89,24 @@ func forwardMessages(srcConn, dstConn *websocket.Conn, name string) {
 		log.Printf("%s: %s\n", name, msg)
 		srcConn.SetReadDeadline(time.Now().Add(idleTimeout))
 	}
+}
+
+func (w *WebsocketController) parseRunningAlloc(jobId string) (*structs.AllocListStub, error) {
+	data, err := w.NomadClient.Get(fmt.Sprintf("/job/%s/allocations", jobId))
+	if err != nil {
+		return nil, err
+	}
+
+	var allocs []structs.AllocListStub
+	err = json.Unmarshal(data, &allocs)
+	if err != nil {
+		return nil, err
+	}
+	for _, alloc := range allocs {
+		if alloc.ClientStatus == "running" || alloc.ClientStatus == "pending" {
+			return &alloc, nil
+		}
+	}
+
+	return nil, fmt.Errorf("no running alloc found for job %s", jobId)
 }
