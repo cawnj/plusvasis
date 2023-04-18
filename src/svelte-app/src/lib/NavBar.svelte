@@ -3,7 +3,7 @@
 	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
 </script>
 
-<div class="mx-1 my-2 w-screen">
+<div class="mx-1 my-2">
 	<Navbar let:hidden let:toggle>
 		<NavBrand href="/">
 			<img src={logo} class="mr-3 h-6 sm:h-9" alt="PlusVasis Logo" />
