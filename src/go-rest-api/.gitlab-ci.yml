@@ -1,13 +1,23 @@
 image: golang:1.19
 
-before_script: cd src/go-rest-api
+before_script:
+  - cd src/go-rest-api
 
 lint:
   stage: test
+  image: golangci/golangci-lint
   script:
-    - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh |
-      sh -s -- -b $(go env GOPATH)/bin v1.52.2
-    - golangci-lint run
+    - golangci-lint run -v --timeout=5m
+  variables:
+    GOCACHE: ${CI_PROJECT_DIR}/vendor/cache
+    GOPATH: ${CI_PROJECT_DIR}/vendor/go
+    GOLANGCI_LINT_CACHE: ${CI_PROJECT_DIR}/vendor/linter-cache
+  cache:
+    key: lintercache
+    paths:
+      - vendor/go/pkg/mod/
+      - vendor/cache
+      - vendor/linter-cache
 
 test:
   stage: test
