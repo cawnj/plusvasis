@@ -35,12 +35,12 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 	id := c.Param("id")
 	rawQuery := c.Request().URL.RawQuery
 	if rawQuery == "" {
-		return c.String(http.StatusBadRequest, "Missing params")
+		return fmt.Errorf("missing query parameters")
 	}
 
 	alloc, err := n.parseRunningAlloc(id)
 	if err != nil {
-		return c.String(http.StatusNotFound, "Allocation not found")
+		return err
 	}
 
 	nomadURL := "wss://nomad.local.cawnj.dev/v1/client/allocation/" + alloc.ID + "/exec"
@@ -48,14 +48,14 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 
 	nomadConn, _, err := websocket.DefaultDialer.Dial(nomadURL, nil)
 	if err != nil {
-		return c.String(http.StatusBadGateway, "Error connecting to Nomad")
+		return err
 	}
 	nomadConn.SetReadDeadline(time.Now().Add(idleTimeout))
 	defer nomadConn.Close()
 
 	clientConn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Error upgrading request to WebSocket")
+		return err
 	}
 	clientConn.SetReadDeadline(time.Now().Add(idleTimeout))
 	defer clientConn.Close()
@@ -63,18 +63,15 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
-		log.Printf("Forwarding messages from client to nomad for job %s", id)
 		n.forwardMessages(clientConn, nomadConn, "client")
 		wg.Done()
 	}()
 	go func() {
-		log.Printf("Forwarding messages from nomad to client for job %s", id)
 		n.forwardMessages(nomadConn, clientConn, "nomad")
 		wg.Done()
 	}()
 	wg.Wait()
 
-	log.Printf("Closing connections for job %s", id)
 	return nil
 }
 
@@ -117,7 +114,7 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 	id := c.Param("id")
 	rawQuery := c.Request().URL.RawQuery
 	if rawQuery == "" {
-		return fmt.Errorf("missing params")
+		return fmt.Errorf("missing query parameters")
 	}
 
 	alloc, err := n.parseRunningAlloc(id)
