@@ -4,8 +4,7 @@
 	import Fa from 'svelte-fa';
 	import { faTerminal } from '@fortawesome/free-solid-svg-icons';
 	import { logout } from '$lib/fb';
-	import { Button, Spinner, Modal } from 'flowbite-svelte';
-	import { goto } from '$app/navigation';
+	import { Button, Spinner, Modal, Card } from 'flowbite-svelte';
 
 	const fetchJobs = async () => {
 		let res: Response;
@@ -38,22 +37,12 @@
 	{:then jobs}
 		<Button color="blue" href="/create">Create Container</Button>
 		{#each jobs as job}
-			<div
-				class="div-container my-3 cursor-pointer"
-				on:click={() => goto(`/container/${job.ID}`)}
-				on:keydown={(event) => {
-					if (event.key === 'Enter' || event.key === ' ') {
-						goto(`/container/${job.ID}`);
-					}
-				}}
-			>
-				<button>
-					<div class="flex items-center">
-						<Fa icon={faTerminal} color="white" class="pr-6" />
-						<span class="text-xl text-white">{job.Name}</span>
-					</div>
-				</button>
-			</div>
+			<Card class="my-3" href={`/container/${job.ID}`}>
+				<div class="flex items-center my-1">
+					<Fa icon={faTerminal} color="white" class="pr-6" />
+					<span class="text-xl text-white">{job.Name}</span>
+				</div>
+			</Card>
 		{/each}
 	{:catch error}
 		<Modal title="Error" open={true}>
