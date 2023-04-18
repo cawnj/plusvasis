@@ -21,13 +21,11 @@ type NomadProxyController struct {
 	Client nomad.NomadClient
 }
 
-var (
-	upgrader = websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
-			return true
-		},
-	}
-)
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
 const idleTimeout = 30 * time.Second
 
@@ -50,15 +48,22 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	nomadConn.SetReadDeadline(time.Now().Add(idleTimeout))
 	defer nomadConn.Close()
 
 	clientConn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		return err
 	}
-	clientConn.SetReadDeadline(time.Now().Add(idleTimeout))
 	defer clientConn.Close()
+
+	err = nomadConn.SetReadDeadline(time.Now().Add(idleTimeout))
+	if err != nil {
+		return err
+	}
+	err = clientConn.SetReadDeadline(time.Now().Add(idleTimeout))
+	if err != nil {
+		return err
+	}
 
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -86,7 +91,10 @@ func (n *NomadProxyController) forwardMessages(srcConn, dstConn *websocket.Conn,
 			break
 		}
 		log.Printf("%s: %s\n", name, msg)
-		srcConn.SetReadDeadline(time.Now().Add(idleTimeout))
+		err = srcConn.SetReadDeadline(time.Now().Add(idleTimeout))
+		if err != nil {
+			break
+		}
 	}
 }
 
