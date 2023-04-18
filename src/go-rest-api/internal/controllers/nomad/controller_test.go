@@ -35,6 +35,11 @@ func (m *MockNomadClient) Delete(endpoint string) ([]byte, error) {
 	return args.Get(0).([]byte), args.Error(1)
 }
 
+func (m *MockNomadClient) RawGet(endpoint string) (*http.Response, error) {
+	args := m.Called(endpoint)
+	return args.Get(0).(*http.Response), args.Error(1)
+}
+
 func setup(method string, url string) (
 	*httptest.ResponseRecorder, echo.Context, *MockNomadClient, NomadController,
 ) {

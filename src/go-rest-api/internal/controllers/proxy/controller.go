@@ -1,8 +1,10 @@
 package proxy
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"sync"
@@ -109,4 +111,83 @@ func (n *NomadProxyController) parseRunningAlloc(jobId string) (*structs.AllocLi
 	}
 
 	return nil, fmt.Errorf("no running alloc found for job %s", jobId)
+}
+
+func (n *NomadProxyController) StreamLogs(c echo.Context) error {
+	id := c.Param("id")
+	rawQuery := c.Request().URL.RawQuery
+	if rawQuery == "" {
+		return fmt.Errorf("missing params")
+	}
+
+	alloc, err := n.parseRunningAlloc(id)
+	if err != nil {
+		return err
+	}
+
+	nomadURL := "https://nomad.local.cawnj.dev/v1/client/fs/logs/" + alloc.ID
+	nomadURL += "?" + rawQuery
+
+	resp, err := n.forwardRequest(c, nomadURL)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	err = streamResponse(c, resp)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	return nil
+}
+
+func (n *NomadProxyController) forwardRequest(c echo.Context, url string) (*http.Response, error) {
+	req, err := http.NewRequest(c.Request().Method, url, c.Request().Body)
+	if err != nil {
+		return nil, err
+	}
+
+	for key, values := range c.Request().Header {
+		for _, value := range values {
+			req.Header.Add(key, value)
+		}
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	return resp, err
+}
+
+func streamResponse(c echo.Context, resp *http.Response) error {
+	if resp.Header.Get("Content-Encoding") == "gzip" {
+		gzipReader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			return err
+		}
+		defer gzipReader.Close()
+		resp.Body = gzipReader
+	}
+
+	buf := make([]byte, 8192)
+	for {
+		bytesRead, err := resp.Body.Read(buf)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return err
+		}
+
+		_, err = c.Response().Writer.Write(buf[:bytesRead])
+		if err != nil {
+			return err
+		}
+
+		if flusher, ok := c.Response().Writer.(http.Flusher); ok {
+			flusher.Flush()
+		}
+	}
+
+	return nil
 }
