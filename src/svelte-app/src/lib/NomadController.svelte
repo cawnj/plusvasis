@@ -1,9 +1,8 @@
 <script lang="ts">
 	import ExecController from '$lib/ExecController.svelte';
 	import { currJobId, currJob, alloc, task, currJobStopped } from '../stores/nomadStore';
-	import { hostname } from '../stores/environmentStore';
-	import { onMount } from 'svelte';
 	import type { Job } from '$lib/Types';
+	import { fetchJobIdAllocations } from '$lib/NomadClient';
 
 	let execControllerComponent: ExecController;
 	let allocId: string;
@@ -48,28 +47,12 @@
 		return url.toString();
 	}
 
-	async function fetchJobIdAllocations() {
-		const url = `${hostname}/job/${jobId}/alloc`;
-		const res = await fetch(url, {
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`
-			}
-		});
-
-		if (res.ok) {
-			const json = await res.json();
-			return json;
-		} else {
-			throw new Error('Failed to fetch allocations');
-		}
-	}
-
+	let url: string;
 	$: if (job && !isStopped && execControllerComponent) {
 		fetchJobIdAllocations().then((json) => {
-			const url = getAllocExecEndpoint(json);
-			execControllerComponent.connectTerm(url);
+			url = getAllocExecEndpoint(json);
 		});
 	}
 </script>
 
-<ExecController bind:this={execControllerComponent} />
+<ExecController bind:this={execControllerComponent} {url} />
