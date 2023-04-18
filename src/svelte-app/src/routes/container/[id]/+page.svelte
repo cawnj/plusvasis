@@ -12,6 +12,7 @@
 	import { fetchJob } from '$lib/NomadClient';
 	import Fa from 'svelte-fa';
 	import ContainerOptions from '$lib/ContainerOptions.svelte';
+	import { Heading, A } from 'flowbite-svelte';
 
 	const fetchAndSetJob = async () => {
 		const job = await fetchJob($page.params.id);
@@ -47,15 +48,15 @@
 			<Spinner />
 		</div>
 	{:then job}
-		<div class="flex justify-between items-center">
-			<div class="flex items-center">
-				<h1 class="mb-4 text-4xl font-bold font-sans text-white align-middle">
+		<div class="flex justify-between mb-4">
+			<div class="flex items-center font-sans font-bold">
+				<Heading tag="h1" customSize="text-2xl md:text-4xl">
 					{job.containerName}
-				</h1>
+				</Heading>
 				{#if job.port}
-					<a class="align-middle mb-2" href="https://{$currJobId}.local.plusvasis.xyz">
-						<Fa icon={faExternalLink} color="white" class="ml-2" />
-					</a>
+					<A aClass="ml-2" href="https://{$currJobId}.local.plusvasis.xyz">
+						<Fa icon={faExternalLink} color="white" size="xs" />
+					</A>
 				{/if}
 			</div>
 			<ContainerOptions />
