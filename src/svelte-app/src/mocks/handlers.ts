@@ -5,31 +5,33 @@ import { hostname } from '../stores/environmentStore';
 // Will add handler later
 export const handlers = [
 	rest.get(`${hostname}/jobs`, (req, res, ctx) => {
-		return res(ctx.status(200), ctx.json(
-			[
+		return res(
+			ctx.status(200),
+			ctx.json([
 				{
 					ID: 'job123',
-					Name: 'job123',
+					Name: 'job123'
 				}
-			]
-		));
+			])
+		);
 	}),
 	rest.get(`https://nomad.local.cawnj.dev/v1/client/fs/logs/alloc-id-123`, (req, res, ctx) => {
 		return res(ctx.status(200), ctx.json({}));
 	}),
 	rest.get(`${hostname}/job/job123/alloc`, (req, res, ctx) => {
-		return res(ctx.status(200), ctx.json(
-			{
+		return res(
+			ctx.status(200),
+			ctx.json({
 				ID: 'alloc-id-123',
 				TaskStates: {
 					job123: {
 						State: 'running'
 					}
 				}
-			}
-		));
+			})
+		);
 	}),
 	rest.post(`${hostname}/jobs`, (req, res, ctx) => {
 		return res(ctx.status(200), ctx.json({}));
-	}),
+	})
 ];

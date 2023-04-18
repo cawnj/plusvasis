@@ -75,3 +75,15 @@ vi.mock('$app/stores', (): typeof stores => {
 		updated
 	};
 });
+
+// Custom mocks
+
+window.matchMedia = window.matchMedia || function (query) {
+    return {
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: function () {return},
+      removeListener: function () {return}
+    };
+  };

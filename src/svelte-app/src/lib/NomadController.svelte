@@ -22,14 +22,9 @@
 	});
 
 	function getAllocExecEndpoint(json: unknown) {
-		if (
-			typeof json === 'object' &&
-			json !== null &&
-			json.hasOwnProperty('ID') &&
-			json.hasOwnProperty('TaskStates')
-		) {
-			allocId = (json as { ID: string })['ID'];
-			taskName = Object.keys((json as { TaskStates: Record<string, unknown> })['TaskStates'])[0];
+		if (json?.ID && json?.TaskStates) {
+			allocId = json.ID;
+			taskName = Object.keys(json.TaskStates)[0];
 
 			alloc.set(allocId);
 			task.set(taskName);
