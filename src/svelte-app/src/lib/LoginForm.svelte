@@ -29,12 +29,7 @@
 
 		if (title === 'Login') {
 			signInWithEmailAndPassword(auth, email, password)
-				.then((userCredential) => {
-					const user = userCredential.user;
-					localStorage.setItem('uid', user.uid);
-					user.getIdToken().then((token) => {
-						localStorage.setItem('token', token);
-					});
+				.then(() => {
 					goto('/');
 				})
 				.catch((error) => {
@@ -42,9 +37,7 @@
 				});
 		} else {
 			createUserWithEmailAndPassword(auth, email, password)
-				.then((userCredential) => {
-					const user = userCredential.user;
-					console.log(user);
+				.then(() => {
 					goto('/');
 				})
 				.catch((error) => {

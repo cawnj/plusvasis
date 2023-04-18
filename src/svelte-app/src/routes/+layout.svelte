@@ -10,7 +10,10 @@
 		const auth = getAuth();
 		onAuthStateChanged(auth, (user) => {
 			if (user) {
-				console.log('Welcome to PlusVasis');
+				localStorage.setItem('uid', user.uid);
+				user.getIdToken().then((token) => {
+					localStorage.setItem('token', token);
+				});
 			} else {
 				goto('/login');
 			}

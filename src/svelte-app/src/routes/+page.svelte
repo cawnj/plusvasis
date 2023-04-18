@@ -3,7 +3,6 @@
 	import { hostname } from '../stores/environmentStore';
 	import Fa from 'svelte-fa';
 	import { faTerminal } from '@fortawesome/free-solid-svg-icons';
-	import { logout } from '$lib/fb';
 	import { Button, Spinner, Modal, Card } from 'flowbite-svelte';
 
 	const fetchJobs = async () => {
@@ -20,8 +19,6 @@
 
 		if (res.ok) {
 			return await res.json();
-		} else if (res.status === 401) {
-			logout();
 		} else {
 			throw new Error('Failed to fetch jobs');
 		}

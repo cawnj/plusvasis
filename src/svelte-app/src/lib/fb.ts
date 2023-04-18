@@ -17,18 +17,3 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export default app;
-
-import { goto } from '$app/navigation';
-import { getAuth, signOut } from 'firebase/auth';
-
-export function logout() {
-	const auth = getAuth();
-	signOut(auth)
-		.then(() => {
-			localStorage.removeItem('uid');
-			goto('/login');
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-}
