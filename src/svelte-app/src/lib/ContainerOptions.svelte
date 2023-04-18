@@ -5,10 +5,19 @@
 	import { fetchJobStop, fetchJobDelete, fetchJobRestart, fetchJobStart } from '$lib/NomadClient';
 	import Fa from 'svelte-fa';
 	import { goto } from '$app/navigation';
+
+	let width: number;
+	let size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined;
+
+	$: {
+		size = width < 768 ? 'xs' : 'md';
+	}
 </script>
 
-<ButtonGroup>
+<svelte:window bind:innerWidth={width} />
+<ButtonGroup {size}>
 	<Button
+		{size}
 		disabled={!$currJobStopped}
 		on:click={() => fetchJobStart().then(() => window.location.reload())}
 	>
@@ -16,6 +25,7 @@
 		<span class="hidden md:block">Start</span>
 	</Button>
 	<Button
+		{size}
 		disabled={$currJobStopped}
 		on:click={() => fetchJobRestart().then(() => window.location.reload())}
 	>
@@ -23,13 +33,14 @@
 		<span class="hidden md:block">Restart</span>
 	</Button>
 	<Button
+		{size}
 		disabled={$currJobStopped}
 		on:click={() => fetchJobStop().then(() => window.location.reload())}
 	>
 		<Fa icon={faStop} color="red" class="md:mr-2" />
 		<span class="hidden md:block">Stop</span>
 	</Button>
-	<Button on:click={() => fetchJobDelete().then(() => goto('/'))}>
+	<Button {size} on:click={() => fetchJobDelete().then(() => goto('/'))}>
 		<Fa icon={faTrash} class="md:mr-2" />
 		<span class="hidden md:block">Delete</span>
 	</Button>
