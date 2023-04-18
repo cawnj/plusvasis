@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Card, Button, Label, Input } from 'flowbite-svelte';
+	import { Card, Button, Label, Input, Alert } from 'flowbite-svelte';
 	import {
 		getAuth,
 		signInWithEmailAndPassword,
@@ -8,10 +8,13 @@
 	} from 'firebase/auth';
 	import logo from '$lib/assets/logo.png';
 	import app from '$lib/fb';
+	import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+	import Fa from 'svelte-fa';
 
 	export let title: string;
 	let email: string;
 	let password: string;
+	let errorCode: string | null = null;
 
 	const auth = getAuth(app);
 
@@ -35,9 +38,7 @@
 					goto('/');
 				})
 				.catch((error) => {
-					const errorCode = error.code;
-					const errorMessage = error.message;
-					console.log('error code:', errorCode, ' error msg: ', errorMessage);
+					errorCode = error.code;
 				});
 		} else {
 			createUserWithEmailAndPassword(auth, email, password)
@@ -47,9 +48,7 @@
 					goto('/');
 				})
 				.catch((error) => {
-					const errorCode = error.code;
-					const errorMessage = error.message;
-					console.log('error code:', errorCode, ' error msg: ', errorMessage);
+					errorCode = error.code;
 				});
 		}
 	}
@@ -63,12 +62,23 @@
 		</div>
 		<Label class="space-y-2">
 			<span>Email</span>
-			<Input type="email" name="email" placeholder="name@company.com" required />
+			<Input type="email" name="email" placeholder="name@example.com" required />
 		</Label>
 		<Label class="space-y-2">
 			<span>Your password</span>
-			<Input type="password" name="password" placeholder="•••••" required />
+			<Input type="password" name="password" placeholder="••••••••••••" required />
 		</Label>
+		{#if errorCode}
+			<Alert color="none" class="bg-red-100 text-red-600 border-red-800 !py-3">
+				<span slot="icon">
+					<Fa icon={faExclamationTriangle} class="mr-2" />
+				</span>
+				<span>
+					{errorCode}
+				</span>
+			</Alert>
+		{/if}
+
 		{#if title === 'Login'}
 			<Button type="submit" class="w-full">Login to your account</Button>
 		{:else}
