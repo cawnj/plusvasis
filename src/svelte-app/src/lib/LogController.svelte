@@ -2,12 +2,13 @@
 	import { onMount } from 'svelte';
 	import { Button, Dropdown, Chevron, Radio } from 'flowbite-svelte';
 	import { decode, getReader } from './StreamLogs';
+	import type { ReadableStreamDefaultReader as PolyfilledReadableStreamDefaultReader } from 'web-streams-polyfill/ponyfill';
 
 	let type = 'stdout';
 	let logs = '';
 
 	let preEl: HTMLPreElement;
-	let reader: ReadableStreamDefaultReader;
+	let reader: PolyfilledReadableStreamDefaultReader;
 
 	// https://github.com/hashicorp/nomad/blob/main/ui/app/utils/classes/stream-logger.js
 	async function readLogs() {
