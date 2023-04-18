@@ -70,4 +70,8 @@ export class ExecSocketAdapter {
 		}
 		this.socket.send(JSON.stringify({ stdin: { data: b64encode(data) } }));
 	}
+
+	close() {
+		this.socket.close();
+	}
 }

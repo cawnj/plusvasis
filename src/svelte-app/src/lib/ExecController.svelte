@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import 'xterm/css/xterm.css';
 	import type { Terminal } from 'xterm';
 	import type { FitAddon } from 'xterm-addon-fit';
@@ -17,6 +17,7 @@
 	type fitType = typeof import('xterm-addon-fit');
 	let xterm: xtermType;
 	let fit: fitType;
+	let execSocketAdapter: ExecSocketAdapter;
 
 	let terminal: Terminal;
 	let terminalElement: HTMLElement;
@@ -34,11 +35,10 @@
 		terminal.loadAddon(termFit);
 	}
 	function connectTerm() {
-		if (!url) {
-			setTimeout(() => connectTerm(), 100);
-			return;
-		}
-		new ExecSocketAdapter(terminal, url);
+		execSocketAdapter = new ExecSocketAdapter(terminal, url);
+	}
+	export function write(content: string) {
+		terminal.write(content);
 	}
 	function postInit() {
 		if (terminalElement && terminal) {
@@ -55,9 +55,10 @@
 		initalizeXterm();
 		postInit();
 	});
-	export function write(content: string) {
-		terminal.write(content);
-	}
+	onDestroy(() => {
+		terminal.dispose();
+		execSocketAdapter.close();
+	});
 </script>
 
 <svelte:window bind:innerWidth={width} />
