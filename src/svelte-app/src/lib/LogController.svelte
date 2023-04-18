@@ -3,6 +3,12 @@
 	import { Button, Dropdown, Chevron, Radio } from 'flowbite-svelte';
 	import { decode, getReader } from './StreamLogs';
 	import type { ReadableStreamDefaultReader as PolyfilledReadableStreamDefaultReader } from 'web-streams-polyfill/ponyfill';
+	import { currJobStopped } from '../stores/nomadStore';
+
+	let isStopped: boolean;
+	currJobStopped.subscribe((value) => {
+		isStopped = value;
+	});
 
 	let type = 'stdout';
 	let logs = '';
@@ -37,13 +43,17 @@
 
 	async function changeType() {
 		if (reader) reader.cancel();
-		reader = await getReader(type);
-		readLogs();
+		if (!isStopped) {
+			reader = await getReader(type);
+			readLogs();
+		}
 	}
 
 	onMount(async () => {
-		reader = await getReader(type);
-		readLogs();
+		if (!isStopped) {
+			reader = await getReader(type);
+			readLogs();
+		}
 	});
 
 	$: {

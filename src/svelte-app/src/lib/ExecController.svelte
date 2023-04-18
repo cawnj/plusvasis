@@ -4,6 +4,12 @@
 	import type { Terminal } from 'xterm';
 	import type { FitAddon } from 'xterm-addon-fit';
 	import { ExecSocketAdapter } from './ExecSocketAdapter';
+	import { currJobStopped } from '../stores/nomadStore';
+
+	let isStopped: boolean;
+	currJobStopped.subscribe((value) => {
+		isStopped = value;
+	});
 
 	export let wsUrl: string;
 	let width: number;
@@ -56,10 +62,10 @@
 		postInit();
 	});
 	onDestroy(() => {
-		terminal.dispose();
-		execSocketAdapter.close();
+		if (terminal) terminal.dispose();
+		if (execSocketAdapter) execSocketAdapter.close();
 	});
-	$: if (wsUrl && terminal) {
+	$: if (!isStopped && wsUrl && terminal) {
 		connectTerm();
 	}
 </script>
