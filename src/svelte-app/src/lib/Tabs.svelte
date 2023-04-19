@@ -14,7 +14,7 @@
 	{:else}
 		{#each tabs as tab, index}
 			<TabItem open={index === 0}>
-				<div slot="title" class="flex items-center gap-2">
+				<div slot="title" class="flex items-center gap-2 text-xs md:text-sm">
 					<Fa icon={tab.icon} color="white" />
 					{tab.name}
 				</div>

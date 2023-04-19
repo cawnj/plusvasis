@@ -39,8 +39,8 @@ describe('form submission', () => {
 	it('should call the login function with form data on form submission', () => {
 		render(LoginForm, { title: 'Login' });
 
-		const emailInput = screen.getByPlaceholderText('name@company.com');
-		const passwordInput = screen.getByPlaceholderText('•••••');
+		const emailInput = screen.getByPlaceholderText('name@example.com');
+		const passwordInput = screen.getByPlaceholderText('••••••••••••');
 		const submitButton = screen.getByText('Login to your account');
 
 		fireEvent.input(emailInput, { target: { value: 'test@example.com' } });

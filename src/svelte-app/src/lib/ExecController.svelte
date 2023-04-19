@@ -6,6 +6,12 @@
 	import { ExecSocketAdapter } from './ExecSocketAdapter';
 
 	export let url: string;
+	let width: number;
+	let fontSize = 14;
+
+	$: {
+		fontSize = width < 768 ? 12 : 18;
+	}
 
 	type xtermType = typeof import('xterm');
 	type fitType = typeof import('xterm-addon-fit');
@@ -19,7 +25,10 @@
 	function initalizeXterm() {
 		terminal = new xterm.Terminal({
 			fontFamily: 'monospace',
-			fontWeight: '400'
+			fontWeight: '400',
+			fontSize: fontSize,
+			cursorBlink: true,
+			scrollback: 10000
 		});
 		termFit = new fit.FitAddon();
 		terminal.loadAddon(termFit);
@@ -51,4 +60,5 @@
 	}
 </script>
 
+<svelte:window bind:innerWidth={width} />
 <div id="terminal" data-testid="exec-controller" bind:this={terminalElement} />

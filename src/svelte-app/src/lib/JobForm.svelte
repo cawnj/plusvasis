@@ -61,7 +61,16 @@
 			<div class="mb-3 mt-3">
 				<Label class="block mb-2">{value.title}</Label>
 				{#if value.type === 'input'}
-					<Input label={key} id={key} name={key} placeholder={value.placeholder} value={job[key]} />
+					<Input
+						label={key}
+						id={key}
+						name={key}
+						placeholder={value.placeholder}
+						value={job[key]}
+						autocapitalize="off"
+						autocomplete="off"
+						autocorrect="off"
+					/>
 				{:else if value.type === 'option'}
 					<Select label={key} id={key} name={key} items={value.options} value={job[key]} />
 				{:else if value.type === 'toggle'}

@@ -4,29 +4,15 @@
 	import NomadController from '$lib/NomadController.svelte';
 	import Tabs from '$lib/Tabs.svelte';
 	import type { Tab } from '$lib/Types';
-	import { currJobId, currJob, currJobStopped } from '../../../stores/nomadStore';
+	import { currJobId, currJob } from '../../../stores/nomadStore';
 	import LogController from '$lib/LogController.svelte';
 	import SettingsController from '$lib/SettingsController.svelte';
-	import { Button, ButtonGroup, Modal, Spinner } from 'flowbite-svelte';
-	import {
-		faTerminal,
-		faFileAlt,
-		faCog,
-		faPlay,
-		faStop,
-		faTrash,
-		faRefresh,
-		faExternalLink
-	} from '@fortawesome/free-solid-svg-icons';
-	import {
-		fetchJob,
-		fetchJobStop,
-		fetchJobDelete,
-		fetchJobRestart,
-		fetchJobStart
-	} from '$lib/NomadClient';
+	import { Button, Modal, Spinner } from 'flowbite-svelte';
+	import { faTerminal, faFileAlt, faCog, faExternalLink } from '@fortawesome/free-solid-svg-icons';
+	import { fetchJob } from '$lib/NomadClient';
 	import Fa from 'svelte-fa';
-	import { goto } from '$app/navigation';
+	import ContainerOptions from '$lib/ContainerOptions.svelte';
+	import { Heading, A } from 'flowbite-svelte';
 
 	const fetchAndSetJob = async () => {
 		const job = await fetchJob($page.params.id);
@@ -56,50 +42,24 @@
 </script>
 
 <Nav />
-<div class="px-8 md:px-16 mb-4">
+<div class="px-4 md:px-16 mb-4">
 	{#await fetchAndSetJob()}
 		<div class="grid h-96 place-items-center">
 			<Spinner />
 		</div>
 	{:then job}
-		<div class="flex justify-between items-center">
-			<div class="flex items-center">
-				<h1 class="mb-4 text-4xl font-bold font-sans text-white align-middle">
+		<div class="flex justify-between mb-4">
+			<div class="flex items-center font-sans font-bold">
+				<Heading tag="h1" customSize="text-2xl md:text-4xl">
 					{job.containerName}
-				</h1>
+				</Heading>
 				{#if job.port}
-					<a class="align-middle mb-2" href="https://{$currJobId}.local.plusvasis.xyz">
-						<Fa icon={faExternalLink} color="white" class="ml-2" />
-					</a>
+					<A aClass="ml-2" href="https://{$currJobId}.local.plusvasis.xyz">
+						<Fa icon={faExternalLink} color="white" size="xs" />
+					</A>
 				{/if}
 			</div>
-			<ButtonGroup>
-				<Button
-					disabled={!$currJobStopped}
-					on:click={() => fetchJobStart().then(() => window.location.reload())}
-				>
-					<Fa icon={faPlay} color="green" class="mr-2" />
-					Start
-				</Button>
-				<Button
-					disabled={$currJobStopped}
-					on:click={() => fetchJobRestart().then(() => window.location.reload())}
-				>
-					<Fa icon={faRefresh} color="orange" class="mr-2" />
-					Restart
-				</Button>
-				<Button
-					disabled={$currJobStopped}
-					on:click={() => fetchJobStop().then(() => window.location.reload())}
-				>
-					<Fa icon={faStop} color="red" class="mr-2" />
-					Stop
-				</Button>
-				<Button on:click={() => fetchJobDelete().then(() => goto('/'))}>
-					<Fa icon={faTrash} class="mr-2" />
-					Delete
-				</Button>
-			</ButtonGroup>
+			<ContainerOptions />
 		</div>
 		<Tabs {tabs} />
 	{:catch error}
