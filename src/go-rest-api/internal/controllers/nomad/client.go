@@ -14,7 +14,6 @@ type NomadClient interface {
 	Get(endpoint string) ([]byte, error)
 	Post(endpoint string, reqBody *bytes.Buffer) ([]byte, error)
 	Delete(endpoint string) ([]byte, error)
-	RawGet(endpoint string) (*http.Response, error)
 }
 
 type DefaultNomadClient struct{}
@@ -70,16 +69,4 @@ func (n *DefaultNomadClient) Delete(endpoint string) ([]byte, error) {
 		return nil, err
 	}
 	return body, nil
-}
-
-func (n *DefaultNomadClient) RawGet(endpoint string) (*http.Response, error) {
-	url := NOMAD_URL + endpoint
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != 200 {
-		return nil, echo.NewHTTPError(resp.StatusCode)
-	}
-	return resp, nil
 }
