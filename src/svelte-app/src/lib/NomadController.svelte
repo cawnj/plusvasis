@@ -3,7 +3,6 @@
 	import { currJobId, currJob, currJobStopped } from '../stores/nomadStore';
 	import { hostname } from '../stores/environmentStore';
 	import type { Job } from '$lib/Types';
-	import { fetchJobIdAllocations } from '$lib/NomadClient';
 
 	let execControllerComponent: ExecController;
 	let wsUrl: string;

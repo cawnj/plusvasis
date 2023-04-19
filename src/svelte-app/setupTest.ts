@@ -80,7 +80,7 @@ vi.mock('$app/stores', (): typeof stores => {
 
 window.matchMedia =
 	window.matchMedia ||
-	function (query) {
+	function () {
 		return {
 			addListener: function () {
 				return;
