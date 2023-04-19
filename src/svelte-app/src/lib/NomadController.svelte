@@ -23,10 +23,7 @@
 	function setExecUrl() {
 		const url = new URL(`${hostname}/job/${jobId}/exec`);
 		url.protocol = url.protocol.replace('http', 'ws');
-		url.searchParams.append('task', job.containerName);
 		url.searchParams.append('command', `["${job.shell}"]`);
-		url.searchParams.append('tty', 'true');
-		url.searchParams.append('ws_handshake', 'true');
 		wsUrl = url.toString();
 	}
 

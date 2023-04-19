@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"sync"
 	"time"
 
@@ -31,8 +32,8 @@ const idleTimeout = 30 * time.Second
 
 func (n *NomadProxyController) AllocExec(c echo.Context) error {
 	id := c.Param("id")
-	rawQuery := c.Request().URL.RawQuery
-	if rawQuery == "" {
+	command := c.QueryParam("command")
+	if command == "" {
 		return fmt.Errorf("missing query parameters")
 	}
 
@@ -41,10 +42,17 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 		return err
 	}
 
-	nomadURL := "wss://nomad.local.cawnj.dev/v1/client/allocation/" + alloc.ID + "/exec"
-	nomadURL += "?" + rawQuery
+	baseURL := "wss://nomad.local.cawnj.dev/"
+	path := "v1/client/allocation/" + alloc.ID + "/exec"
+	queryParams := url.Values{}
+	queryParams.Add("command", command)
+	queryParams.Add("task", alloc.TaskGroup)
+	queryParams.Add("tty", "true")
+	queryParams.Add("ws_handshake", "true")
 
-	nomadConn, _, err := websocket.DefaultDialer.Dial(nomadURL, nil)
+	url := baseURL + path + "?" + queryParams.Encode()
+
+	nomadConn, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		return err
 	}
@@ -121,8 +129,9 @@ func (n *NomadProxyController) parseRunningAlloc(jobId string) (*structs.AllocLi
 
 func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 	id := c.Param("id")
-	rawQuery := c.Request().URL.RawQuery
-	if rawQuery == "" {
+	task := c.QueryParam("task")
+	logType := c.QueryParam("type")
+	if task == "" || logType == "" {
 		return fmt.Errorf("missing query parameters")
 	}
 
@@ -131,23 +140,30 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 		return err
 	}
 
-	nomadURL := "https://nomad.local.cawnj.dev/v1/client/fs/logs/" + alloc.ID
-	nomadURL += "?" + rawQuery
+	baseURL := "https://nomad.local.cawnj.dev/"
+	path := "v1/client/fs/logs/" + alloc.ID
+	queryParams := url.Values{}
+	queryParams.Add("task", task)
+	queryParams.Add("type", logType)
+	queryParams.Add("follow", "true")
+	queryParams.Add("offset", "50000")
+	queryParams.Add("origin", "end")
 
-	resp, err := n.forwardRequest(c, nomadURL)
+	url := baseURL + path + "?" + queryParams.Encode()
+	resp, err := n.forwardRequest(c, url)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	log.Printf("Started log streaming for job %s", id)
+	log.Printf("Started streaming %s for job %s", logType, id)
 
 	err = streamResponse(c, resp)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
 
-	log.Printf("Stopped log streaming for job %s", id)
+	log.Printf("Stopped streaming %s for job %s", logType, id)
 	return nil
 }
 

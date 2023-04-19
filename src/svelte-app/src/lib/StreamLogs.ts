@@ -32,9 +32,6 @@ export async function getStream(type: string, abortController: AbortController) 
 	const urlBuilder = new URL(`${hostname}/job/${jobId}/logs`);
 	urlBuilder.searchParams.append('task', job.containerName);
 	urlBuilder.searchParams.append('type', type);
-	urlBuilder.searchParams.append('follow', 'true');
-	urlBuilder.searchParams.append('offset', '50000');
-	urlBuilder.searchParams.append('origin', 'end');
 	const url = urlBuilder.toString();
 
 	const response = await fetch(url, {
