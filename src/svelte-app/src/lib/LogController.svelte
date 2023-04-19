@@ -57,6 +57,11 @@
 			readLogs();
 		}
 	}
+	function scrollToBottom() {
+		if (preEl) {
+			preEl.scrollTop = preEl.scrollHeight;
+		}
+	}
 
 	onMount(async () => {
 		if (!isStopped) {
@@ -70,7 +75,10 @@
 	});
 
 	$: {
-		if (preEl) preEl.scrollTop = preEl.scrollHeight;
+		if (logs)
+			requestAnimationFrame(() => {
+				setTimeout(scrollToBottom, 0);
+			});
 	}
 </script>
 
