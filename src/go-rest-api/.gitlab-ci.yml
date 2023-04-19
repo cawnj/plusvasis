@@ -22,3 +22,7 @@ lint:
 test:
   stage: test
   script: go test -v ./...
+
+build:
+  stage: build
+  script: go build ./cmd/server/main.go

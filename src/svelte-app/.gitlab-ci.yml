@@ -15,3 +15,7 @@ lint:
 test:
   stage: test
   script: npm run test:unit run
+
+build:
+  stage: build
+  script: npm run build
