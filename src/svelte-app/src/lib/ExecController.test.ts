@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
 import ExecController from './ExecController.svelte';
-import { hostname } from '../stores/environmentStore';
 
 describe('ExecController', () => {
 	it('should render', () => {
