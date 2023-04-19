@@ -33,14 +33,20 @@
 			<Spinner />
 		</div>
 	{:then jobs}
-		{#each jobs as job}
-			<Card class="my-3" href={`/container/${job.ID}`}>
-				<div class="flex items-center my-1">
-					<Fa icon={faTerminal} color="white" class="pr-6" />
-					<span class="text-xl text-white">{job.Name}</span>
-				</div>
-			</Card>
-		{/each}
+		{#if !jobs}
+			<div class="py-4">
+				<span class="text-white">No containers found</span>
+			</div>
+		{:else}
+			{#each jobs as job}
+				<Card class="my-3" href={`/container/${job.ID}`}>
+					<div class="flex items-center my-1">
+						<Fa icon={faTerminal} color="white" class="pr-6" />
+						<span class="text-xl text-white">{job.Name}</span>
+					</div>
+				</Card>
+			{/each}
+		{/if}
 	{:catch error}
 		<Modal title="Error" open={true}>
 			<div class="grid justify-center w-40">
