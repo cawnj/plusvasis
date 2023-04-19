@@ -28,7 +28,7 @@ export function decode(chunk: string): { offset: number; message: string } | nul
 	return null;
 }
 
-export async function getStream(type: string) {
+export async function getStream(type: string, abortController: AbortController) {
 	const urlBuilder = new URL(`${hostname}/job/${jobId}/logs`);
 	urlBuilder.searchParams.append('task', job.containerName);
 	urlBuilder.searchParams.append('type', type);
@@ -37,7 +37,9 @@ export async function getStream(type: string) {
 	urlBuilder.searchParams.append('origin', 'end');
 	const url = urlBuilder.toString();
 
-	const response = await fetch(url);
+	const response = await fetch(url, {
+		signal: abortController.signal
+	});
 	if (!response.ok) {
 		throw new Error(response.statusText);
 	} else if (!response.body) {
