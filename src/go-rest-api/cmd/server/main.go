@@ -12,11 +12,16 @@ import (
 func main() {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
+		AllowOrigins: []string{
+			"http://localhost:5173",
+			"https://*.plusvasis.xyz",
+		},
 		AllowHeaders: []string{"*"},
 	}))
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.Secure())
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
 	routes.HealthRoutes(e)
 	routes.NomadJobs(e)
