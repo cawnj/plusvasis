@@ -2,8 +2,8 @@
 	import Nav from '$lib/NavBar.svelte';
 	import { hostname } from '../stores/environmentStore';
 	import Fa from 'svelte-fa';
-	import { faTerminal } from '@fortawesome/free-solid-svg-icons';
-	import { Button, Spinner, Modal, Card } from 'flowbite-svelte';
+	import { faInfoCircle, faTerminal } from '@fortawesome/free-solid-svg-icons';
+	import { Button, Spinner, Modal, Card, Alert } from 'flowbite-svelte';
 
 	const fetchJobs = async () => {
 		let res: Response;
@@ -34,9 +34,10 @@
 		</div>
 	{:then jobs}
 		{#if !jobs}
-			<div class="py-4">
-				<span class="text-white">No containers found</span>
-			</div>
+			<Alert class="my-4 max-w-md">
+				<span slot="icon"><Fa icon={faInfoCircle} /> </span>
+				<span class="font-medium">It seems like you haven't created any containers yet...</span>
+			</Alert>
 		{:else}
 			{#each jobs as job}
 				<Card class="my-3" href={`/container/${job.ID}`}>
