@@ -7,6 +7,11 @@ cache:
     - vendor/cache
     - vendor/linter-cache
 
+variables:
+  GOCACHE: ${CI_PROJECT_DIR}/vendor/cache
+  GOPATH: ${CI_PROJECT_DIR}/vendor/go
+  GOLANGCI_LINT_CACHE: ${CI_PROJECT_DIR}/vendor/linter-cache
+
 before_script:
   - cd src/go-rest-api
 
@@ -15,10 +20,6 @@ lint:
   image: golangci/golangci-lint
   script:
     - golangci-lint run -v --timeout=5m
-  variables:
-    GOCACHE: ${CI_PROJECT_DIR}/vendor/cache
-    GOPATH: ${CI_PROJECT_DIR}/vendor/go
-    GOLANGCI_LINT_CACHE: ${CI_PROJECT_DIR}/vendor/linter-cache
 
 test:
   stage: test
