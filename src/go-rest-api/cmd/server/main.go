@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"plusvasis/internal/middleware/firebase"
 	"plusvasis/internal/routes"
 
 	"github.com/labstack/echo/v4"
@@ -22,6 +23,7 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
+	e.Use(firebase.Auth())
 
 	routes.HealthRoutes(e)
 	routes.NomadJobs(e)
