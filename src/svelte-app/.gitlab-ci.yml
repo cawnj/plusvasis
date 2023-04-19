@@ -1,6 +1,7 @@
 image: node:latest
 
 cache:
+  key: node-cache
   paths:
     - src/svelte-app/node_modules/
 

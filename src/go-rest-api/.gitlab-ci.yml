@@ -1,5 +1,12 @@
 image: golang:1.19
 
+cache:
+  key: gocache
+  paths:
+    - vendor/go/pkg/mod/
+    - vendor/cache
+    - vendor/linter-cache
+
 before_script:
   - cd src/go-rest-api
 
@@ -12,12 +19,6 @@ lint:
     GOCACHE: ${CI_PROJECT_DIR}/vendor/cache
     GOPATH: ${CI_PROJECT_DIR}/vendor/go
     GOLANGCI_LINT_CACHE: ${CI_PROJECT_DIR}/vendor/linter-cache
-  cache:
-    key: lintercache
-    paths:
-      - vendor/go/pkg/mod/
-      - vendor/cache
-      - vendor/linter-cache
 
 test:
   stage: test
