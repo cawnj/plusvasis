@@ -2,6 +2,7 @@ package firebase
 
 import (
 	"context"
+	"net/http"
 	"strings"
 
 	firebase "firebase.google.com/go"
@@ -53,13 +54,13 @@ func WithConfig(config Config) echo.MiddlewareFunc {
 				token := strings.Split(c.Request().Header["Authorization"][0], "Bearer ")[1]
 				user, err := client.VerifyIDToken(context.Background(), token)
 				if err != nil {
-					return echo.ErrUnauthorized
+					return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 				}
 
 				c.Set("uid", user.UID)
 				return next(c)
 			} else {
-				return echo.ErrUnauthorized
+				return echo.NewHTTPError(http.StatusUnauthorized, "missing authorization header")
 			}
 		}
 	}

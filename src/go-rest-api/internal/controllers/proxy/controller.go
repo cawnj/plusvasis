@@ -54,23 +54,23 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 
 	nomadConn, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
-		return err
+		return echo.ErrBadGateway
 	}
 	defer nomadConn.Close()
 
 	clientConn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
-		return err
+		return echo.ErrBadGateway
 	}
 	defer clientConn.Close()
 
 	err = nomadConn.SetReadDeadline(time.Now().Add(idleTimeout))
 	if err != nil {
-		return err
+		return echo.ErrInternalServerError
 	}
 	err = clientConn.SetReadDeadline(time.Now().Add(idleTimeout))
 	if err != nil {
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	log.Printf("Started terminal session for job %s", id)
@@ -116,7 +116,7 @@ func (n *NomadProxyController) parseRunningAlloc(jobId string) (*structs.AllocLi
 	var allocs []structs.AllocListStub
 	err = json.Unmarshal(data, &allocs)
 	if err != nil {
-		return nil, err
+		return nil, echo.ErrInternalServerError
 	}
 	for _, alloc := range allocs {
 		if alloc.ClientStatus == "running" || alloc.ClientStatus == "pending" {
@@ -124,7 +124,7 @@ func (n *NomadProxyController) parseRunningAlloc(jobId string) (*structs.AllocLi
 		}
 	}
 
-	return nil, fmt.Errorf("no running alloc found for job %s", jobId)
+	return nil, echo.ErrNotFound
 }
 
 func (n *NomadProxyController) StreamLogs(c echo.Context) error {
@@ -132,7 +132,7 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 	task := c.QueryParam("task")
 	logType := c.QueryParam("type")
 	if task == "" || logType == "" {
-		return fmt.Errorf("missing query parameters")
+		return echo.ErrBadRequest
 	}
 
 	alloc, err := n.parseRunningAlloc(id)
@@ -160,7 +160,7 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 
 	err = streamResponse(c, resp)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, err.Error())
+		return err
 	}
 
 	log.Printf("Stopped streaming %s for job %s", logType, id)
@@ -170,7 +170,7 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 func (n *NomadProxyController) forwardRequest(c echo.Context, url string) (*http.Response, error) {
 	req, err := http.NewRequest(c.Request().Method, url, c.Request().Body)
 	if err != nil {
-		return nil, err
+		return nil, echo.ErrInternalServerError
 	}
 
 	for key, values := range c.Request().Header {
@@ -181,15 +181,18 @@ func (n *NomadProxyController) forwardRequest(c echo.Context, url string) (*http
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
+	if err != nil {
+		return nil, echo.ErrBadGateway
+	}
 
-	return resp, err
+	return resp, nil
 }
 
 func streamResponse(c echo.Context, resp *http.Response) error {
 	if resp.Header.Get("Content-Encoding") == "gzip" {
 		gzipReader, err := gzip.NewReader(resp.Body)
 		if err != nil {
-			return err
+			return echo.ErrInternalServerError
 		}
 		defer gzipReader.Close()
 		resp.Body = gzipReader
@@ -202,7 +205,7 @@ func streamResponse(c echo.Context, resp *http.Response) error {
 			if err == io.EOF {
 				break
 			}
-			return err
+			return echo.ErrInternalServerError
 		}
 
 		select {
@@ -213,7 +216,7 @@ func streamResponse(c echo.Context, resp *http.Response) error {
 
 		_, err = c.Response().Writer.Write(buf[:bytesRead])
 		if err != nil {
-			return err
+			return echo.ErrInternalServerError
 		}
 
 		if flusher, ok := c.Response().Writer.(http.Flusher); ok {

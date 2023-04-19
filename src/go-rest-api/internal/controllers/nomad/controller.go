@@ -20,15 +20,13 @@ type NomadController struct {
 func (n *NomadController) GetJobs(c echo.Context) error {
 	data, err := n.Client.Get("/jobs?meta=true")
 	if err != nil {
-		log.Println("[nomad/GetJobs]", err)
 		return err
 	}
 
 	var jobs []nomad.JobListStub
 	err = json.Unmarshal(data, &jobs)
 	if err != nil {
-		log.Println("[nomad/GetJobs]", err)
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	var filteredJobs []nomad.JobListStub
@@ -53,20 +51,18 @@ func (n *NomadController) CreateJob(c echo.Context) error {
 
 	body, err := templates.CreateJobJson(job)
 	if err != nil {
-		log.Println("[nomad/CreateJob]", err)
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	data, err := n.Client.Post("/jobs", body)
 	if err != nil {
-		log.Println("[nomad/CreateJob]", err)
 		return err
 	}
 
 	var resp nomad.JobRegisterResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	return c.JSON(http.StatusOK, resp)
@@ -81,8 +77,7 @@ func (n *NomadController) UpdateJob(c echo.Context) error {
 
 	body, err := templates.CreateJobJson(job)
 	if err != nil {
-		log.Println("[nomad/UpdateJob]", err)
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	uid := c.Get("uid").(string)
@@ -93,14 +88,13 @@ func (n *NomadController) UpdateJob(c echo.Context) error {
 
 	data, err := n.Client.Post(fmt.Sprintf("/job/%s", jobId), body)
 	if err != nil {
-		log.Println("[nomad/UpdateJob]", err)
 		return err
 	}
 
 	var resp nomad.JobRegisterResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	return c.JSON(http.StatusOK, resp)
@@ -112,15 +106,13 @@ func (n *NomadController) ReadJob(c echo.Context) error {
 
 	data, err := n.Client.Get(fmt.Sprintf("/job/%s", jobId))
 	if err != nil {
-		log.Println("[nomad/ReadJob]", err)
 		return err
 	}
 
 	var job nomad.Job
 	err = json.Unmarshal(data, &job)
 	if err != nil {
-		log.Println("[nomad/ReadJob]", err)
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	// Doing this check here because if we use n.CheckUserAllowed, we will duplicate requests
@@ -146,14 +138,13 @@ func (n *NomadController) StopJob(c echo.Context) error {
 	}
 	data, err := n.Client.Delete(url)
 	if err != nil {
-		log.Println("[nomad/StopJob]", err)
 		return err
 	}
 
 	var resp nomad.JobDeregisterResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	return c.JSON(http.StatusOK, resp)
@@ -169,15 +160,13 @@ func (n *NomadController) ReadJobAllocs(c echo.Context) error {
 
 	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
 	if err != nil {
-		log.Println("[nomad/ReadJobAllocs]", err)
 		return err
 	}
 
 	var allocs []nomad.AllocListStub
 	err = json.Unmarshal(data, &allocs)
 	if err != nil {
-		log.Println("[nomad/ReadJobAllocs]", err)
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	return c.JSON(http.StatusOK, allocs)
@@ -193,7 +182,6 @@ func (n *NomadController) ReadJobAlloc(c echo.Context) error {
 
 	alloc, err := n.ParseRunningAlloc(jobId)
 	if err != nil {
-		log.Println("[nomad/ReadJobAlloc]", err)
 		return err
 	}
 	return c.JSON(http.StatusOK, alloc)
@@ -204,28 +192,24 @@ func (n *NomadController) RestartJob(c echo.Context) error {
 	jobId := c.Param("id")
 
 	if err := n.CheckUserAllowed(uid, jobId); err != nil {
-		fmt.Println(err)
 		return err
 	}
 
 	alloc, err := n.ParseRunningAlloc(jobId)
 	if err != nil {
-		log.Println("[nomad/RestartJob]", err)
 		return err
 	}
 
 	body := bytes.NewBuffer([]byte{})
 	data, err := n.Client.Post(fmt.Sprintf("/client/allocation/%s/restart", alloc.ID), body)
 	if err != nil {
-		log.Println("[nomad/RestartJob]", err)
 		return err
 	}
 
 	var resp nomad.GenericResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
-		log.Println("[nomad/RestartJob]", err)
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	return c.JSON(http.StatusOK, resp)
@@ -237,7 +221,6 @@ func (n *NomadController) StartJob(c echo.Context) error {
 
 	data, err := n.Client.Get(fmt.Sprintf("/job/%s", jobId))
 	if err != nil {
-		log.Println("[nomad/StartJob]", err)
 		return err
 	}
 
@@ -261,20 +244,18 @@ func (n *NomadController) StartJob(c echo.Context) error {
 
 	body, err := json.Marshal(jobRequest)
 	if err != nil {
-		log.Println("[nomad/StartJob]", err)
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	data, err = n.Client.Post(fmt.Sprintf("/job/%s", jobId), bytes.NewBuffer(body))
 	if err != nil {
-		log.Println("[nomad/UpdateJob]", err)
 		return err
 	}
 
 	var resp nomad.JobRegisterResponse
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	return c.JSON(http.StatusOK, resp)
@@ -289,7 +270,7 @@ func (n *NomadController) CheckUserAllowed(uid, jobId string) error {
 	var job nomad.Job
 	err = json.Unmarshal(data, &job)
 	if err != nil {
-		return err
+		return echo.ErrInternalServerError
 	}
 
 	if job.Meta["user"] != uid {
@@ -308,7 +289,7 @@ func (n *NomadController) ParseRunningAlloc(jobId string) (*nomad.AllocListStub,
 	var allocs []nomad.AllocListStub
 	err = json.Unmarshal(data, &allocs)
 	if err != nil {
-		return nil, err
+		return nil, echo.ErrInternalServerError
 	}
 	for _, alloc := range allocs {
 		if alloc.ClientStatus == "running" || alloc.ClientStatus == "pending" {
@@ -316,7 +297,7 @@ func (n *NomadController) ParseRunningAlloc(jobId string) (*nomad.AllocListStub,
 		}
 	}
 
-	return nil, fmt.Errorf("no running alloc found for job %s", jobId)
+	return nil, echo.ErrNotFound
 }
 
 func (n *NomadController) GetExistingJobNames(uid string) ([]string, error) {
