@@ -50,7 +50,6 @@
 		if (terminalElement && terminal) {
 			terminal.open(terminalElement);
 			termFit.fit();
-			connectTerm();
 		} else {
 			setTimeout(() => postInit(), 100);
 		}
