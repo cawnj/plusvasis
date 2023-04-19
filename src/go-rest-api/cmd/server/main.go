@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"plusvasis/internal/middleware/firebase"
 	"plusvasis/internal/routes"
 
 	"github.com/labstack/echo/v4"
@@ -12,11 +13,19 @@ import (
 func main() {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
+		AllowOrigins: []string{
+			"http://localhost:5173",
+			"https://*.plusvasis.xyz",
+		},
 		AllowHeaders: []string{"*"},
 	}))
-	e.Use(middleware.Logger())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "method=${method}, path=${path}, status=${status}, error=${error}\n",
+	}))
 	e.Use(middleware.Recover())
+	e.Use(middleware.Secure())
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
+	e.Use(firebase.Auth())
 
 	routes.HealthRoutes(e)
 	routes.NomadJobs(e)

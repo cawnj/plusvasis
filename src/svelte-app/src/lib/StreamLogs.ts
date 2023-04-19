@@ -35,7 +35,10 @@ export async function getStream(type: string, abortController: AbortController) 
 	const url = urlBuilder.toString();
 
 	const response = await fetch(url, {
-		signal: abortController.signal
+		signal: abortController.signal,
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem('token')}`
+		}
 	});
 	if (!response.ok) {
 		throw new Error(response.statusText);
