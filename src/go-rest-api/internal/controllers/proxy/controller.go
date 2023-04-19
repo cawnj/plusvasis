@@ -189,6 +189,12 @@ func streamResponse(c echo.Context, resp *http.Response) error {
 			return err
 		}
 
+		select {
+		case <-c.Request().Context().Done():
+			return nil
+		default:
+		}
+
 		_, err = c.Response().Writer.Write(buf[:bytesRead])
 		if err != nil {
 			return err
