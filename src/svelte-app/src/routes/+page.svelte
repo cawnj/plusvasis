@@ -27,12 +27,12 @@
 
 <Nav />
 <div class="px-4 md:px-16">
+	<Button color="blue" href="/create">Create Container</Button>
 	{#await fetchJobs()}
 		<div class="grid h-96 place-items-center">
 			<Spinner />
 		</div>
 	{:then jobs}
-		<Button color="blue" href="/create">Create Container</Button>
 		{#each jobs as job}
 			<Card class="my-3" href={`/container/${job.ID}`}>
 				<div class="flex items-center my-1">
