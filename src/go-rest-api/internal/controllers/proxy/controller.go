@@ -65,22 +65,24 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 		return err
 	}
 
+	log.Printf("Started terminal session for job %s", id)
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
-		n.forwardMessages(clientConn, nomadConn, "client")
+		n.forwardMessages(clientConn, nomadConn)
 		wg.Done()
 	}()
 	go func() {
-		n.forwardMessages(nomadConn, clientConn, "nomad")
+		n.forwardMessages(nomadConn, clientConn)
 		wg.Done()
 	}()
 	wg.Wait()
 
+	log.Printf("Stopped terminal session for job %s", id)
 	return nil
 }
 
-func (n *NomadProxyController) forwardMessages(srcConn, dstConn *websocket.Conn, name string) {
+func (n *NomadProxyController) forwardMessages(srcConn, dstConn *websocket.Conn) {
 	for {
 		msgType, msg, err := srcConn.ReadMessage()
 		if err != nil {
@@ -90,7 +92,6 @@ func (n *NomadProxyController) forwardMessages(srcConn, dstConn *websocket.Conn,
 		if err != nil {
 			break
 		}
-		log.Printf("%s: %s\n", name, msg)
 		err = srcConn.SetReadDeadline(time.Now().Add(idleTimeout))
 		if err != nil {
 			break
@@ -139,10 +140,14 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 	}
 	defer resp.Body.Close()
 
+	log.Printf("Started log streaming for job %s", id)
+
 	err = streamResponse(c, resp)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
+
+	log.Printf("Stopped log streaming for job %s", id)
 	return nil
 }
 
