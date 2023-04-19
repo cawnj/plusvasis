@@ -49,19 +49,22 @@ func WithConfig(config Config) echo.MiddlewareFunc {
 				return next(c)
 			}
 
+			token := ""
 			if c.Request().Header["Authorization"] != nil {
-
-				token := strings.Split(c.Request().Header["Authorization"][0], "Bearer ")[1]
-				user, err := client.VerifyIDToken(context.Background(), token)
-				if err != nil {
-					return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-				}
-
-				c.Set("uid", user.UID)
-				return next(c)
+				token = strings.Split(c.Request().Header["Authorization"][0], "Bearer ")[1]
+			} else if c.QueryParam("access_token") != "" {
+				token = c.QueryParam("access_token")
 			} else {
-				return echo.NewHTTPError(http.StatusUnauthorized, "missing authorization header")
+				return echo.NewHTTPError(http.StatusUnauthorized, "missing auth token")
 			}
+
+			user, err := client.VerifyIDToken(context.Background(), token)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+			}
+
+			c.Set("uid", user.UID)
+			return next(c)
 		}
 	}
 }

@@ -24,6 +24,10 @@
 		const url = new URL(`${hostname}/job/${jobId}/exec`);
 		url.protocol = url.protocol.replace('http', 'ws');
 		url.searchParams.append('command', `["${job.shell}"]`);
+
+		const token = localStorage.getItem('token');
+		if (token) url.searchParams.append('access_token', token);
+
 		wsUrl = url.toString();
 	}
 
