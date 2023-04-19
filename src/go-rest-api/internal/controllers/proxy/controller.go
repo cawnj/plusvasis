@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"sync"
@@ -73,7 +72,7 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 
-	log.Printf("Started terminal session for job %s", id)
+	fmt.Printf("Started terminal session for job %s\n", id)
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
@@ -86,7 +85,7 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 	}()
 	wg.Wait()
 
-	log.Printf("Stopped terminal session for job %s", id)
+	fmt.Printf("Stopped terminal session for job %s\n", id)
 	return nil
 }
 
@@ -156,14 +155,14 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 	}
 	defer resp.Body.Close()
 
-	log.Printf("Started streaming %s for job %s", logType, id)
+	fmt.Printf("Started streaming %s for job %s\n", logType, id)
 
 	err = streamResponse(c, resp)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("Stopped streaming %s for job %s", logType, id)
+	fmt.Printf("Stopped streaming %s for job %s\n", logType, id)
 	return nil
 }
 

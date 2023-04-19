@@ -19,7 +19,9 @@ func main() {
 		},
 		AllowHeaders: []string{"*"},
 	}))
-	e.Use(middleware.Logger())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "method=${method}, path=${path}, status=${status}, error=${error}\n",
+	}))
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
