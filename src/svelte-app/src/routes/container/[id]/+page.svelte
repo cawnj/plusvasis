@@ -54,7 +54,7 @@
 					{job.containerName}
 				</Heading>
 				{#if job.port}
-					<A aClass="ml-2" href="https://{$currJobId}.local.plusvasis.xyz">
+					<A aClass="ml-2" href="https://{$currJobId}.plusvasis.xyz">
 						<Fa icon={faExternalLink} color="white" size="xs" />
 					</A>
 				{/if}

@@ -1,3 +1,3 @@
 export const hostname = import.meta.env.PROD
-	? 'https://api.local.plusvasis.xyz'
+	? 'https://api.plusvasis.xyz'
 	: 'http://localhost:8080';

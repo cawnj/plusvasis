@@ -33,5 +33,11 @@ export const handlers = [
 	}),
 	rest.post(`${hostname}/jobs`, (req, res, ctx) => {
 		return res(ctx.status(200), ctx.json({}));
+	}),
+	rest.get(`${hostname}/job/job123/logs`, (req, res, ctx) => {
+		return res(ctx.status(200), ctx.json({}));
+	}),
+	rest.get(`${hostname}/job/job123/exec`, (req, res, ctx) => {
+		return res(ctx.status(200), ctx.json({}));
 	})
 ];

@@ -189,7 +189,7 @@ const JOB_TMPL = `{
                         "Tags": [
                             "traefik.enable=true",
                             "traefik.http.routers.{{.User}}-{{.Name}}.entrypoints=https",
-                            "traefik.http.routers.{{.User}}-{{.Name}}.rule=Host(` + "`" + `{{.User}}-{{.Name}}.local.plusvasis.xyz` + "`" + `)",
+                            "traefik.http.routers.{{.User}}-{{.Name}}.rule=Host(` + "`" + `{{.User}}-{{.Name}}.plusvasis.xyz` + "`" + `)",
                             "traefik.port=${NOMAD_PORT_port}"
                         ],
                         {{end}}
