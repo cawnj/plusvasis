@@ -1,6 +1,20 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
 import ContainerPage from './ContainerPage.svelte';
+import { currJob } from '../stores/nomadStore';
+import type { Job } from '$lib/Types';
+
+const mockJob: Job = {
+	user: null,
+	containerName: 'test',
+	dockerImage: 'test',
+	shell: 'test',
+	volumes: [],
+	env: [],
+	port: 0,
+	expose: false
+};
+currJob.set(mockJob);
 
 describe('ContainerPage', () => {
 	it('renders without errors', () => {
