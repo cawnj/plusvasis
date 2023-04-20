@@ -17,8 +17,13 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type DialerInterface interface {
+	Dial(urlStr string, requestHeader http.Header) (*websocket.Conn, *http.Response, error)
+}
+
 type NomadProxyController struct {
 	Client nomad.NomadClient
+	Dialer DialerInterface
 }
 
 var upgrader = websocket.Upgrader{
@@ -51,7 +56,7 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 
 	url := baseURL + path + "?" + queryParams.Encode()
 
-	nomadConn, _, err := websocket.DefaultDialer.Dial(url, nil)
+	nomadConn, _, err := n.Dialer.Dial(url, nil)
 	if err != nil {
 		return echo.ErrBadGateway
 	}
