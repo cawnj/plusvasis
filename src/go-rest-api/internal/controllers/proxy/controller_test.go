@@ -84,6 +84,13 @@ func setup(method string, url string) (
 	return rec, c, nomadClient, dialer, nomadController
 }
 
+func createMockHttpResponse(statusCode int) *http.Response {
+	recorder := httptest.NewRecorder()
+	recorder.WriteHeader(statusCode)
+	response := recorder.Result()
+	return response
+}
+
 func TestAllocExec(t *testing.T) {
 	// Setup
 	jobName := "test"
@@ -102,8 +109,9 @@ func TestAllocExec(t *testing.T) {
 	allocsJson, _ := json.Marshal(nomadJobAlloc)
 	nomadClient.On("Get", "/job/"+jobName+"/allocations").Return(allocsJson, nil)
 
-	mockWsConn := new(MockWsConn)
-	dialer.On("Dial", mock.Anything, mock.Anything).Return(mockWsConn, nil, nil)
+	wsConn := new(MockWsConn)
+	httpResponse := createMockHttpResponse(http.StatusOK)
+	dialer.On("Dial", mock.Anything, mock.Anything).Return(wsConn, httpResponse, nil)
 
 	// Assertions
 	expectedCode := http.StatusOK
