@@ -12,6 +12,7 @@
 	import app from '$lib/fb';
 	import { faArrowLeft, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
+	import { LoginButton } from 'svelte-auth-ui';
 
 	export let title: string;
 	let email: string;
@@ -91,11 +92,14 @@
 				</Alert>
 			{/if}
 			{#if title === 'Login'}
-				<Button type="submit" class="w-full">Login to your account</Button>
+				<Button type="submit" class="w-full"><span class="text-base">Login with email</span></Button
+				>
 				<Hr class="my-2" width="w-64">or</Hr>
-				<Button on:click={githubLogin} class="w-full">Login with Github</Button>
+				<LoginButton provider="github" withLoader on:click={githubLogin} class="w-full h-full" />
 			{:else}
-				<Button type="submit" class="w-full">Create your account</Button>
+				<Button type="submit" class="w-full"
+					><span class="text-base">Sign up with email</span></Button
+				>
 			{/if}
 		</div>
 		<div class="flex flex-col space-y-2">
