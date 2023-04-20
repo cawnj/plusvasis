@@ -15,10 +15,29 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 type NomadProxyController struct {
 	Client nomad.NomadClient
+	Dialer DialerInterface
+}
+
+type DialerInterface interface {
+	Dial(urlStr string, requestHeader http.Header) (WsConnInterface, *http.Response, error)
+}
+
+type DefaultDialer struct{}
+
+func (d *DefaultDialer) Dial(urlStr string, requestHeader http.Header) (WsConnInterface, *http.Response, error) {
+	return websocket.DefaultDialer.Dial(urlStr, requestHeader)
+}
+
+type WsConnInterface interface {
+	ReadMessage() (messageType int, p []byte, err error)
+	WriteMessage(messageType int, data []byte) error
+	Close() error
+	SetReadDeadline(t time.Time) error
 }
 
 var upgrader = websocket.Upgrader{
@@ -51,7 +70,7 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 
 	url := baseURL + path + "?" + queryParams.Encode()
 
-	nomadConn, _, err := websocket.DefaultDialer.Dial(url, nil)
+	nomadConn, _, err := n.Dialer.Dial(url, nil)
 	if err != nil {
 		return echo.ErrBadGateway
 	}
@@ -59,7 +78,7 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 
 	clientConn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
-		return echo.ErrBadGateway
+		return errors.Wrap(err, "failed to upgrade connection")
 	}
 	defer clientConn.Close()
 
@@ -89,7 +108,7 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 	return nil
 }
 
-func (n *NomadProxyController) forwardMessages(srcConn, dstConn *websocket.Conn) {
+func (n *NomadProxyController) forwardMessages(srcConn, dstConn WsConnInterface) {
 	for {
 		msgType, msg, err := srcConn.ReadMessage()
 		if err != nil {
@@ -149,7 +168,7 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 	queryParams.Add("origin", "end")
 
 	url := baseURL + path + "?" + queryParams.Encode()
-	resp, err := n.forwardRequest(c, url)
+	resp, err := n.Client.ForwardRequest(c, url)
 	if err != nil {
 		return err
 	}
@@ -164,27 +183,6 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 
 	fmt.Printf("Stopped streaming %s for job %s\n", logType, id)
 	return nil
-}
-
-func (n *NomadProxyController) forwardRequest(c echo.Context, url string) (*http.Response, error) {
-	req, err := http.NewRequest(c.Request().Method, url, c.Request().Body)
-	if err != nil {
-		return nil, echo.ErrInternalServerError
-	}
-
-	for key, values := range c.Request().Header {
-		for _, value := range values {
-			req.Header.Add(key, value)
-		}
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, echo.ErrBadGateway
-	}
-
-	return resp, nil
 }
 
 func streamResponse(c echo.Context, resp *http.Response) error {

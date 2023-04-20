@@ -14,6 +14,7 @@ type NomadClient interface {
 	Get(endpoint string) ([]byte, error)
 	Post(endpoint string, reqBody *bytes.Buffer) ([]byte, error)
 	Delete(endpoint string) ([]byte, error)
+	ForwardRequest(c echo.Context, url string) (*http.Response, error)
 }
 
 type DefaultNomadClient struct{}
@@ -69,4 +70,25 @@ func (n *DefaultNomadClient) Delete(endpoint string) ([]byte, error) {
 		return nil, echo.ErrInternalServerError
 	}
 	return body, nil
+}
+
+func (n *DefaultNomadClient) ForwardRequest(c echo.Context, url string) (*http.Response, error) {
+	req, err := http.NewRequest(c.Request().Method, url, c.Request().Body)
+	if err != nil {
+		return nil, echo.ErrInternalServerError
+	}
+
+	for key, values := range c.Request().Header {
+		for _, value := range values {
+			req.Header.Add(key, value)
+		}
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, echo.ErrBadGateway
+	}
+
+	return resp, nil
 }

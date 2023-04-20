@@ -8,7 +8,10 @@ import (
 )
 
 func NomadProxy(e *echo.Echo) {
-	controller := proxy.NomadProxyController{Client: &nomad.DefaultNomadClient{}}
+	controller := proxy.NomadProxyController{
+		Client: &nomad.DefaultNomadClient{},
+		Dialer: &proxy.DefaultDialer{},
+	}
 
 	e.GET("/job/:id/exec", controller.AllocExec)
 	e.GET("/job/:id/logs", controller.StreamLogs)
