@@ -7,4 +7,21 @@ describe('ContainerPage', () => {
 		const { container } = render(ContainerPage);
 		expect(container).toBeDefined();
 	});
+
+	it('displays loading spinner while fetching job data', async () => {
+		const { getByTestId } = render(ContainerPage);
+		expect(getByTestId('loading-spinner')).toBeInTheDocument();
+	});
+
+	it('does not display the link to the container if job data does not have a port', async () => {
+		const { queryByText } = render(ContainerPage, { props: { $page: { params: { id: '123' } } } });
+		await new Promise((r) => setTimeout(r, 1000)); // wait for fetchAndSetJob to resolve
+		expect(queryByText('https://123.plusvasis.xyz')).not.toBeInTheDocument();
+	});
+
+	it('displays error modal when fetching job data fails', async () => {
+		const { getByText } = render(ContainerPage, { params: { id: 'invalid-id' } });
+		await new Promise((resolve) => setTimeout(resolve, 1000)); // simulate delay in fetching data
+		expect(getByText('Error')).toBeInTheDocument();
+	});
 });

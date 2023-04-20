@@ -42,7 +42,7 @@
 
 <div class="px-4 md:px-16 mb-4">
 	{#await fetchAndSetJob()}
-		<div class="grid h-96 place-items-center">
+		<div class="grid h-96 place-items-center" data-testid="loading-spinner">
 			<Spinner />
 		</div>
 	{:then job}
