@@ -9,6 +9,11 @@ const config: UserConfig & { test: VitestConfig['test'] } = {
 	define: {
 		'import.meta.vitest': 'undefined'
 	},
+	resolve: {
+		alias: {
+			clsx: 'clsx/dist/clsx.js'
+		}
+	},
 	test: {
 		globals: true,
 		environment: 'jsdom',
