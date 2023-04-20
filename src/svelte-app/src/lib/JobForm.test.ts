@@ -9,7 +9,9 @@ afterAll(() => server.close());
 
 describe('JobForm', () => {
 	it('renders the form', () => {
-		const { container } = render(JobForm);
+		const { container } = render(JobForm, {
+			props: { type: 'create' }
+		});
 		expect(container.querySelector('form')).not.toBeNull();
 	});
 
