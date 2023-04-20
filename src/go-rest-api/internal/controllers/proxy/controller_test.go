@@ -72,25 +72,43 @@ func (h *HijackableResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error)
 	return h.Conn, rw, nil
 }
 
-func setup(method, url string) (
-	*HijackableResponseWriter, echo.Context, *MockNomadClient, *MockDialer, NomadProxyController,
+func setup(method string, url string) (
+	*httptest.ResponseRecorder, echo.Context, *MockNomadClient, NomadProxyController,
 ) {
 	e := echo.New()
-	req := createMockWsRequest(method, url)
-	rec := &HijackableResponseWriter{
-		ResponseWriter: httptest.NewRecorder(),
-		Conn:           &MockConn{},
-	}
+	req := httptest.NewRequest(method, url, nil)
+	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
 	nomadClient := new(MockNomadClient)
 	dialer := new(MockDialer)
-	nomadController := NomadProxyController{
+	controller := NomadProxyController{
 		Client: nomadClient,
 		Dialer: dialer,
 	}
 
-	return rec, c, nomadClient, dialer, nomadController
+	return rec, c, nomadClient, controller
+}
+
+func setupWithHrw(method, url string) (
+	*HijackableResponseWriter, echo.Context, *MockNomadClient, *MockDialer, NomadProxyController,
+) {
+	e := echo.New()
+	req := createMockWsRequest(method, url)
+	hrw := &HijackableResponseWriter{
+		ResponseWriter: httptest.NewRecorder(),
+		Conn:           &MockConn{},
+	}
+	c := e.NewContext(req, hrw)
+
+	nomadClient := new(MockNomadClient)
+	dialer := new(MockDialer)
+	controller := NomadProxyController{
+		Client: nomadClient,
+		Dialer: dialer,
+	}
+
+	return hrw, c, nomadClient, dialer, controller
 }
 
 func createMockHttpResponse(statusCode int) *http.Response {
@@ -112,7 +130,7 @@ func createMockWsRequest(method, url string) *http.Request {
 func TestAllocExec(t *testing.T) {
 	// Setup
 	jobName := "test"
-	rec, c, nomadClient, dialer, nomadProxyController := setup(http.MethodGet, "/job/"+jobName+"/exec")
+	hrw, c, client, dialer, controller := setupWithHrw(http.MethodGet, "/job/"+jobName+"/exec")
 	c.SetParamNames("id")
 	c.SetParamValues(jobName)
 	c.QueryParams().Set("command", "[\"/bin/bash\"]")
@@ -125,11 +143,40 @@ func TestAllocExec(t *testing.T) {
 		},
 	}
 	allocsJson, _ := json.Marshal(nomadJobAlloc)
-	nomadClient.On("Get", "/job/"+jobName+"/allocations").Return(allocsJson, nil)
+	client.On("Get", "/job/"+jobName+"/allocations").Return(allocsJson, nil)
 
 	httpResponse := createMockHttpResponse(http.StatusOK)
-	dialer.On("Dial", mock.Anything, mock.Anything).Return(rec.Conn, httpResponse, nil)
+	dialer.On("Dial", mock.Anything, mock.Anything).Return(hrw.Conn, httpResponse, nil)
 
 	// Assertions
-	assert.NoError(t, nomadProxyController.AllocExec(c))
+	assert.NoError(t, controller.AllocExec(c))
+}
+
+func TestStreamLogs(t *testing.T) {
+	// Setup
+	jobName := "test"
+	rec, c, client, controller := setup(http.MethodGet, "/job/"+jobName+"/logs")
+	c.SetParamNames("id")
+	c.SetParamValues(jobName)
+	c.QueryParams().Set("task", "test")
+	c.QueryParams().Set("type", "test")
+
+	// Mocks
+	nomadJobAlloc := []nomad.AllocListStub{
+		{
+			ID:           "test",
+			ClientStatus: "running",
+		},
+	}
+	allocsJson, _ := json.Marshal(nomadJobAlloc)
+	client.On("Get", "/job/"+jobName+"/allocations").Return(allocsJson, nil)
+
+	httpResponse := createMockHttpResponse(http.StatusOK)
+	client.On("ForwardRequest", mock.Anything).Return(httpResponse, nil)
+
+	// Assertions
+	expectedCode := http.StatusOK
+	if assert.NoError(t, controller.StreamLogs(c)) {
+		assert.Equal(t, expectedCode, rec.Code)
+	}
 }
