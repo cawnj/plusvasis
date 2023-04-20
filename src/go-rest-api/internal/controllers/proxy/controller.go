@@ -17,11 +17,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type WsConnInterface interface {
-	ReadMessage() (messageType int, p []byte, err error)
-	WriteMessage(messageType int, data []byte) error
-	Close() error
-	SetReadDeadline(t time.Time) error
+type NomadProxyController struct {
+	Client nomad.NomadClient
+	Dialer DialerInterface
 }
 
 type DialerInterface interface {
@@ -34,9 +32,11 @@ func (d *DefaultDialer) Dial(urlStr string, requestHeader http.Header) (WsConnIn
 	return websocket.DefaultDialer.Dial(urlStr, requestHeader)
 }
 
-type NomadProxyController struct {
-	Client nomad.NomadClient
-	Dialer DialerInterface
+type WsConnInterface interface {
+	ReadMessage() (messageType int, p []byte, err error)
+	WriteMessage(messageType int, data []byte) error
+	Close() error
+	SetReadDeadline(t time.Time) error
 }
 
 var upgrader = websocket.Upgrader{
