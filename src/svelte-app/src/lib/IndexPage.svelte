@@ -26,7 +26,7 @@
 <div class="px-4 md:px-16">
 	<Button color="blue" href="/create">Create Container</Button>
 	{#await fetchJobs()}
-		<div class="grid h-96 place-items-center">
+		<div class="grid h-96 place-items-center" data-testid="spinner">
 			<Spinner />
 		</div>
 	{:then jobs}
@@ -36,14 +36,16 @@
 				<span class="font-medium">It seems like you haven't created any containers yet...</span>
 			</Alert>
 		{:else}
-			{#each jobs as job}
-				<Card class="my-3" href={`/container/${job.ID}`}>
-					<div class="flex items-center my-1">
-						<Fa icon={faTerminal} color="white" class="pr-6" />
-						<span class="text-xl text-white">{job.Name}</span>
-					</div>
-				</Card>
-			{/each}
+			<div data-testid="job-list">
+				{#each jobs as job}
+					<Card class="my-3" href={`/container/${job.ID}`}>
+						<div class="flex items-center my-1">
+							<Fa icon={faTerminal} color="white" class="pr-6" />
+							<span class="text-xl text-white">{job.Name}</span>
+						</div>
+					</Card>
+				{/each}
+			</div>
 		{/if}
 	{:catch error}
 		<Modal title="Error" open={true}>
