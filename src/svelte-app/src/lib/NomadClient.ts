@@ -60,7 +60,7 @@ export async function fetchJob(jobId: string) {
 			volumes: data.Meta.volumes,
 			env: data.Meta.env,
 			port: parseInt(data.Meta.port),
-			expose: data.Meta.expose
+			expose: data.Meta.expose === 'true' ? true : false
 		};
 		currJobStopped.set(data.Status === 'dead');
 		return job;

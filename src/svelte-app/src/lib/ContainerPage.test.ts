@@ -13,7 +13,7 @@ describe('ContainerPage', () => {
 		expect(getByTestId('loading-spinner')).toBeInTheDocument();
 	});
 
-	it('does not display the link to the container if job data does not have a port', async () => {
+	it('does not display the link to the container if job.expose is false', async () => {
 		const { queryByText } = render(ContainerPage, { props: { $page: { params: { id: '123' } } } });
 		await new Promise((r) => setTimeout(r, 1000)); // wait for fetchAndSetJob to resolve
 		expect(queryByText('https://123.plusvasis.xyz')).not.toBeInTheDocument();

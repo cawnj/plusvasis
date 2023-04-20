@@ -51,7 +51,7 @@
 				<Heading tag="h1" customSize="text-2xl md:text-4xl">
 					{job.containerName}
 				</Heading>
-				{#if job.port}
+				{#if job.expose}
 					<A aClass="ml-2" href="https://{$currJobId}.plusvasis.xyz">
 						<Fa icon={faExternalLink} color="white" size="xs" />
 					</A>
