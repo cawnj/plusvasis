@@ -134,6 +134,7 @@ func TestAllocExec(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues(jobName)
 	c.QueryParams().Set("command", "[\"/bin/bash\"]")
+	c.Set("uid", "test")
 
 	// Mocks
 	nomadJobAlloc := []nomad.AllocListStub{
@@ -144,6 +145,15 @@ func TestAllocExec(t *testing.T) {
 	}
 	allocsJson, _ := json.Marshal(nomadJobAlloc)
 	client.On("Get", "/job/"+jobName+"/allocations").Return(allocsJson, nil)
+
+	nomadJobCheckUser := nomad.Job{
+		ID: "test",
+		Meta: map[string]string{
+			"user": "test",
+		},
+	}
+	nomadJobCheckUserJson, _ := json.Marshal(nomadJobCheckUser)
+	client.On("Get", "/job/"+jobName).Return(nomadJobCheckUserJson, nil)
 
 	httpResponse := createMockHttpResponse(http.StatusOK)
 	dialer.On("Dial", mock.Anything, mock.Anything).Return(hrw.Conn, httpResponse, nil)
@@ -160,6 +170,7 @@ func TestStreamLogs(t *testing.T) {
 	c.SetParamValues(jobName)
 	c.QueryParams().Set("task", "test")
 	c.QueryParams().Set("type", "test")
+	c.Set("uid", "test")
 
 	// Mocks
 	nomadJobAlloc := []nomad.AllocListStub{
@@ -170,6 +181,15 @@ func TestStreamLogs(t *testing.T) {
 	}
 	allocsJson, _ := json.Marshal(nomadJobAlloc)
 	client.On("Get", "/job/"+jobName+"/allocations").Return(allocsJson, nil)
+
+	nomadJobCheckUser := nomad.Job{
+		ID: "test",
+		Meta: map[string]string{
+			"user": "test",
+		},
+	}
+	nomadJobCheckUserJson, _ := json.Marshal(nomadJobCheckUser)
+	client.On("Get", "/job/"+jobName).Return(nomadJobCheckUserJson, nil)
 
 	httpResponse := createMockHttpResponse(http.StatusOK)
 	client.On("ForwardRequest", mock.Anything).Return(httpResponse, nil)
