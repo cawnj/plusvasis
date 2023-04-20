@@ -23,6 +23,25 @@ describe('IndexPage', () => {
 		await tick();
 	});
 
+	it('should show a message if there are no jobs', async () => {
+		// Mock the fetch function to return an empty list of jobs
+		global.fetch = vi.fn(() =>
+			Promise.resolve({
+				ok: true,
+				json: () => Promise.resolve()
+			})
+		);
+
+		const { getByText } = render(IndexPage);
+
+		// Wait for the message to appear
+		await waitFor(() => {
+			expect(
+				getByText("It seems like you haven't created any containers yet...")
+			).toBeInTheDocument();
+		});
+	});
+
 	it('should show an error modal if the server returns an error', async () => {
 		// Mock the fetch function to return an error
 		global.fetch = vi.fn(() => Promise.reject(new Error('Failed to fetch jobs')));
