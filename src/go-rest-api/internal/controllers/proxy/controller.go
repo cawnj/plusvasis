@@ -10,16 +10,16 @@ import (
 	"sync"
 	"time"
 
-	"plusvasis/internal/controllers/nomad"
+	nomadController "plusvasis/internal/controllers/nomad"
 
 	"github.com/gorilla/websocket"
-	"github.com/hashicorp/nomad/nomad/structs"
+	nomad "github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 
 type NomadProxyController struct {
-	Client nomad.NomadClient
+	Client nomadController.NomadClient
 	Dialer DialerInterface
 }
 
@@ -49,13 +49,18 @@ var upgrader = websocket.Upgrader{
 const idleTimeout = 30 * time.Second
 
 func (n *NomadProxyController) AllocExec(c echo.Context) error {
-	id := c.Param("id")
+	jobId := c.Param("id")
 	command := c.QueryParam("command")
 	if command == "" {
 		return fmt.Errorf("missing query parameters")
 	}
 
-	alloc, err := n.parseRunningAlloc(id)
+	uid := c.Get("uid").(string)
+	if err := n.checkUserAllowed(uid, jobId); err != nil {
+		return err
+	}
+
+	alloc, err := n.parseRunningAlloc(jobId)
 	if err != nil {
 		return err
 	}
@@ -91,7 +96,7 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 
-	fmt.Printf("Started terminal session for job %s\n", id)
+	fmt.Printf("Started terminal session for job %s\n", jobId)
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
@@ -104,7 +109,7 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 	}()
 	wg.Wait()
 
-	fmt.Printf("Stopped terminal session for job %s\n", id)
+	fmt.Printf("Stopped terminal session for job %s\n", jobId)
 	return nil
 }
 
@@ -125,13 +130,13 @@ func (n *NomadProxyController) forwardMessages(srcConn, dstConn WsConnInterface)
 	}
 }
 
-func (n *NomadProxyController) parseRunningAlloc(jobId string) (*structs.AllocListStub, error) {
+func (n *NomadProxyController) parseRunningAlloc(jobId string) (*nomad.AllocListStub, error) {
 	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
 	if err != nil {
 		return nil, err
 	}
 
-	var allocs []structs.AllocListStub
+	var allocs []nomad.AllocListStub
 	err = json.Unmarshal(data, &allocs)
 	if err != nil {
 		return nil, echo.ErrInternalServerError
@@ -145,15 +150,39 @@ func (n *NomadProxyController) parseRunningAlloc(jobId string) (*structs.AllocLi
 	return nil, echo.ErrNotFound
 }
 
+func (n *NomadProxyController) checkUserAllowed(uid, jobId string) error {
+	data, err := n.Client.Get(fmt.Sprintf("/job/%s", jobId))
+	if err != nil {
+		return err
+	}
+
+	var job nomad.Job
+	err = json.Unmarshal(data, &job)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	if job.Meta["user"] != uid {
+		return echo.ErrUnauthorized
+	}
+
+	return nil
+}
+
 func (n *NomadProxyController) StreamLogs(c echo.Context) error {
-	id := c.Param("id")
+	jobId := c.Param("id")
 	task := c.QueryParam("task")
 	logType := c.QueryParam("type")
 	if task == "" || logType == "" {
 		return echo.ErrBadRequest
 	}
 
-	alloc, err := n.parseRunningAlloc(id)
+	uid := c.Get("uid").(string)
+	if err := n.checkUserAllowed(uid, jobId); err != nil {
+		return err
+	}
+
+	alloc, err := n.parseRunningAlloc(jobId)
 	if err != nil {
 		return err
 	}
@@ -174,14 +203,14 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 	}
 	defer resp.Body.Close()
 
-	fmt.Printf("Started streaming %s for job %s\n", logType, id)
+	fmt.Printf("Started streaming %s for job %s\n", logType, jobId)
 
 	err = streamResponse(c, resp)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Stopped streaming %s for job %s\n", logType, id)
+	fmt.Printf("Stopped streaming %s for job %s\n", logType, jobId)
 	return nil
 }
 
