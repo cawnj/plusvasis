@@ -24,9 +24,16 @@ func (m *MockNomadClient) Get(endpoint string) ([]byte, error) {
 	args := m.Called(endpoint)
 	return args.Get(0).([]byte), args.Error(1)
 }
-
-func (m *MockNomadClient) Post(endpoint string, body *bytes.Buffer) ([]byte, error) { return nil, nil }
-func (m *MockNomadClient) Delete(endpoint string) ([]byte, error)                   { return nil, nil }
+func (m *MockNomadClient) Post(endpoint string, reqBody *bytes.Buffer) ([]byte, error) {
+	return nil, nil
+}
+func (m *MockNomadClient) Delete(endpoint string) ([]byte, error) {
+	return nil, nil
+}
+func (m *MockNomadClient) ForwardRequest(c echo.Context, url string) (*http.Response, error) {
+	args := m.Called(url)
+	return args.Get(0).(*http.Response), args.Error(1)
+}
 
 type MockDialer struct {
 	mock.Mock

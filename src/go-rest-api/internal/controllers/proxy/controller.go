@@ -168,7 +168,7 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 	queryParams.Add("origin", "end")
 
 	url := baseURL + path + "?" + queryParams.Encode()
-	resp, err := n.forwardRequest(c, url)
+	resp, err := n.Client.ForwardRequest(c, url)
 	if err != nil {
 		return err
 	}
@@ -183,27 +183,6 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 
 	fmt.Printf("Stopped streaming %s for job %s\n", logType, id)
 	return nil
-}
-
-func (n *NomadProxyController) forwardRequest(c echo.Context, url string) (*http.Response, error) {
-	req, err := http.NewRequest(c.Request().Method, url, c.Request().Body)
-	if err != nil {
-		return nil, echo.ErrInternalServerError
-	}
-
-	for key, values := range c.Request().Header {
-		for _, value := range values {
-			req.Header.Add(key, value)
-		}
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, echo.ErrBadGateway
-	}
-
-	return resp, nil
 }
 
 func streamResponse(c echo.Context, resp *http.Response) error {
