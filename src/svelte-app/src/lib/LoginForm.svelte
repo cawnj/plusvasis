@@ -18,11 +18,13 @@
 	let email: string;
 	let password: string;
 	let errorCode: string | null = null;
+	let loading = false;
 
 	const auth = getAuth(app);
-	const provider = new GithubAuthProvider();
+	const githubProvider = new GithubAuthProvider();
 
-	async function githubLogin() {
+	async function oauthLogin(provider: GithubAuthProvider) {
+		loading = true;
 		signInWithPopup(auth, provider)
 			.then(() => {
 				goto('/');
@@ -80,7 +82,7 @@
 			<span>Your password</span>
 			<Input type="password" name="password" placeholder="••••••••••••" required />
 		</Label>
-		<div class="flex flex-col space-y-6 py-2">
+		<div class="space-y-6 py-2">
 			{#if errorCode}
 				<Alert color="none" class="bg-red-100 text-red-600 border-red-800 !py-3">
 					<span slot="icon">
@@ -95,7 +97,15 @@
 				<Button type="submit" class="w-full"><span class="text-base">Login with email</span></Button
 				>
 				<Hr class="my-2" width="w-64">or</Hr>
-				<LoginButton provider="github" withLoader on:click={githubLogin} class="w-full h-full" />
+				<div class="space-y-4">
+					<LoginButton
+						provider="github"
+						{loading}
+						withLoader
+						on:click={() => oauthLogin(githubProvider)}
+						class="w-full h-full"
+					/>
+				</div>
 			{:else}
 				<Button type="submit" class="w-full"
 					><span class="text-base">Sign up with email</span></Button
