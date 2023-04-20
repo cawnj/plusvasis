@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/gorilla/websocket"
 	nomad "github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -37,9 +37,33 @@ type MockDialer struct {
 	mock.Mock
 }
 
-func (m *MockDialer) Dial(urlStr string, requestHeader http.Header) (*websocket.Conn, *http.Response, error) {
+func (m *MockDialer) Dial(urlStr string, requestHeader http.Header) (WsConnInterface, *http.Response, error) {
 	args := m.Called(urlStr, requestHeader)
-	return args.Get(0).(*websocket.Conn), args.Get(1).(*http.Response), args.Error(2)
+	return args.Get(0).(WsConnInterface), args.Get(1).(*http.Response), args.Error(2)
+}
+
+type MockWsConn struct {
+	mock.Mock
+}
+
+func (m *MockWsConn) ReadMessage() (messageType int, p []byte, err error) {
+	args := m.Called()
+	return args.Int(0), args.Get(1).([]byte), args.Error(2)
+}
+
+func (m *MockWsConn) WriteMessage(messageType int, data []byte) error {
+	args := m.Called(messageType, data)
+	return args.Error(0)
+}
+
+func (m *MockWsConn) Close() error {
+	args := m.Called()
+	return args.Error(0)
+}
+
+func (m *MockWsConn) SetReadDeadline(t time.Time) error {
+	args := m.Called(t)
+	return args.Error(0)
 }
 
 func setup(method string, url string) (
@@ -78,7 +102,8 @@ func TestAllocExec(t *testing.T) {
 	allocsJson, _ := json.Marshal(nomadJobAlloc)
 	nomadClient.On("Get", "/job/"+jobName+"/allocations").Return(allocsJson, nil)
 
-	dialer.On("Dial", mock.Anything, mock.Anything).Return(nil, nil, nil)
+	mockWsConn := new(MockWsConn)
+	dialer.On("Dial", mock.Anything, mock.Anything).Return(mockWsConn, nil, nil)
 
 	// Assertions
 	expectedCode := http.StatusOK

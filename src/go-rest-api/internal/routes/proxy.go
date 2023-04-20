@@ -4,14 +4,13 @@ import (
 	"plusvasis/internal/controllers/nomad"
 	"plusvasis/internal/controllers/proxy"
 
-	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )
 
 func NomadProxy(e *echo.Echo) {
 	controller := proxy.NomadProxyController{
 		Client: &nomad.DefaultNomadClient{},
-		Dialer: websocket.DefaultDialer,
+		Dialer: &proxy.DefaultDialer{},
 	}
 
 	e.GET("/job/:id/exec", controller.AllocExec)

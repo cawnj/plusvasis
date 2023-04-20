@@ -17,8 +17,21 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type WsConnInterface interface {
+	ReadMessage() (messageType int, p []byte, err error)
+	WriteMessage(messageType int, data []byte) error
+	Close() error
+	SetReadDeadline(t time.Time) error
+}
+
 type DialerInterface interface {
-	Dial(urlStr string, requestHeader http.Header) (*websocket.Conn, *http.Response, error)
+	Dial(urlStr string, requestHeader http.Header) (WsConnInterface, *http.Response, error)
+}
+
+type DefaultDialer struct{}
+
+func (d *DefaultDialer) Dial(urlStr string, requestHeader http.Header) (WsConnInterface, *http.Response, error) {
+	return websocket.DefaultDialer.Dial(urlStr, requestHeader)
 }
 
 type NomadProxyController struct {
@@ -94,7 +107,7 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 	return nil
 }
 
-func (n *NomadProxyController) forwardMessages(srcConn, dstConn *websocket.Conn) {
+func (n *NomadProxyController) forwardMessages(srcConn, dstConn WsConnInterface) {
 	for {
 		msgType, msg, err := srcConn.ReadMessage()
 		if err != nil {
