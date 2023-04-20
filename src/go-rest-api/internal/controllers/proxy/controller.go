@@ -15,6 +15,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 type NomadProxyController struct {
@@ -77,7 +78,7 @@ func (n *NomadProxyController) AllocExec(c echo.Context) error {
 
 	clientConn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
-		return echo.ErrBadGateway
+		return errors.Wrap(err, "failed to upgrade connection")
 	}
 	defer clientConn.Close()
 
