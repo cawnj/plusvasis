@@ -42,5 +42,46 @@ export const handlers = [
 	}),
 	rest.get(`${hostname}/job/job123`, (req, res, ctx) => {
 		return res(ctx.status(200), ctx.json({}));
+	}),
+	rest.get(`${hostname}/job/nomadClient`, (req, res, ctx) => {
+		return res(
+			ctx.status(200),
+			ctx.json({
+				Name: 'test',
+				TaskGroups: [
+					{
+						Tasks: [
+							{
+								Config: {
+									Image: 'test'
+								}
+							}
+						]
+					}
+				],
+				Meta: {
+					shell: 'sh',
+					volumes: [],
+					env: 'test',
+					port: '8080',
+					expose: 'true'
+				}
+			})
+		);
+	}),
+	rest.post(`${hostname}/job/nomadClient`, (req, res, ctx) => {
+		return res(ctx.status(200), ctx.json({}));
+	}),
+	rest.delete(`${hostname}/job/nomadClient`, (req, res, ctx) => {
+		return res(ctx.status(200), ctx.json({}));
+	}),
+	rest.post(`${hostname}/job/nomadClient/restart`, (req, res, ctx) => {
+		return res(ctx.status(200), ctx.json({}));
+	}),
+	rest.get(`${hostname}/job/nomadClient/start`, (req, res, ctx) => {
+		return res(ctx.status(200), ctx.json({}));
+	}),
+	rest.get(`${hostname}/job/nomadClient/alloc`, (req, res, ctx) => {
+		return res(ctx.status(200), ctx.json({}));
 	})
 ];
