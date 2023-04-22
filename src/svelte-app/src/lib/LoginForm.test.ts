@@ -4,7 +4,12 @@ import LoginForm from './LoginForm.svelte';
 
 // Mock firebase/auth
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-vi.mock('firebase/auth', () => {
+vi.mock('firebase/auth', async () => {
+	const actual = await vi.importActual('firebase/auth');
+	if (!actual) {
+		throw new Error('Could not import actual firebase/auth');
+	}
+
 	const getAuth = vi.fn(() => ({}));
 	const signInWithEmailAndPassword = vi.fn(() =>
 		Promise.resolve({
@@ -17,6 +22,7 @@ vi.mock('firebase/auth', () => {
 	const createUserWithEmailAndPassword = vi.fn();
 
 	return {
+		...actual,
 		getAuth,
 		signInWithEmailAndPassword,
 		createUserWithEmailAndPassword
@@ -41,7 +47,7 @@ describe('form submission', () => {
 
 		const emailInput = screen.getByPlaceholderText('name@example.com');
 		const passwordInput = screen.getByPlaceholderText('••••••••••••');
-		const submitButton = screen.getByText('Login to your account');
+		const submitButton = screen.getByText('Login with email');
 
 		fireEvent.input(emailInput, { target: { value: 'test@example.com' } });
 		fireEvent.input(passwordInput, { target: { value: 'password' } });
