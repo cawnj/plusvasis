@@ -27,9 +27,11 @@
 		loading = true;
 		signInWithPopup(auth, provider)
 			.then(() => {
+				loading = false;
 				goto('/');
 			})
 			.catch((error) => {
+				loading = false;
 				errorCode = error.code;
 			});
 	}
