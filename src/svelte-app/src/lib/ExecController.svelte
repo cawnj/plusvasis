@@ -13,8 +13,9 @@
 
 	export let wsUrl: string;
 	let width: number;
-	let fontSize = 14;
+	let height: number;
 
+	let fontSize = 14;
 	$: {
 		fontSize = width < 768 ? 12 : 18;
 	}
@@ -43,6 +44,13 @@
 	function connectTerm() {
 		execSocketAdapter = new ExecSocketAdapter(terminal, wsUrl);
 	}
+	function resizeTerm() {
+		const rows = Math.floor((height - 300) / (fontSize * 1.2));
+		const cols = Math.floor(width / fontSize);
+		terminal.resize(cols, rows);
+		terminal.refresh(0, terminal.rows - 1);
+		termFit.fit();
+	}
 	export function write(content: string) {
 		terminal.write(content);
 	}
@@ -67,7 +75,10 @@
 	$: if (!isStopped && wsUrl && terminal) {
 		connectTerm();
 	}
+	$: if ((width || height) && terminal) {
+		resizeTerm();
+	}
 </script>
 
-<svelte:window bind:innerWidth={width} />
+<svelte:window bind:innerWidth={width} bind:innerHeight={height} />
 <div id="terminal" data-testid="exec-controller" bind:this={terminalElement} />

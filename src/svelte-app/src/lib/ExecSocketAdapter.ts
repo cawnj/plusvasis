@@ -40,6 +40,13 @@ export class ExecSocketAdapter {
 			this.terminal.writeln('');
 			this.terminal.writeln('Connection closed.');
 		};
+
+		this.terminal.onResize(() => {
+			if (this.socket.readyState != WebSocket.OPEN) {
+				return;
+			}
+			this.sendTtySize();
+		});
 	}
 
 	sendTtySize() {
@@ -65,7 +72,7 @@ export class ExecSocketAdapter {
 	}
 
 	handleData(data: string) {
-		if (this.socket.readyState == WebSocket.CLOSED) {
+		if (this.socket.readyState != WebSocket.OPEN) {
 			return;
 		}
 		this.socket.send(JSON.stringify({ stdin: { data: b64encode(data) } }));
