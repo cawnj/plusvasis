@@ -15,7 +15,10 @@ export class ExecSocketAdapter {
 		if (!this.terminal) {
 			throw new Error('Terminal is not defined.');
 		}
+		this.connect();
+	}
 
+	connect() {
 		this.socket.onopen = () => {
 			this.sendWsHandshake();
 			this.sendTtySize();
@@ -37,8 +40,7 @@ export class ExecSocketAdapter {
 
 		this.socket.onclose = () => {
 			this.stopHeartbeat();
-			this.terminal.writeln('');
-			this.terminal.writeln('Connection closed.');
+			this.reconnect();
 		};
 
 		this.terminal.onResize(() => {
@@ -47,6 +49,12 @@ export class ExecSocketAdapter {
 			}
 			this.sendTtySize();
 		});
+	}
+
+	reconnect() {
+		console.log('reconnecting...');
+		this.socket = new WebSocket(this.socket.url);
+		this.connect();
 	}
 
 	sendTtySize() {
