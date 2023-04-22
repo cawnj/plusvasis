@@ -22,8 +22,8 @@ describe('when we do not return an object', () => {
 			containerName: 'testContainer',
 			dockerImage: 'testImage',
 			shell: 'testShell',
-			volumes: 'testVolumes',
-			env: 'testEnv',
+			volumes: [['testVolumes', 'testVolumes']],
+			env: [['testEnv', 'testEnv']],
 			port: 1234,
 			expose: true
 		};
@@ -39,8 +39,8 @@ describe('when we do not return an object', () => {
 			containerName: 'testContainer',
 			dockerImage: 'testImage',
 			shell: 'testShell',
-			volumes: 'testVolumes',
-			env: 'testEnv',
+			volumes: [['testVolumes', 'testVolumes']],
+			env: [['testEnv', 'testEnv']],
 			port: 1234,
 			expose: true
 		};
