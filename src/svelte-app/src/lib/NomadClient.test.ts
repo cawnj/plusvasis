@@ -12,7 +12,7 @@ import {
 import type { Job } from './Types';
 import { currJobId } from '../stores/nomadStore';
 
-describe('NomadClient', () => {
+describe('when we do not return an object', () => {
 	currJobId.set('nomadClient');
 
 	it('should create a new job successfully', async () => {
@@ -50,13 +50,6 @@ describe('NomadClient', () => {
 		expect(consoleSpy).toHaveBeenCalledWith('Container Updated');
 	});
 
-	it('should fetch a job successfully', async () => {
-		const consoleSpy = vi.spyOn(console, 'log');
-		const job = await fetchJob('nomadClient');
-		expect(job).toBeTruthy();
-		expect(consoleSpy).not.toHaveBeenCalledWith('Error');
-	});
-
 	it('should stop a job successfully', async () => {
 		const consoleSpy = vi.spyOn(console, 'log');
 		await fetchJobStop();
@@ -79,6 +72,15 @@ describe('NomadClient', () => {
 		const consoleSpy = vi.spyOn(console, 'log');
 		await fetchJobStart();
 		expect(consoleSpy).toHaveBeenCalledWith('Container Started');
+	});
+});
+
+describe('when we return an object', () => {
+	it('should fetch a job successfully', async () => {
+		const consoleSpy = vi.spyOn(console, 'log');
+		const job = await fetchJob('nomadClient');
+		expect(job).toBeTruthy();
+		expect(consoleSpy).not.toHaveBeenCalledWith('Error');
 	});
 
 	it('should fetch job allocations successfully', async () => {
