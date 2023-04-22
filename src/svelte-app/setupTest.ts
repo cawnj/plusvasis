@@ -37,7 +37,9 @@ vi.mock('$app/stores', (): typeof stores => {
 		const navigating = readable<Navigation | null>(null);
 		const page = readable<Page>({
 			url: new URL('http://localhost'),
-			params: {},
+			params: {
+				id: 'job123'
+			},
 			route: {
 				id: null
 			},
@@ -46,7 +48,10 @@ vi.mock('$app/stores', (): typeof stores => {
 			data: {},
 			form: undefined
 		});
-		const updated = { subscribe: readable(false).subscribe, check: () => false };
+		const updated = {
+			...readable(false),
+			check: async () => false
+		};
 
 		return { navigating, page, updated };
 	};
@@ -62,10 +67,8 @@ vi.mock('$app/stores', (): typeof stores => {
 		}
 	};
 	const updated: typeof stores.updated = {
-		subscribe(fn) {
-			return getStores().updated.subscribe(fn);
-		},
-		check: () => false
+		...readable(false),
+		check: async () => false
 	};
 
 	return {
