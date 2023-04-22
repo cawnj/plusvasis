@@ -11,3 +11,6 @@
 .pre-logs {
 	@apply bg-gray-900 text-white p-4 whitespace-pre-wrap max-h-96 overflow-auto scrollbar-hide;
 }
+.xterm-viewport {
+	@apply scrollbar-hide;
+}
