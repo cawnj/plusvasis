@@ -76,7 +76,7 @@
 				{:else if value.type === 'toggle'}
 					<Toggle label={key} id={key} name={key} checked={job[key]} />
 				{/if}
-				<Helper class="text-sm mt-2">{value.info}</Helper>
+				<Helper class="text-sm mt-2 whitespace-pre-line">{value.info}</Helper>
 			</div>
 		{/if}
 	{/each}

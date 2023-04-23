@@ -69,7 +69,7 @@ export const JobFields: { key: string; value: JobField }[] = [
 			title: 'Environment Variables',
 			type: 'input',
 			placeholder: 'ENV_VAR=VALUE',
-			info: 'These will be passed to the container. You can add multiple environment variables by separating them with a comma.'
+			info: 'These will be passed to the container. You can add multiple environment variables by separating them with a comma.\nRefer to other containers with the {{container_name}} syntax - e.g. DB_URL=postgres://{{db}}'
 		}
 	},
 	{
@@ -78,7 +78,7 @@ export const JobFields: { key: string; value: JobField }[] = [
 			title: 'Port',
 			type: 'input',
 			placeholder: '8080',
-			info: 'The port on which the service runs on.'
+			info: 'The port to expose to the host.'
 		}
 	},
 	{
@@ -87,7 +87,7 @@ export const JobFields: { key: string; value: JobField }[] = [
 			title: 'Expose',
 			type: 'toggle',
 			placeholder: true,
-			info: 'If checked, the port will be exposed to the host.'
+			info: 'Enabling this setting will make your container publicly accessible.'
 		}
 	}
 ];
