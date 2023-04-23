@@ -13,7 +13,7 @@ type Formatter struct{}
 
 func (f *Formatter) Format(entry *logrus.Entry) ([]byte, error) {
 	timestamp := entry.Time.Format(time.RFC3339)
-	return []byte(fmt.Sprintf("[%s] method=%s, uri=%s, status=%d, user=%s, error=%v\n",
+	return []byte(fmt.Sprintf("[%s] method=%s, uri=%s, status=%d, user=%v, error=%v\n",
 		timestamp,
 		entry.Data["method"],
 		entry.Data["uri"],
@@ -30,17 +30,11 @@ var DefaultRequestLoggerConfig = middleware.RequestLoggerConfig{
 	LogMethod: true,
 	LogError:  true,
 	LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
-		uid := c.Get("uid")
-		if uid != nil {
-			uid = uid.(string)
-		} else {
-			uid = "nil"
-		}
 		log.WithFields(logrus.Fields{
 			"method": values.Method,
 			"uri":    values.URI,
 			"status": values.Status,
-			"user":   uid,
+			"user":   c.Get("uid"),
 			"error":  values.Error,
 		}).Info()
 		return nil
