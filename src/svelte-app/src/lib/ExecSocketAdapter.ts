@@ -15,7 +15,10 @@ export class ExecSocketAdapter {
 		if (!this.terminal) {
 			throw new Error('Terminal is not defined.');
 		}
+		this.connect();
+	}
 
+	connect() {
 		this.socket.onopen = () => {
 			this.sendWsHandshake();
 			this.sendTtySize();
@@ -37,9 +40,21 @@ export class ExecSocketAdapter {
 
 		this.socket.onclose = () => {
 			this.stopHeartbeat();
-			this.terminal.writeln('');
-			this.terminal.writeln('Connection closed.');
+			this.reconnect();
 		};
+
+		this.terminal.onResize(() => {
+			if (this.socket.readyState != WebSocket.OPEN) {
+				return;
+			}
+			this.sendTtySize();
+		});
+	}
+
+	reconnect() {
+		console.log('reconnecting...');
+		this.socket = new WebSocket(this.socket.url);
+		this.connect();
 	}
 
 	sendTtySize() {
@@ -65,7 +80,7 @@ export class ExecSocketAdapter {
 	}
 
 	handleData(data: string) {
-		if (this.socket.readyState == WebSocket.CLOSED) {
+		if (this.socket.readyState != WebSocket.OPEN) {
 			return;
 		}
 		this.socket.send(JSON.stringify({ stdin: { data: b64encode(data) } }));
