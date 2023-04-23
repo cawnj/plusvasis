@@ -1,0 +1,21 @@
+{
+    "schemes": [
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "API backend for PlusVasis service",
+        "title": "PlusVasis API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "api.plusvasis.xyz",
+    "paths": {},
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

@@ -1,0 +1,15 @@
+host: api.plusvasis.xyz
+info:
+  contact: {}
+  description: API backend for PlusVasis service
+  title: PlusVasis API
+  version: "1.0"
+paths: {}
+schemes:
+- https
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

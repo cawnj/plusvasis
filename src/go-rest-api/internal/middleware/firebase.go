@@ -19,7 +19,7 @@ type Config struct {
 
 // disable auth for health check
 func DefaultSkipper(c echo.Context) bool {
-	return c.Path() == "/health"
+	return c.Path() == "/health" || strings.HasPrefix(c.Path(), "/swagger")
 }
 
 var DefaultConfig = Config{
