@@ -1,31 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"time"
 
 	"plusvasis/internal/middleware/firebase"
+	"plusvasis/internal/middleware/logger"
 	"plusvasis/internal/routes"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/sirupsen/logrus"
 )
-
-type CustomFormatter struct{}
-
-func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	timestamp := entry.Time.Format(time.RFC3339)
-	return []byte(fmt.Sprintf("[%s] method=%s, uri=%s, status=%d, user=%s, error=%v\n",
-		timestamp,
-		entry.Data["method"],
-		entry.Data["uri"],
-		entry.Data["status"],
-		entry.Data["user"],
-		entry.Data["error"],
-	)), nil
-}
 
 func main() {
 	e := echo.New()
@@ -37,31 +21,7 @@ func main() {
 		AllowHeaders: []string{"*"},
 	}))
 
-	log := logrus.New()
-	log.SetFormatter(&CustomFormatter{})
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogURI:    true,
-		LogStatus: true,
-		LogMethod: true,
-		LogError:  true,
-		LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
-			uid := c.Get("uid")
-			if uid != nil {
-				uid = uid.(string)
-			} else {
-				uid = "nil"
-			}
-			log.WithFields(logrus.Fields{
-				"method": values.Method,
-				"uri":    values.URI,
-				"status": values.Status,
-				"user":   uid,
-				"error":  values.Error,
-			}).Info()
-			return nil
-		},
-	}))
-
+	e.Use(logger.CustomLogger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
