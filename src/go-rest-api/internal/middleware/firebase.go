@@ -1,4 +1,4 @@
-package firebase
+package middleware
 
 import (
 	"context"
@@ -27,12 +27,12 @@ var DefaultConfig = Config{
 	Skipper:         DefaultSkipper,
 }
 
-func Auth() echo.MiddlewareFunc {
+func Firebase() echo.MiddlewareFunc {
 	c := DefaultConfig
-	return WithConfig(c)
+	return FirebaseWithConfig(c)
 }
 
-func WithConfig(config Config) echo.MiddlewareFunc {
+func FirebaseWithConfig(config Config) echo.MiddlewareFunc {
 	opt := option.WithCredentialsFile(config.CredentialsFile)
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {

@@ -3,8 +3,7 @@ package main
 import (
 	"os"
 
-	"plusvasis/internal/middleware/firebase"
-	"plusvasis/internal/middleware/logger"
+	customMw "plusvasis/internal/middleware"
 	"plusvasis/internal/routes"
 
 	"github.com/labstack/echo/v4"
@@ -21,11 +20,12 @@ func main() {
 		AllowHeaders: []string{"*"},
 	}))
 
-	e.Use(logger.CustomLogger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
-	e.Use(firebase.Auth())
+
+	e.Use(customMw.Logger())
+	e.Use(customMw.Firebase())
 
 	routes.HealthRoutes(e)
 	routes.NomadJobs(e)
