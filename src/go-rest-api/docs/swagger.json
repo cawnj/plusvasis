@@ -11,6 +11,330 @@
     },
     "host": "api.plusvasis.xyz",
     "paths": {
+        "/job/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get details of a Nomad job",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nomad"
+                ],
+                "summary": "ReadJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Job ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.JobListStub"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing Nomad job",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nomad"
+                ],
+                "summary": "UpdateJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Job ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Nomad Job",
+                        "name": "job",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/plusvasis_internal_templates.NomadJob"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.JobRegisterResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Stop a running Nomad job",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nomad"
+                ],
+                "summary": "StopJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Job ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Purge job",
+                        "name": "purge",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.JobDeregisterResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/job/{id}/alloc": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get the running allocation of a Nomad job",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nomad"
+                ],
+                "summary": "ReadJobAlloc",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Job ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.AllocListStub"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/job/{id}/allocations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all allocations of a Nomad job",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nomad"
+                ],
+                "summary": "ReadJobAllocs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Job ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/structs.AllocListStub"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/job/{id}/restart": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Restart a Nomad job",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nomad"
+                ],
+                "summary": "RestartJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Job ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.GenericResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/job/{id}/start": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Start a stopped Nomad job",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nomad"
+                ],
+                "summary": "StartJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Job ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.JobRegisterResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/jobs": {
             "get": {
                 "security": [
@@ -18,7 +342,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all Nomad jobs",
+                "description": "Get details of all Nomad jobs",
                 "produces": [
                     "application/json"
                 ],
@@ -46,6 +370,52 @@
                         "description": "Internal Server Error"
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new Nomad job",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nomad"
+                ],
+                "summary": "CreateJob",
+                "parameters": [
+                    {
+                        "description": "Nomad Job",
+                        "name": "job",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/plusvasis_internal_templates.NomadJob"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.JobRegisterResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
             }
         }
     },
@@ -54,6 +424,346 @@
             "type": "object",
             "properties": {
                 "message": {}
+            }
+        },
+        "plusvasis_internal_templates.NomadJob": {
+            "type": "object",
+            "properties": {
+                "containerName": {
+                    "type": "string"
+                },
+                "dockerImage": {
+                    "type": "string"
+                },
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "envString": {
+                    "type": "string"
+                },
+                "expose": {
+                    "type": "boolean"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "shell": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                },
+                "volumes": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "structs.AllocDeploymentStatus": {
+            "type": "object",
+            "properties": {
+                "canary": {
+                    "description": "Canary marks whether the allocation is a canary or not. A canary that has\nbeen promoted will have this field set to false.",
+                    "type": "boolean"
+                },
+                "healthy": {
+                    "description": "Healthy marks whether the allocation has been marked healthy or unhealthy\nas part of a deployment. It can be unset if it has neither been marked\nhealthy or unhealthy.",
+                    "type": "boolean"
+                },
+                "modifyIndex": {
+                    "description": "ModifyIndex is the raft index in which the deployment status was last\nchanged.",
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "description": "Timestamp is the time at which the health status was set.",
+                    "type": "string"
+                }
+            }
+        },
+        "structs.AllocListStub": {
+            "type": "object",
+            "properties": {
+                "allocatedResources": {
+                    "$ref": "#/definitions/structs.AllocatedResources"
+                },
+                "clientDescription": {
+                    "type": "string"
+                },
+                "clientStatus": {
+                    "type": "string"
+                },
+                "createIndex": {
+                    "type": "integer"
+                },
+                "createTime": {
+                    "type": "integer"
+                },
+                "deploymentStatus": {
+                    "$ref": "#/definitions/structs.AllocDeploymentStatus"
+                },
+                "desiredDescription": {
+                    "type": "string"
+                },
+                "desiredStatus": {
+                    "type": "string"
+                },
+                "desiredTransition": {
+                    "$ref": "#/definitions/structs.DesiredTransition"
+                },
+                "evalID": {
+                    "type": "string"
+                },
+                "followupEvalID": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "jobID": {
+                    "type": "string"
+                },
+                "jobType": {
+                    "type": "string"
+                },
+                "jobVersion": {
+                    "type": "integer"
+                },
+                "modifyIndex": {
+                    "type": "integer"
+                },
+                "modifyTime": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "nodeID": {
+                    "type": "string"
+                },
+                "nodeName": {
+                    "type": "string"
+                },
+                "preemptedAllocations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "preemptedByAllocation": {
+                    "type": "string"
+                },
+                "rescheduleTracker": {
+                    "$ref": "#/definitions/structs.RescheduleTracker"
+                },
+                "taskGroup": {
+                    "type": "string"
+                },
+                "taskStates": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/structs.TaskState"
+                    }
+                }
+            }
+        },
+        "structs.AllocatedCpuResources": {
+            "type": "object",
+            "properties": {
+                "cpuShares": {
+                    "type": "integer"
+                },
+                "reservedCores": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "structs.AllocatedDeviceResource": {
+            "type": "object",
+            "properties": {
+                "deviceIDs": {
+                    "description": "DeviceIDs is the set of allocated devices",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "vendor": {
+                    "description": "Vendor, Type, and Name are used to select the plugin to request the\ndevice IDs from.",
+                    "type": "string"
+                }
+            }
+        },
+        "structs.AllocatedMemoryResources": {
+            "type": "object",
+            "properties": {
+                "memoryMB": {
+                    "type": "integer"
+                },
+                "memoryMaxMB": {
+                    "type": "integer"
+                }
+            }
+        },
+        "structs.AllocatedPortMapping": {
+            "type": "object",
+            "properties": {
+                "hostIP": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "to": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "integer"
+                }
+            }
+        },
+        "structs.AllocatedResources": {
+            "type": "object",
+            "properties": {
+                "shared": {
+                    "description": "Shared is the set of resource that are shared by all tasks in the group.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/structs.AllocatedSharedResources"
+                        }
+                    ]
+                },
+                "taskLifecycles": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/structs.TaskLifecycleConfig"
+                    }
+                },
+                "tasks": {
+                    "description": "Tasks is a mapping of task name to the resources for the task.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/structs.AllocatedTaskResources"
+                    }
+                }
+            }
+        },
+        "structs.AllocatedSharedResources": {
+            "type": "object",
+            "properties": {
+                "diskMB": {
+                    "type": "integer"
+                },
+                "networks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.NetworkResource"
+                    }
+                },
+                "ports": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.AllocatedPortMapping"
+                    }
+                }
+            }
+        },
+        "structs.AllocatedTaskResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "$ref": "#/definitions/structs.AllocatedCpuResources"
+                },
+                "devices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.AllocatedDeviceResource"
+                    }
+                },
+                "memory": {
+                    "$ref": "#/definitions/structs.AllocatedMemoryResources"
+                },
+                "networks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.NetworkResource"
+                    }
+                }
+            }
+        },
+        "structs.DNSConfig": {
+            "type": "object",
+            "properties": {
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "searches": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "servers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "structs.DesiredTransition": {
+            "type": "object",
+            "properties": {
+                "forceReschedule": {
+                    "description": "ForceReschedule is used to indicate that this allocation must be rescheduled.\nThis field is only used when operators want to force a placement even if\na failed allocation is not eligible to be rescheduled",
+                    "type": "boolean"
+                },
+                "migrate": {
+                    "description": "Migrate is used to indicate that this allocation should be stopped and\nmigrated to another node.",
+                    "type": "boolean"
+                },
+                "noShutdownDelay": {
+                    "description": "NoShutdownDelay, if set to true, will override the group and\ntask shutdown_delay configuration and ignore the delay for any\nallocations stopped as a result of this Deregister call.",
+                    "type": "boolean"
+                },
+                "reschedule": {
+                    "description": "Reschedule is used to indicate that this allocation is eligible to be\nrescheduled. Most allocations are automatically eligible for\nrescheduling, so this field is only required when an allocation is not\nautomatically eligible. An example is an allocation that is part of a\ndeployment.",
+                    "type": "boolean"
+                }
+            }
+        },
+        "structs.GenericResponse": {
+            "type": "object",
+            "properties": {
+                "index": {
+                    "description": "This is the index associated with the write",
+                    "type": "integer"
+                }
             }
         },
         "structs.JobChildrenSummary": {
@@ -66,6 +776,46 @@
                     "type": "integer"
                 },
                 "running": {
+                    "type": "integer"
+                }
+            }
+        },
+        "structs.JobDeregisterResponse": {
+            "type": "object",
+            "properties": {
+                "evalCreateIndex": {
+                    "type": "integer"
+                },
+                "evalID": {
+                    "type": "string"
+                },
+                "index": {
+                    "description": "This is the index associated with the read",
+                    "type": "integer"
+                },
+                "jobModifyIndex": {
+                    "type": "integer"
+                },
+                "knownLeader": {
+                    "description": "Used to indicate if there is a known leader node",
+                    "type": "boolean"
+                },
+                "lastContact": {
+                    "description": "If AllowStale is used, this is time elapsed since\nlast contact between the follower and leader. This\ncan be used to gauge staleness.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/time.Duration"
+                        }
+                    ]
+                },
+                "nextToken": {
+                    "description": "NextToken is the token returned with queries that support\npaginated lists. To resume paging from this point, pass\nthis token in the next request's QueryOptions.",
+                    "type": "string"
+                },
+                "volumeEvalID": {
+                    "type": "string"
+                },
+                "volumeEvalIndex": {
                     "type": "integer"
                 }
             }
@@ -134,6 +884,44 @@
                     "type": "integer"
                 },
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "structs.JobRegisterResponse": {
+            "type": "object",
+            "properties": {
+                "evalCreateIndex": {
+                    "type": "integer"
+                },
+                "evalID": {
+                    "type": "string"
+                },
+                "index": {
+                    "description": "This is the index associated with the read",
+                    "type": "integer"
+                },
+                "jobModifyIndex": {
+                    "type": "integer"
+                },
+                "knownLeader": {
+                    "description": "Used to indicate if there is a known leader node",
+                    "type": "boolean"
+                },
+                "lastContact": {
+                    "description": "If AllowStale is used, this is time elapsed since\nlast contact between the follower and leader. This\ncan be used to gauge staleness.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/time.Duration"
+                        }
+                    ]
+                },
+                "nextToken": {
+                    "description": "NextToken is the token returned with queries that support\npaginated lists. To resume paging from this point, pass\nthis token in the next request's QueryOptions.",
+                    "type": "string"
+                },
+                "warnings": {
+                    "description": "Warnings contains any warnings about the given job. These may include\ndeprecation warnings.",
                     "type": "string"
                 }
             }
@@ -221,6 +1009,221 @@
                 }
             }
         },
+        "structs.NetworkResource": {
+            "type": "object",
+            "properties": {
+                "cidr": {
+                    "description": "CIDR block of addresses",
+                    "type": "string"
+                },
+                "device": {
+                    "description": "Name of the device",
+                    "type": "string"
+                },
+                "dns": {
+                    "description": "DNS Configuration",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/structs.DNSConfig"
+                        }
+                    ]
+                },
+                "dynamicPorts": {
+                    "description": "Host Dynamically assigned ports",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.Port"
+                    }
+                },
+                "hostname": {
+                    "description": "Hostname of the network namespace",
+                    "type": "string"
+                },
+                "ip": {
+                    "description": "Host IP address",
+                    "type": "string"
+                },
+                "mbits": {
+                    "description": "Throughput",
+                    "type": "integer"
+                },
+                "mode": {
+                    "description": "Mode of the network",
+                    "type": "string"
+                },
+                "reservedPorts": {
+                    "description": "Host Reserved ports",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.Port"
+                    }
+                }
+            }
+        },
+        "structs.Port": {
+            "type": "object",
+            "properties": {
+                "hostNetwork": {
+                    "description": "HostNetwork is the name of the network this port should be assigned\nto. Jobs with a HostNetwork set can only be placed on nodes with\nthat host network available.",
+                    "type": "string"
+                },
+                "label": {
+                    "description": "Label is the key for HCL port blocks: port \"foo\" {}",
+                    "type": "string"
+                },
+                "to": {
+                    "description": "To is the port inside a network namespace where this port is\nforwarded. -1 is an internal sentinel value used by Consul Connect\nto mean \"same as the host port.\"",
+                    "type": "integer"
+                },
+                "value": {
+                    "description": "Value is the static or dynamic port value. For dynamic ports this\nwill be 0 in the jobspec and set by the scheduler.",
+                    "type": "integer"
+                }
+            }
+        },
+        "structs.RescheduleEvent": {
+            "type": "object",
+            "properties": {
+                "delay": {
+                    "description": "Delay is the reschedule delay associated with the attempt",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/time.Duration"
+                        }
+                    ]
+                },
+                "prevAllocID": {
+                    "description": "PrevAllocID is the ID of the previous allocation being restarted",
+                    "type": "string"
+                },
+                "prevNodeID": {
+                    "description": "PrevNodeID is the node ID of the previous allocation",
+                    "type": "string"
+                },
+                "rescheduleTime": {
+                    "description": "RescheduleTime is the timestamp of a reschedule attempt",
+                    "type": "integer"
+                }
+            }
+        },
+        "structs.RescheduleTracker": {
+            "type": "object",
+            "properties": {
+                "events": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.RescheduleEvent"
+                    }
+                }
+            }
+        },
+        "structs.TaskEvent": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "description": "Details is a map with annotated info about the event",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "diskLimit": {
+                    "description": "The maximum allowed task disk size.\nDeprecated, use Details[\"disk_limit\"] to access this.",
+                    "type": "integer"
+                },
+                "displayMessage": {
+                    "description": "DisplayMessage is a human friendly message about the event",
+                    "type": "string"
+                },
+                "downloadError": {
+                    "description": "Artifact Download fields\nDeprecated, use Details[\"download_error\"] to access this.",
+                    "type": "string"
+                },
+                "driverError": {
+                    "description": "Driver Failure fields.\nDeprecated, use Details[\"driver_error\"] to access this.",
+                    "type": "string"
+                },
+                "driverMessage": {
+                    "description": "DriverMessage indicates a driver action being taken.\nDeprecated, use Details[\"driver_message\"] to access this.",
+                    "type": "string"
+                },
+                "exitCode": {
+                    "description": "Deprecated, use Details[\"exit_code\"] to access this.",
+                    "type": "integer"
+                },
+                "failedSibling": {
+                    "description": "Name of the sibling task that caused termination of the task that\nthe TaskEvent refers to.\nDeprecated, use Details[\"failed_sibling\"] to access this.",
+                    "type": "string"
+                },
+                "failsTask": {
+                    "description": "FailsTask marks whether this event fails the task.\nDeprecated, use Details[\"fails_task\"] to access this.",
+                    "type": "boolean"
+                },
+                "genericSource": {
+                    "description": "GenericSource is the source of a message.\nDeprecated, is redundant with event type.",
+                    "type": "string"
+                },
+                "killError": {
+                    "description": "Task Killed Fields.\nDeprecated, use Details[\"kill_error\"] to access this.",
+                    "type": "string"
+                },
+                "killReason": {
+                    "description": "KillReason is the reason the task was killed\nDeprecated, use Details[\"kill_reason\"] to access this.",
+                    "type": "string"
+                },
+                "killTimeout": {
+                    "description": "Killing fields\nDeprecated, use Details[\"kill_timeout\"] to access this.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/time.Duration"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "A possible message explaining the termination of the task.",
+                    "type": "string"
+                },
+                "restartReason": {
+                    "description": "Restart fields.\nDeprecated, use Details[\"restart_reason\"] to access this.",
+                    "type": "string"
+                },
+                "setupError": {
+                    "description": "Setup Failure fields.\nDeprecated, use Details[\"setup_error\"] to access this.",
+                    "type": "string"
+                },
+                "signal": {
+                    "description": "Deprecated, use Details[\"signal\"] to access this.",
+                    "type": "integer"
+                },
+                "startDelay": {
+                    "description": "TaskRestarting fields.\nDeprecated, use Details[\"start_delay\"] to access this.",
+                    "type": "integer"
+                },
+                "taskSignal": {
+                    "description": "TaskSignal is the signal that was sent to the task\nDeprecated, use Details[\"task_signal\"] to access this.",
+                    "type": "string"
+                },
+                "taskSignalReason": {
+                    "description": "TaskSignalReason indicates the reason the task is being signalled.\nDeprecated, use Details[\"task_signal_reason\"] to access this.",
+                    "type": "string"
+                },
+                "time": {
+                    "description": "Unix Nanosecond timestamp",
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "validationError": {
+                    "description": "Validation fields\nDeprecated, use Details[\"validation_error\"] to access this.",
+                    "type": "string"
+                },
+                "vaultError": {
+                    "description": "VaultError is the error from token renewal\nDeprecated, use Details[\"vault_renewal_error\"] to access this.",
+                    "type": "string"
+                }
+            }
+        },
         "structs.TaskGroupSummary": {
             "type": "object",
             "properties": {
@@ -246,6 +1249,124 @@
                     "type": "integer"
                 }
             }
+        },
+        "structs.TaskHandle": {
+            "type": "object",
+            "properties": {
+                "driverState": {
+                    "description": "Driver-specific state containing a handle to the remote task.",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "version": {
+                    "description": "Version of driver state. Used by the driver to gracefully handle\nplugin upgrades.",
+                    "type": "integer"
+                }
+            }
+        },
+        "structs.TaskLifecycleConfig": {
+            "type": "object",
+            "properties": {
+                "hook": {
+                    "type": "string"
+                },
+                "sidecar": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "structs.TaskState": {
+            "type": "object",
+            "properties": {
+                "events": {
+                    "description": "Series of task events that transition the state of the task.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.TaskEvent"
+                    }
+                },
+                "failed": {
+                    "description": "Failed marks a task as having failed",
+                    "type": "boolean"
+                },
+                "finishedAt": {
+                    "description": "FinishedAt is the time at which the task transitioned to dead and will\nnot be started again.",
+                    "type": "string"
+                },
+                "lastRestart": {
+                    "description": "LastRestart is the time the task last restarted. It is updated each time the\ntask restarts",
+                    "type": "string"
+                },
+                "restarts": {
+                    "description": "Restarts is the number of times the task has restarted",
+                    "type": "integer"
+                },
+                "startedAt": {
+                    "description": "StartedAt is the time the task is started. It is updated each time the\ntask starts",
+                    "type": "string"
+                },
+                "state": {
+                    "description": "The current state of the task.",
+                    "type": "string"
+                },
+                "taskHandle": {
+                    "description": "Experimental -  TaskHandle is based on drivers.TaskHandle and used\nby remote task drivers to migrate task handles between allocations.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/structs.TaskHandle"
+                        }
+                    ]
+                }
+            }
+        },
+        "time.Duration": {
+            "type": "integer",
+            "enum": [
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                1,
+                1000,
+                1000000,
+                1000000000
+            ],
+            "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second"
+            ]
         }
     },
     "securityDefinitions": {

@@ -3,6 +3,254 @@ definitions:
     properties:
       message: {}
     type: object
+  plusvasis_internal_templates.NomadJob:
+    properties:
+      containerName:
+        type: string
+      dockerImage:
+        type: string
+      env:
+        items:
+          items:
+            type: string
+          type: array
+        type: array
+      envString:
+        type: string
+      expose:
+        type: boolean
+      port:
+        type: integer
+      shell:
+        type: string
+      user:
+        type: string
+      volumes:
+        items:
+          items:
+            type: string
+          type: array
+        type: array
+    type: object
+  structs.AllocDeploymentStatus:
+    properties:
+      canary:
+        description: |-
+          Canary marks whether the allocation is a canary or not. A canary that has
+          been promoted will have this field set to false.
+        type: boolean
+      healthy:
+        description: |-
+          Healthy marks whether the allocation has been marked healthy or unhealthy
+          as part of a deployment. It can be unset if it has neither been marked
+          healthy or unhealthy.
+        type: boolean
+      modifyIndex:
+        description: |-
+          ModifyIndex is the raft index in which the deployment status was last
+          changed.
+        type: integer
+      timestamp:
+        description: Timestamp is the time at which the health status was set.
+        type: string
+    type: object
+  structs.AllocListStub:
+    properties:
+      allocatedResources:
+        $ref: '#/definitions/structs.AllocatedResources'
+      clientDescription:
+        type: string
+      clientStatus:
+        type: string
+      createIndex:
+        type: integer
+      createTime:
+        type: integer
+      deploymentStatus:
+        $ref: '#/definitions/structs.AllocDeploymentStatus'
+      desiredDescription:
+        type: string
+      desiredStatus:
+        type: string
+      desiredTransition:
+        $ref: '#/definitions/structs.DesiredTransition'
+      evalID:
+        type: string
+      followupEvalID:
+        type: string
+      id:
+        type: string
+      jobID:
+        type: string
+      jobType:
+        type: string
+      jobVersion:
+        type: integer
+      modifyIndex:
+        type: integer
+      modifyTime:
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
+      nodeID:
+        type: string
+      nodeName:
+        type: string
+      preemptedAllocations:
+        items:
+          type: string
+        type: array
+      preemptedByAllocation:
+        type: string
+      rescheduleTracker:
+        $ref: '#/definitions/structs.RescheduleTracker'
+      taskGroup:
+        type: string
+      taskStates:
+        additionalProperties:
+          $ref: '#/definitions/structs.TaskState'
+        type: object
+    type: object
+  structs.AllocatedCpuResources:
+    properties:
+      cpuShares:
+        type: integer
+      reservedCores:
+        items:
+          type: integer
+        type: array
+    type: object
+  structs.AllocatedDeviceResource:
+    properties:
+      deviceIDs:
+        description: DeviceIDs is the set of allocated devices
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      type:
+        type: string
+      vendor:
+        description: |-
+          Vendor, Type, and Name are used to select the plugin to request the
+          device IDs from.
+        type: string
+    type: object
+  structs.AllocatedMemoryResources:
+    properties:
+      memoryMB:
+        type: integer
+      memoryMaxMB:
+        type: integer
+    type: object
+  structs.AllocatedPortMapping:
+    properties:
+      hostIP:
+        type: string
+      label:
+        type: string
+      to:
+        type: integer
+      value:
+        type: integer
+    type: object
+  structs.AllocatedResources:
+    properties:
+      shared:
+        allOf:
+        - $ref: '#/definitions/structs.AllocatedSharedResources'
+        description: Shared is the set of resource that are shared by all tasks in
+          the group.
+      taskLifecycles:
+        additionalProperties:
+          $ref: '#/definitions/structs.TaskLifecycleConfig'
+        type: object
+      tasks:
+        additionalProperties:
+          $ref: '#/definitions/structs.AllocatedTaskResources'
+        description: Tasks is a mapping of task name to the resources for the task.
+        type: object
+    type: object
+  structs.AllocatedSharedResources:
+    properties:
+      diskMB:
+        type: integer
+      networks:
+        items:
+          $ref: '#/definitions/structs.NetworkResource'
+        type: array
+      ports:
+        items:
+          $ref: '#/definitions/structs.AllocatedPortMapping'
+        type: array
+    type: object
+  structs.AllocatedTaskResources:
+    properties:
+      cpu:
+        $ref: '#/definitions/structs.AllocatedCpuResources'
+      devices:
+        items:
+          $ref: '#/definitions/structs.AllocatedDeviceResource'
+        type: array
+      memory:
+        $ref: '#/definitions/structs.AllocatedMemoryResources'
+      networks:
+        items:
+          $ref: '#/definitions/structs.NetworkResource'
+        type: array
+    type: object
+  structs.DNSConfig:
+    properties:
+      options:
+        items:
+          type: string
+        type: array
+      searches:
+        items:
+          type: string
+        type: array
+      servers:
+        items:
+          type: string
+        type: array
+    type: object
+  structs.DesiredTransition:
+    properties:
+      forceReschedule:
+        description: |-
+          ForceReschedule is used to indicate that this allocation must be rescheduled.
+          This field is only used when operators want to force a placement even if
+          a failed allocation is not eligible to be rescheduled
+        type: boolean
+      migrate:
+        description: |-
+          Migrate is used to indicate that this allocation should be stopped and
+          migrated to another node.
+        type: boolean
+      noShutdownDelay:
+        description: |-
+          NoShutdownDelay, if set to true, will override the group and
+          task shutdown_delay configuration and ignore the delay for any
+          allocations stopped as a result of this Deregister call.
+        type: boolean
+      reschedule:
+        description: |-
+          Reschedule is used to indicate that this allocation is eligible to be
+          rescheduled. Most allocations are automatically eligible for
+          rescheduling, so this field is only required when an allocation is not
+          automatically eligible. An example is an allocation that is part of a
+          deployment.
+        type: boolean
+    type: object
+  structs.GenericResponse:
+    properties:
+      index:
+        description: This is the index associated with the write
+        type: integer
+    type: object
   structs.JobChildrenSummary:
     properties:
       dead:
@@ -10,6 +258,38 @@ definitions:
       pending:
         type: integer
       running:
+        type: integer
+    type: object
+  structs.JobDeregisterResponse:
+    properties:
+      evalCreateIndex:
+        type: integer
+      evalID:
+        type: string
+      index:
+        description: This is the index associated with the read
+        type: integer
+      jobModifyIndex:
+        type: integer
+      knownLeader:
+        description: Used to indicate if there is a known leader node
+        type: boolean
+      lastContact:
+        allOf:
+        - $ref: '#/definitions/time.Duration'
+        description: |-
+          If AllowStale is used, this is time elapsed since
+          last contact between the follower and leader. This
+          can be used to gauge staleness.
+      nextToken:
+        description: |-
+          NextToken is the token returned with queries that support
+          paginated lists. To resume paging from this point, pass
+          this token in the next request's QueryOptions.
+        type: string
+      volumeEvalID:
+        type: string
+      volumeEvalIndex:
         type: integer
     type: object
   structs.JobListStub:
@@ -55,6 +335,39 @@ definitions:
       submitTime:
         type: integer
       type:
+        type: string
+    type: object
+  structs.JobRegisterResponse:
+    properties:
+      evalCreateIndex:
+        type: integer
+      evalID:
+        type: string
+      index:
+        description: This is the index associated with the read
+        type: integer
+      jobModifyIndex:
+        type: integer
+      knownLeader:
+        description: Used to indicate if there is a known leader node
+        type: boolean
+      lastContact:
+        allOf:
+        - $ref: '#/definitions/time.Duration'
+        description: |-
+          If AllowStale is used, this is time elapsed since
+          last contact between the follower and leader. This
+          can be used to gauge staleness.
+      nextToken:
+        description: |-
+          NextToken is the token returned with queries that support
+          paginated lists. To resume paging from this point, pass
+          this token in the next request's QueryOptions.
+        type: string
+      warnings:
+        description: |-
+          Warnings contains any warnings about the given job. These may include
+          deprecation warnings.
         type: string
     type: object
   structs.JobSummary:
@@ -111,6 +424,199 @@ definitions:
       onFailure:
         type: string
     type: object
+  structs.NetworkResource:
+    properties:
+      cidr:
+        description: CIDR block of addresses
+        type: string
+      device:
+        description: Name of the device
+        type: string
+      dns:
+        allOf:
+        - $ref: '#/definitions/structs.DNSConfig'
+        description: DNS Configuration
+      dynamicPorts:
+        description: Host Dynamically assigned ports
+        items:
+          $ref: '#/definitions/structs.Port'
+        type: array
+      hostname:
+        description: Hostname of the network namespace
+        type: string
+      ip:
+        description: Host IP address
+        type: string
+      mbits:
+        description: Throughput
+        type: integer
+      mode:
+        description: Mode of the network
+        type: string
+      reservedPorts:
+        description: Host Reserved ports
+        items:
+          $ref: '#/definitions/structs.Port'
+        type: array
+    type: object
+  structs.Port:
+    properties:
+      hostNetwork:
+        description: |-
+          HostNetwork is the name of the network this port should be assigned
+          to. Jobs with a HostNetwork set can only be placed on nodes with
+          that host network available.
+        type: string
+      label:
+        description: 'Label is the key for HCL port blocks: port "foo" {}'
+        type: string
+      to:
+        description: |-
+          To is the port inside a network namespace where this port is
+          forwarded. -1 is an internal sentinel value used by Consul Connect
+          to mean "same as the host port."
+        type: integer
+      value:
+        description: |-
+          Value is the static or dynamic port value. For dynamic ports this
+          will be 0 in the jobspec and set by the scheduler.
+        type: integer
+    type: object
+  structs.RescheduleEvent:
+    properties:
+      delay:
+        allOf:
+        - $ref: '#/definitions/time.Duration'
+        description: Delay is the reschedule delay associated with the attempt
+      prevAllocID:
+        description: PrevAllocID is the ID of the previous allocation being restarted
+        type: string
+      prevNodeID:
+        description: PrevNodeID is the node ID of the previous allocation
+        type: string
+      rescheduleTime:
+        description: RescheduleTime is the timestamp of a reschedule attempt
+        type: integer
+    type: object
+  structs.RescheduleTracker:
+    properties:
+      events:
+        items:
+          $ref: '#/definitions/structs.RescheduleEvent'
+        type: array
+    type: object
+  structs.TaskEvent:
+    properties:
+      details:
+        additionalProperties:
+          type: string
+        description: Details is a map with annotated info about the event
+        type: object
+      diskLimit:
+        description: |-
+          The maximum allowed task disk size.
+          Deprecated, use Details["disk_limit"] to access this.
+        type: integer
+      displayMessage:
+        description: DisplayMessage is a human friendly message about the event
+        type: string
+      downloadError:
+        description: |-
+          Artifact Download fields
+          Deprecated, use Details["download_error"] to access this.
+        type: string
+      driverError:
+        description: |-
+          Driver Failure fields.
+          Deprecated, use Details["driver_error"] to access this.
+        type: string
+      driverMessage:
+        description: |-
+          DriverMessage indicates a driver action being taken.
+          Deprecated, use Details["driver_message"] to access this.
+        type: string
+      exitCode:
+        description: Deprecated, use Details["exit_code"] to access this.
+        type: integer
+      failedSibling:
+        description: |-
+          Name of the sibling task that caused termination of the task that
+          the TaskEvent refers to.
+          Deprecated, use Details["failed_sibling"] to access this.
+        type: string
+      failsTask:
+        description: |-
+          FailsTask marks whether this event fails the task.
+          Deprecated, use Details["fails_task"] to access this.
+        type: boolean
+      genericSource:
+        description: |-
+          GenericSource is the source of a message.
+          Deprecated, is redundant with event type.
+        type: string
+      killError:
+        description: |-
+          Task Killed Fields.
+          Deprecated, use Details["kill_error"] to access this.
+        type: string
+      killReason:
+        description: |-
+          KillReason is the reason the task was killed
+          Deprecated, use Details["kill_reason"] to access this.
+        type: string
+      killTimeout:
+        allOf:
+        - $ref: '#/definitions/time.Duration'
+        description: |-
+          Killing fields
+          Deprecated, use Details["kill_timeout"] to access this.
+      message:
+        description: A possible message explaining the termination of the task.
+        type: string
+      restartReason:
+        description: |-
+          Restart fields.
+          Deprecated, use Details["restart_reason"] to access this.
+        type: string
+      setupError:
+        description: |-
+          Setup Failure fields.
+          Deprecated, use Details["setup_error"] to access this.
+        type: string
+      signal:
+        description: Deprecated, use Details["signal"] to access this.
+        type: integer
+      startDelay:
+        description: |-
+          TaskRestarting fields.
+          Deprecated, use Details["start_delay"] to access this.
+        type: integer
+      taskSignal:
+        description: |-
+          TaskSignal is the signal that was sent to the task
+          Deprecated, use Details["task_signal"] to access this.
+        type: string
+      taskSignalReason:
+        description: |-
+          TaskSignalReason indicates the reason the task is being signalled.
+          Deprecated, use Details["task_signal_reason"] to access this.
+        type: string
+      time:
+        description: Unix Nanosecond timestamp
+        type: integer
+      type:
+        type: string
+      validationError:
+        description: |-
+          Validation fields
+          Deprecated, use Details["validation_error"] to access this.
+        type: string
+      vaultError:
+        description: |-
+          VaultError is the error from token renewal
+          Deprecated, use Details["vault_renewal_error"] to access this.
+        type: string
+    type: object
   structs.TaskGroupSummary:
     properties:
       complete:
@@ -128,6 +634,108 @@ definitions:
       unknown:
         type: integer
     type: object
+  structs.TaskHandle:
+    properties:
+      driverState:
+        description: Driver-specific state containing a handle to the remote task.
+        items:
+          type: integer
+        type: array
+      version:
+        description: |-
+          Version of driver state. Used by the driver to gracefully handle
+          plugin upgrades.
+        type: integer
+    type: object
+  structs.TaskLifecycleConfig:
+    properties:
+      hook:
+        type: string
+      sidecar:
+        type: boolean
+    type: object
+  structs.TaskState:
+    properties:
+      events:
+        description: Series of task events that transition the state of the task.
+        items:
+          $ref: '#/definitions/structs.TaskEvent'
+        type: array
+      failed:
+        description: Failed marks a task as having failed
+        type: boolean
+      finishedAt:
+        description: |-
+          FinishedAt is the time at which the task transitioned to dead and will
+          not be started again.
+        type: string
+      lastRestart:
+        description: |-
+          LastRestart is the time the task last restarted. It is updated each time the
+          task restarts
+        type: string
+      restarts:
+        description: Restarts is the number of times the task has restarted
+        type: integer
+      startedAt:
+        description: |-
+          StartedAt is the time the task is started. It is updated each time the
+          task starts
+        type: string
+      state:
+        description: The current state of the task.
+        type: string
+      taskHandle:
+        allOf:
+        - $ref: '#/definitions/structs.TaskHandle'
+        description: |-
+          Experimental -  TaskHandle is based on drivers.TaskHandle and used
+          by remote task drivers to migrate task handles between allocations.
+    type: object
+  time.Duration:
+    enum:
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    type: integer
+    x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
 host: api.plusvasis.xyz
 info:
   contact: {}
@@ -135,9 +743,214 @@ info:
   title: PlusVasis API
   version: "1.0"
 paths:
+  /job/{id}:
+    delete:
+      description: Stop a running Nomad job
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Purge job
+        in: query
+        name: purge
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.JobDeregisterResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: StopJob
+      tags:
+      - nomad
+    get:
+      description: Get details of a Nomad job
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.JobListStub'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: ReadJob
+      tags:
+      - nomad
+    post:
+      consumes:
+      - application/json
+      description: Update an existing Nomad job
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Nomad Job
+        in: body
+        name: job
+        required: true
+        schema:
+          $ref: '#/definitions/plusvasis_internal_templates.NomadJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.JobRegisterResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: UpdateJob
+      tags:
+      - nomad
+  /job/{id}/alloc:
+    get:
+      description: Get the running allocation of a Nomad job
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.AllocListStub'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: ReadJobAlloc
+      tags:
+      - nomad
+  /job/{id}/allocations:
+    get:
+      description: Get all allocations of a Nomad job
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/structs.AllocListStub'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: ReadJobAllocs
+      tags:
+      - nomad
+  /job/{id}/restart:
+    post:
+      description: Restart a Nomad job
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.GenericResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: RestartJob
+      tags:
+      - nomad
+  /job/{id}/start:
+    get:
+      description: Start a stopped Nomad job
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.JobRegisterResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: StartJob
+      tags:
+      - nomad
   /jobs:
     get:
-      description: Get all Nomad jobs
+      description: Get details of all Nomad jobs
       produces:
       - application/json
       responses:
@@ -156,6 +969,35 @@ paths:
       security:
       - BearerAuth: []
       summary: GetJobs
+      tags:
+      - nomad
+    post:
+      consumes:
+      - application/json
+      description: Create a new Nomad job
+      parameters:
+      - description: Nomad Job
+        in: body
+        name: job
+        required: true
+        schema:
+          $ref: '#/definitions/plusvasis_internal_templates.NomadJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.JobRegisterResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: CreateJob
       tags:
       - nomad
 schemes:
