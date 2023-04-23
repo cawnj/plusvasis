@@ -23,23 +23,25 @@ func (f *Formatter) Format(entry *logrus.Entry) ([]byte, error) {
 	)), nil
 }
 
-var log = logrus.New()
-var DefaultRequestLoggerConfig = middleware.RequestLoggerConfig{
-	LogURI:    true,
-	LogStatus: true,
-	LogMethod: true,
-	LogError:  true,
-	LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
-		log.WithFields(logrus.Fields{
-			"method": values.Method,
-			"uri":    values.URI,
-			"status": values.Status,
-			"user":   c.Get("uid"),
-			"error":  values.Error,
-		}).Info()
-		return nil
-	},
-}
+var (
+	log                        = logrus.New()
+	DefaultRequestLoggerConfig = middleware.RequestLoggerConfig{
+		LogURI:    true,
+		LogStatus: true,
+		LogMethod: true,
+		LogError:  true,
+		LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
+			log.WithFields(logrus.Fields{
+				"method": values.Method,
+				"uri":    values.URI,
+				"status": values.Status,
+				"user":   c.Get("uid"),
+				"error":  values.Error,
+			}).Info()
+			return nil
+		},
+	}
+)
 
 func Logger() echo.MiddlewareFunc {
 	log.SetFormatter(&Formatter{})
