@@ -48,6 +48,22 @@ var upgrader = websocket.Upgrader{
 
 const idleTimeout = 30 * time.Second
 
+// AllocExec godoc
+//
+// @Summary AllocExec
+// @Description Execute commands in a Nomad job allocation via WebSockets
+// @Tags proxy
+// @Accept json
+// @Produce json
+// @Param id path string true "Allocation ID"
+// @Param command query string true "Command to execute"
+// @Success 200
+// @Failure 401 {object} echo.HTTPError
+// @Failure 404
+// @Failure 500
+// @Failure 502
+// @Security BearerAuth
+// @Router /job/{id}/exec [get]
 func (n *NomadProxyController) AllocExec(c echo.Context) error {
 	jobId := c.Param("id")
 	command := c.QueryParam("command")
@@ -169,6 +185,22 @@ func (n *NomadProxyController) checkUserAllowed(uid, jobId string) error {
 	return nil
 }
 
+// StreamLogs godoc
+//
+// @Summary StreamLogs
+// @Description Stream logs from a Nomad job allocation
+// @Tags proxy
+// @Produce json
+// @Param id path string true "Job ID"
+// @Param task query string true "Task name (same as job name)"
+// @Param type query string true "Log type (stdout or stderr)"
+// @Success 200
+// @Failure 400
+// @Failure 401
+// @Failure 404
+// @Failure 500
+// @Security BearerAuth
+// @Router /job/{id}/logs [get]
 func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 	jobId := c.Param("id")
 	task := c.QueryParam("task")
