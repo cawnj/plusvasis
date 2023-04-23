@@ -18,11 +18,11 @@ import (
 //	@description	API backend for PlusVasis service
 
 //	@host		api.plusvasis.xyz
-//  @schemes	https
+//	@schemes	https
 
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
 
 func setupMiddlewares(e *echo.Echo) {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

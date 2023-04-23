@@ -17,6 +17,17 @@ type NomadController struct {
 	Client NomadClient
 }
 
+// GetJobs godoc
+//
+//	@Summary		GetJobs
+//	@Description	Get all Nomad jobs
+//	@Tags			nomad
+//	@Produce		json
+//	@Success		200	{object}	[]nomad.JobListStub
+//	@Failure		401	{object}	echo.HTTPError
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/jobs [get]
 func (n *NomadController) GetJobs(c echo.Context) error {
 	data, err := n.Client.Get("/jobs?meta=true")
 	if err != nil {

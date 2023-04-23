@@ -15,7 +15,244 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {},
+    "paths": {
+        "/jobs": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all Nomad jobs",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nomad"
+                ],
+                "summary": "GetJobs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/structs.JobListStub"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "echo.HTTPError": {
+            "type": "object",
+            "properties": {
+                "message": {}
+            }
+        },
+        "structs.JobChildrenSummary": {
+            "type": "object",
+            "properties": {
+                "dead": {
+                    "type": "integer"
+                },
+                "pending": {
+                    "type": "integer"
+                },
+                "running": {
+                    "type": "integer"
+                }
+            }
+        },
+        "structs.JobListStub": {
+            "type": "object",
+            "properties": {
+                "createIndex": {
+                    "type": "integer"
+                },
+                "datacenters": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "jobModifyIndex": {
+                    "type": "integer"
+                },
+                "jobSummary": {
+                    "$ref": "#/definitions/structs.JobSummary"
+                },
+                "meta": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "modifyIndex": {
+                    "type": "integer"
+                },
+                "multiregion": {
+                    "$ref": "#/definitions/structs.Multiregion"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "parameterizedJob": {
+                    "type": "boolean"
+                },
+                "parentID": {
+                    "type": "string"
+                },
+                "periodic": {
+                    "type": "boolean"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "statusDescription": {
+                    "type": "string"
+                },
+                "stop": {
+                    "type": "boolean"
+                },
+                "submitTime": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "structs.JobSummary": {
+            "type": "object",
+            "properties": {
+                "children": {
+                    "description": "Children contains a summary for the children of this job.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/structs.JobChildrenSummary"
+                        }
+                    ]
+                },
+                "createIndex": {
+                    "description": "Raft Indexes",
+                    "type": "integer"
+                },
+                "jobID": {
+                    "description": "JobID is the ID of the job the summary is for",
+                    "type": "string"
+                },
+                "modifyIndex": {
+                    "type": "integer"
+                },
+                "namespace": {
+                    "description": "Namespace is the namespace of the job and its summary",
+                    "type": "string"
+                },
+                "summary": {
+                    "description": "Summary contains the summary per task group for the Job",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/structs.TaskGroupSummary"
+                    }
+                }
+            }
+        },
+        "structs.Multiregion": {
+            "type": "object",
+            "properties": {
+                "regions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.MultiregionRegion"
+                    }
+                },
+                "strategy": {
+                    "$ref": "#/definitions/structs.MultiregionStrategy"
+                }
+            }
+        },
+        "structs.MultiregionRegion": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "datacenters": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "meta": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "structs.MultiregionStrategy": {
+            "type": "object",
+            "properties": {
+                "maxParallel": {
+                    "type": "integer"
+                },
+                "onFailure": {
+                    "type": "string"
+                }
+            }
+        },
+        "structs.TaskGroupSummary": {
+            "type": "object",
+            "properties": {
+                "complete": {
+                    "type": "integer"
+                },
+                "failed": {
+                    "type": "integer"
+                },
+                "lost": {
+                    "type": "integer"
+                },
+                "queued": {
+                    "type": "integer"
+                },
+                "running": {
+                    "type": "integer"
+                },
+                "starting": {
+                    "type": "integer"
+                },
+                "unknown": {
+                    "type": "integer"
+                }
+            }
+        }
+    },
     "securityDefinitions": {
         "BearerAuth": {
             "type": "apiKey",
