@@ -8,6 +8,7 @@
 	onMount(() => {
 		signOut(auth)
 			.then(() => {
+				localStorage.removeItem('token');
 				goto('/login');
 			})
 			.catch((error) => {
