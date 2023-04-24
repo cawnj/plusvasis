@@ -6,6 +6,8 @@ export async function load({ params, cookies }: PageServerLoadEvent) {
 	const token = cookies.get('token');
 	const jobId = params.id;
 
+	if (!token || !jobId) return;
+
 	async function fetchJob() {
 		const url = `${hostname}/job/${jobId}`;
 		const res = await fetch(url, {
