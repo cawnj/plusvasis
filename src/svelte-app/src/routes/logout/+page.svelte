@@ -1,12 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { getAuth, signOut } from 'firebase/auth';
+	import { signOut } from '../../stores/auth';
 	import { onMount } from 'svelte';
 
-	const auth = getAuth();
-
 	onMount(() => {
-		signOut(auth)
+		signOut()
 			.then(() => {
 				localStorage.removeItem('token');
 				goto('/login');
