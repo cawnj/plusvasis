@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { getApps, initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import {
 	PUBLIC_FIREBASE_PROJECT_ID,
@@ -9,14 +9,22 @@ import {
 	PUBLIC_FIREBASE_APP_ID
 } from '$env/static/public';
 
-const firebaseConfig = {
-	apiKey: PUBLIC_FIREBASE_API_KEY,
-	authDomain: PUBLIC_FIREBASE_AUTH_DOMAIN,
-	projectId: PUBLIC_FIREBASE_PROJECT_ID,
-	storageBucket: PUBLIC_FIREBASE_STORAGE_BUCKET,
-	messagingSenderId: PUBLIC_FIREBASE_MESSAGE_SENDER_ID,
-	appId: PUBLIC_FIREBASE_APP_ID
-};
+function makeApp() {
+	const apps = getApps();
+	if (apps.length > 0) {
+		return apps[0];
+	}
 
-export const firebase = initializeApp(firebaseConfig);
+	return initializeApp({
+		apiKey: PUBLIC_FIREBASE_API_KEY,
+		authDomain: PUBLIC_FIREBASE_AUTH_DOMAIN,
+		projectId: PUBLIC_FIREBASE_PROJECT_ID,
+		storageBucket: PUBLIC_FIREBASE_STORAGE_BUCKET,
+		messagingSenderId: PUBLIC_FIREBASE_MESSAGE_SENDER_ID,
+		appId: PUBLIC_FIREBASE_APP_ID,
+		databaseURL: `https://${PUBLIC_FIREBASE_PROJECT_ID}.firebaseio.com`
+	});
+}
+
+export const firebase = makeApp();
 export const auth = getAuth(firebase);
