@@ -11,7 +11,7 @@ import { writable } from 'svelte/store';
 import { auth } from '$lib/firebase/client';
 
 export const user = writable<User | null>(null);
-export const token = writable<string | null>(null);
+export const token = writable<string | undefined>(undefined);
 
 export async function signOut() {
 	return auth.signOut();
@@ -31,12 +31,13 @@ export async function createUserWithEmail(email: string, password: string) {
 
 if (browser) {
 	auth.onIdTokenChanged(async (newUser) => {
-		const token = newUser ? await newUser?.getIdToken() : undefined;
-		document.cookie = cookie.serialize('token', token ?? '', {
+		const newToken = newUser ? await newUser?.getIdToken() : undefined;
+		document.cookie = cookie.serialize('token', newToken ?? '', {
 			path: '/',
 			maxAge: token ? undefined : 0
 		});
 		user.set(newUser);
+		token.set(newToken);
 	});
 
 	// refresh the ID token every 10 minutes

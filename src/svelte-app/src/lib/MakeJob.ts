@@ -1,5 +1,10 @@
 import type { Job } from '$lib/Types';
+import { user } from '../stores/auth';
 
+let uid: string | undefined;
+user.subscribe((value) => {
+	uid = value?.uid;
+});
 export function MakeJob(formData: FormData) {
 	const containerName = formData.get('containerName') as string;
 	const dockerImage = formData.get('dockerImage') as string;
@@ -30,7 +35,7 @@ export function MakeJob(formData: FormData) {
 	const expose: boolean = exposeStr != null;
 
 	const job: Job = {
-		user: localStorage.getItem('uid'),
+		user: uid,
 		containerName: containerName,
 		dockerImage: dockerImage,
 		shell: shell,

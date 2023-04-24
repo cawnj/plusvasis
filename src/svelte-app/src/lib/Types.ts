@@ -2,7 +2,7 @@ import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import type { ComponentType } from 'svelte';
 
 export type Job = {
-	user: string | null;
+	user: string | undefined;
 	containerName: string;
 	dockerImage: string;
 	shell: string;
@@ -12,7 +12,7 @@ export type Job = {
 	expose: boolean;
 	cpu: number;
 	memory: number;
-	[key: string]: string | null | number | [string, string][] | boolean;
+	[key: string]: string | undefined | number | [string, string][] | boolean;
 };
 
 type JobField = {

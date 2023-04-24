@@ -2,10 +2,19 @@ import { hostname } from '../stores/environmentStore';
 import { currJobId, currJobStopped } from '../stores/nomadStore';
 import type { Job } from '$lib/Types';
 import fetch from 'cross-fetch';
+import { user, token } from '../stores/auth';
 
 let jobId: string;
+let authToken: string | undefined;
+let uid: string | undefined;
 currJobId.subscribe((value) => {
 	jobId = value;
+});
+user.subscribe((value) => {
+	uid = value?.uid;
+});
+token.subscribe((value) => {
+	authToken = value;
 });
 
 export async function fetchJobCreate(job: Job) {
@@ -14,7 +23,7 @@ export async function fetchJobCreate(job: Job) {
 		method: 'POST',
 		body: JSON.stringify(job),
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			Authorization: `Bearer ${authToken}`
 		}
 	});
 
@@ -31,7 +40,7 @@ export async function fetchJobUpdate(job: Job) {
 		method: 'POST',
 		body: JSON.stringify(job),
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			Authorization: `Bearer ${authToken}`
 		}
 	});
 
@@ -46,14 +55,14 @@ export async function fetchJob(jobId: string) {
 	const url = `${hostname}/job/${jobId}`;
 	const res = await fetch(url, {
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			Authorization: `Bearer ${authToken}`
 		}
 	});
 	if (res.ok) {
 		const data = await res.json();
 
 		const job: Job = {
-			user: localStorage.getItem('uid'),
+			user: uid,
 			containerName: data.Name,
 			dockerImage: data.TaskGroups[0].Tasks[0].Config.image,
 			shell: data.Meta.shell,
@@ -77,7 +86,7 @@ export async function fetchJobStop() {
 	const res = await fetch(url, {
 		method: 'DELETE',
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			Authorization: `Bearer ${authToken}`
 		}
 	});
 
@@ -93,7 +102,7 @@ export async function fetchJobDelete() {
 	const res = await fetch(url, {
 		method: 'DELETE',
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			Authorization: `Bearer ${authToken}`
 		}
 	});
 
@@ -109,7 +118,7 @@ export async function fetchJobRestart() {
 	const res = await fetch(url, {
 		method: 'POST',
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			Authorization: `Bearer ${authToken}`
 		}
 	});
 
@@ -125,7 +134,7 @@ export async function fetchJobStart() {
 	const res = await fetch(url, {
 		method: 'GET',
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			Authorization: `Bearer ${authToken}`
 		}
 	});
 
@@ -140,7 +149,7 @@ export async function fetchJobIdAllocations() {
 	const url = `${hostname}/job/${jobId}/alloc`;
 	const res = await fetch(url, {
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			Authorization: `Bearer ${authToken}`
 		}
 	});
 
