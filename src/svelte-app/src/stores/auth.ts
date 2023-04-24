@@ -1,6 +1,12 @@
 import cookie from 'cookie';
 import { browser } from '$app/environment';
-import { GithubAuthProvider, type User, signInWithPopup } from 'firebase/auth';
+import {
+	GithubAuthProvider,
+	type User,
+	signInWithPopup,
+	signInWithEmailAndPassword,
+	createUserWithEmailAndPassword
+} from 'firebase/auth';
 import { writable } from 'svelte/store';
 import { auth } from '$lib/firebase/client';
 
@@ -11,8 +17,16 @@ export async function signOut() {
 	return auth.signOut();
 }
 
-export async function signIn() {
+export async function signInWithGithub() {
 	await signInWithPopup(auth, new GithubAuthProvider());
+}
+
+export async function signInWithEmail(email: string, password: string) {
+	await signInWithEmailAndPassword(auth, email, password);
+}
+
+export async function createUserWithEmail(email: string, password: string) {
+	await createUserWithEmailAndPassword(auth, email, password);
 }
 
 if (browser) {
