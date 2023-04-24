@@ -1,17 +1,13 @@
 import { hostname } from '../stores/environmentStore';
-import { currJobId, currJobStopped } from '../stores/nomadStore';
+import { currJobId } from '../stores/nomadStore';
 import type { Job } from '$lib/Types';
 import fetch from 'cross-fetch';
-import { user, token } from '../stores/auth';
+import { token } from '../stores/auth';
 
 let jobId: string;
 let authToken: string | undefined;
-let uid: string | undefined;
 currJobId.subscribe((value) => {
 	jobId = value;
-});
-user.subscribe((value) => {
-	uid = value?.uid;
 });
 token.subscribe((value) => {
 	authToken = value;
@@ -48,36 +44,6 @@ export async function fetchJobUpdate(job: Job) {
 		console.log('Container Updated');
 	} else {
 		console.log('Error');
-	}
-}
-
-export async function fetchJob(jobId: string) {
-	const url = `${hostname}/job/${jobId}`;
-	const res = await fetch(url, {
-		headers: {
-			Authorization: `Bearer ${authToken}`
-		}
-	});
-	if (res.ok) {
-		const data = await res.json();
-
-		const job: Job = {
-			user: uid,
-			containerName: data.Name,
-			dockerImage: data.TaskGroups[0].Tasks[0].Config.image,
-			shell: data.Meta.shell,
-			volumes: data.Meta.volumes,
-			env: data.Meta.env,
-			port: parseInt(data.Meta.port),
-			expose: data.Meta.expose === 'true' ? true : false,
-			cpu: parseInt(data.TaskGroups[0].Tasks[0].Resources.CPU),
-			memory: parseInt(data.TaskGroups[0].Tasks[0].Resources.MemoryMB)
-		};
-		currJobStopped.set(data.Status === 'dead');
-		return job;
-	} else {
-		console.log('Error');
-		return null;
 	}
 }
 

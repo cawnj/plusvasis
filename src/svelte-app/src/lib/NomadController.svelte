@@ -35,7 +35,7 @@
 		wsUrl = url.toString();
 	}
 
-	$: if (!isStopped && jobId && job) {
+	$: if (!isStopped && jobId && job && authToken) {
 		setExecUrl();
 	}
 </script>
