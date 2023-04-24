@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { user, signOut, signIn } from '../../stores/auth';
-	import { hostname } from '../../stores/environmentStore';
 	import { page } from '$app/stores';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
 </script>
 
 <div
@@ -16,6 +18,13 @@
 		</div>
 		<div>
 			<span>{$page.data.token}</span>
+		</div>
+		<div>
+			{#each data.jobs as job}
+				<div>
+					<span>{job.Name}</span>
+				</div>
+			{/each}
 		</div>
 		<button on:click={() => signOut()}>Log out</button>
 	{:else}
