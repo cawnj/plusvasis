@@ -17,6 +17,17 @@ type NomadController struct {
 	Client NomadClient
 }
 
+// GetJobs godoc
+//
+//	@Summary		GetJobs
+//	@Description	Get details of all Nomad jobs
+//	@Tags			nomad
+//	@Produce		json
+//	@Success		200	{object}	[]nomad.JobListStub
+//	@Failure		401	{object}	echo.HTTPError
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/jobs [get]
 func (n *NomadController) GetJobs(c echo.Context) error {
 	data, err := n.Client.Get("/jobs?meta=true")
 	if err != nil {
@@ -40,6 +51,19 @@ func (n *NomadController) GetJobs(c echo.Context) error {
 	return c.JSON(http.StatusOK, filteredJobs)
 }
 
+// CreateJob godoc
+//
+//	@Summary		CreateJob
+//	@Description	Create a new Nomad job
+//	@Tags			nomad
+//	@Accept			json
+//	@Produce		json
+//	@Param			job	body		templates.NomadJob	true	"Nomad Job"
+//	@Success		200	{object}	nomad.JobRegisterResponse
+//	@Failure		401	{object}	echo.HTTPError
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/jobs [post]
 func (n *NomadController) CreateJob(c echo.Context) error {
 	var job templates.NomadJob
 	err := decodeJobJson(&job, c.Request().Body)
@@ -68,6 +92,20 @@ func (n *NomadController) CreateJob(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
+// UpdateJob godoc
+//
+//	@Summary		UpdateJob
+//	@Description	Update an existing Nomad job
+//	@Tags			nomad
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string				true	"Job ID"
+//	@Param			job	body		templates.NomadJob	true	"Nomad Job"
+//	@Success		200	{object}	nomad.JobRegisterResponse
+//	@Failure		401	{object}	echo.HTTPError
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/job/{id} [post]
 func (n *NomadController) UpdateJob(c echo.Context) error {
 	var job templates.NomadJob
 	err := decodeJobJson(&job, c.Request().Body)
@@ -100,6 +138,18 @@ func (n *NomadController) UpdateJob(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
+// ReadJob godoc
+//
+//	@Summary		ReadJob
+//	@Description	Get details of a Nomad job
+//	@Tags			nomad
+//	@Produce		json
+//	@Param			id	path		string	true	"Job ID"
+//	@Success		200	{object}	nomad.JobListStub
+//	@Failure		401	{object}	echo.HTTPError
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/job/{id} [get]
 func (n *NomadController) ReadJob(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
@@ -123,6 +173,19 @@ func (n *NomadController) ReadJob(c echo.Context) error {
 	return c.JSON(http.StatusOK, job)
 }
 
+// StopJob godoc
+//
+//	@Summary		StopJob
+//	@Description	Stop a running Nomad job
+//	@Tags			nomad
+//	@Produce		json
+//	@Param			id		path		string	true	"Job ID"
+//	@Param			purge	query		string	false	"Purge job"
+//	@Success		200		{object}	nomad.JobDeregisterResponse
+//	@Failure		401		{object}	echo.HTTPError
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/job/{id} [delete]
 func (n *NomadController) StopJob(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
@@ -150,6 +213,18 @@ func (n *NomadController) StopJob(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
+// ReadJobAllocs godoc
+//
+//	@Summary		ReadJobAllocs
+//	@Description	Get all allocations of a Nomad job
+//	@Tags			nomad
+//	@Produce		json
+//	@Param			id	path		string	true	"Job ID"
+//	@Success		200	{object}	[]nomad.AllocListStub
+//	@Failure		401	{object}	echo.HTTPError
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/job/{id}/allocations [get]
 func (n *NomadController) ReadJobAllocs(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
@@ -172,6 +247,19 @@ func (n *NomadController) ReadJobAllocs(c echo.Context) error {
 	return c.JSON(http.StatusOK, allocs)
 }
 
+// ReadJobAlloc godoc
+//
+//	@Summary		ReadJobAlloc
+//	@Description	Get the running allocation of a Nomad job
+//	@Tags			nomad
+//	@Produce		json
+//	@Param			id	path		string	true	"Job ID"
+//	@Success		200	{object}	nomad.AllocListStub
+//	@Failure		401	{object}	echo.HTTPError
+//	@Failure		404
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/job/{id}/alloc [get]
 func (n *NomadController) ReadJobAlloc(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
@@ -187,6 +275,19 @@ func (n *NomadController) ReadJobAlloc(c echo.Context) error {
 	return c.JSON(http.StatusOK, alloc)
 }
 
+// RestartJob godoc
+//
+//	@Summary		RestartJob
+//	@Description	Restart a Nomad job
+//	@Tags			nomad
+//	@Produce		json
+//	@Param			id	path		string	true	"Job ID"
+//	@Success		200	{object}	nomad.GenericResponse
+//	@Failure		401	{object}	echo.HTTPError
+//	@Failure		404
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/job/{id}/restart [post]
 func (n *NomadController) RestartJob(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
@@ -215,6 +316,18 @@ func (n *NomadController) RestartJob(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
+// StartJob godoc
+//
+//	@Summary		StartJob
+//	@Description	Start a stopped Nomad job
+//	@Tags			nomad
+//	@Produce		json
+//	@Param			id	path		string	true	"Job ID"
+//	@Success		200	{object}	nomad.JobRegisterResponse
+//	@Failure		401	{object}	echo.HTTPError
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/job/{id}/start [get]
 func (n *NomadController) StartJob(c echo.Context) error {
 	uid := c.Get("uid").(string)
 	jobId := c.Param("id")
