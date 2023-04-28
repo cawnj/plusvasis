@@ -76,10 +76,28 @@
 				{:else if value.type === 'toggle'}
 					<Toggle label={key} id={key} name={key} checked={job[key]} />
 				{:else if value.type === 'cpuRange'}
-					<Range label={key} id={key} min="100" max="1000" bind:value={job.cpu} />
+					<Range
+						class="mb-4 w-1/4"
+						label={key}
+						id={key}
+						min="100"
+						max="1000"
+						step="50"
+						size="lg"
+						bind:value={job.cpu}
+					/>
 					<Label class="block mb-2">Value: {job.cpu}</Label>
 				{:else if value.type === 'memoryRange'}
-					<Range label={key} id={key} min="300" max="2000" bind:value={job.memory} />
+					<Range
+						class="mb-4 w-1/4"
+						label={key}
+						id={key}
+						min="300"
+						max="2000"
+						step="50"
+						size="lg"
+						bind:value={job.memory}
+					/>
 					<Label class="block mb-2">Value: {job.memory}</Label>
 				{/if}
 				<Helper class="text-sm mt-2 whitespace-pre-line">{value.info}</Helper>
