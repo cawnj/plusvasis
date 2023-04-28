@@ -61,8 +61,8 @@ export async function fetchJob(jobId: string) {
 			env: data.Meta.env,
 			port: parseInt(data.Meta.port),
 			expose: data.Meta.expose === 'true' ? true : false,
-			cpu: data.TaskGroups[0].Tasks[0].Resources.CPU,
-			memory: data.TaskGroups[0].Tasks[0].Resources.MemoryMB
+			cpu: parseInt(data.TaskGroups[0].Tasks[0].Resources.CPU),
+			memory: parseInt(data.TaskGroups[0].Tasks[0].Resources.MemoryMB)
 		};
 		currJobStopped.set(data.Status === 'dead');
 		return job;
