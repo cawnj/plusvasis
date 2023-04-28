@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { JobFields } from '$lib/Types';
-	import { Label, Input, Helper, Select, Toggle, Button, Spinner } from 'flowbite-svelte';
+	import { Label, Input, Helper, Select, Toggle, Button, Spinner, Range } from 'flowbite-svelte';
 	import type { Job } from '$lib/Types';
 	import { currJob } from '../stores/nomadStore';
 	import { MakeJob } from '$lib/MakeJob';
@@ -75,6 +75,32 @@
 					<Select label={key} id={key} name={key} items={value.options} value={job[key]} />
 				{:else if value.type === 'toggle'}
 					<Toggle label={key} id={key} name={key} checked={job[key]} />
+				{:else if value.type === 'cpuRange'}
+					<Range
+						class="mb-4 w-1/4"
+						label={key}
+						id={key}
+						name={key}
+						min="100"
+						max="1000"
+						step="50"
+						size="lg"
+						bind:value={job.cpu}
+					/>
+					<Label class="block mb-2">Value: {job.cpu}</Label>
+				{:else if value.type === 'memoryRange'}
+					<Range
+						class="mb-4 w-1/4"
+						label={key}
+						id={key}
+						name={key}
+						min="300"
+						max="2000"
+						step="50"
+						size="lg"
+						bind:value={job.memory}
+					/>
+					<Label class="block mb-2">Value: {job.memory}</Label>
 				{/if}
 				<Helper class="text-sm mt-2 whitespace-pre-line">{value.info}</Helper>
 			</div>

@@ -12,7 +12,9 @@ const mockJob: Job = {
 	volumes: [],
 	env: [],
 	port: 0,
-	expose: false
+	expose: false,
+	cpu: 100,
+	memory: 300
 };
 currJob.set(mockJob);
 

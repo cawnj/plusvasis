@@ -25,7 +25,9 @@ describe('when we do not return an object', () => {
 			volumes: [['testVolumes', 'testVolumes']],
 			env: [['testEnv', 'testEnv']],
 			port: 1234,
-			expose: true
+			expose: true,
+			cpu: 100,
+			memory: 300
 		};
 
 		const consoleSpy = vi.spyOn(console, 'log');
@@ -42,7 +44,9 @@ describe('when we do not return an object', () => {
 			volumes: [['testVolumes', 'testVolumes']],
 			env: [['testEnv', 'testEnv']],
 			port: 1234,
-			expose: true
+			expose: true,
+			cpu: 100,
+			memory: 300
 		};
 
 		const consoleSpy = vi.spyOn(console, 'log');

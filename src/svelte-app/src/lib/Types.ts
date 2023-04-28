@@ -10,6 +10,8 @@ export type Job = {
 	env: [string, string][];
 	port: number;
 	expose: boolean;
+	cpu: number;
+	memory: number;
 	[key: string]: string | null | number | [string, string][] | boolean;
 };
 
@@ -88,6 +90,24 @@ export const JobFields: { key: string; value: JobField }[] = [
 			type: 'toggle',
 			placeholder: true,
 			info: 'Enabling this setting will make your container publicly accessible.'
+		}
+	},
+	{
+		key: 'cpu',
+		value: {
+			title: 'CPU',
+			type: 'cpuRange',
+			placeholder: '100',
+			info: 'CPU allocation.'
+		}
+	},
+	{
+		key: 'memory',
+		value: {
+			title: 'Memory',
+			type: 'memoryRange',
+			placeholder: '300',
+			info: 'Memory allocation.'
 		}
 	}
 ];

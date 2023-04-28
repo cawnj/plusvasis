@@ -6,7 +6,9 @@
 
 	// default job configuration
 	currJob.set({
-		shell: '/bin/sh'
+		shell: '/bin/sh',
+		cpu: 100,
+		memory: 300
 	} as Job);
 </script>
 

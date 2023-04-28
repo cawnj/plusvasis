@@ -20,6 +20,8 @@ type NomadJob struct {
 	EnvString string     `json:"envString"`
 	Port      int        `json:"port"`
 	Expose    bool       `json:"expose"`
+	Cpu       int        `json:"cpu"`
+	Memory    int        `json:"memory"`
 }
 
 func last(i int, slice interface{}) bool {
@@ -151,6 +153,10 @@ const JOB_TMPL = `{
                                     "target": "/userdata"
                                 }
                             ]
+                        },
+                        "Resources": {
+                            "CPU": {{.Cpu}},
+                            "MemoryMB": {{.Memory}}
                         }
                         {{if .Env}},
                         "Env": {
