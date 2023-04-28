@@ -154,12 +154,16 @@ const JOB_TMPL = `{
                                 }
                             ]
                         },
+                        "Resources": {
+                            "CPU": {{.Cpu}},
+                            "MemoryMB": {{.Memory}}
+                        }
                         {{if .Env}},
                         "Env": {
                             {{range $i, $v := .Env}}
                             "{{index $v 0}}": "{{index $v 1}}"{{if not (last $i $.Env)}},{{end}}
                             {{end}}
-                        },
+                        }
                         {{end}}
                         {{if .EnvString}},
                         "Templates": [
@@ -168,15 +172,8 @@ const JOB_TMPL = `{
                                 "EmbeddedTmpl": "{{.EnvString}}",
                                 "Envvars": true
                             }
-                        ],
+                        ]
                         {{end}}
-                        "Resources": {
-                            "CPU": {{.Cpu}},
-                            "MemoryMB": {{.Memory}},
-                            "MemoryMaxMB": 0,
-                            "DiskMB": 0,
-                            "IOPS": 0
-                        }
                     }
                 ],
                 "Networks": [
