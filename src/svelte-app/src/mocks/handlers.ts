@@ -54,6 +54,10 @@ export const handlers = [
 							{
 								Config: {
 									Image: 'test'
+								},
+								Resources: {
+									CPU: '100',
+									MemoryMB: '300'
 								}
 							}
 						]

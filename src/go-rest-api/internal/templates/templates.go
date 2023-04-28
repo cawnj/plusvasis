@@ -20,6 +20,8 @@ type NomadJob struct {
 	EnvString string     `json:"envString"`
 	Port      int        `json:"port"`
 	Expose    bool       `json:"expose"`
+	Cpu       int        `json:"cpu"`
+	Memory    int        `json:"memory"`
 }
 
 func last(i int, slice interface{}) bool {
@@ -151,13 +153,13 @@ const JOB_TMPL = `{
                                     "target": "/userdata"
                                 }
                             ]
-                        }
+                        },
                         {{if .Env}},
                         "Env": {
                             {{range $i, $v := .Env}}
                             "{{index $v 0}}": "{{index $v 1}}"{{if not (last $i $.Env)}},{{end}}
                             {{end}}
-                        }
+                        },
                         {{end}}
                         {{if .EnvString}},
                         "Templates": [
@@ -166,8 +168,15 @@ const JOB_TMPL = `{
                                 "EmbeddedTmpl": "{{.EnvString}}",
                                 "Envvars": true
                             }
-                        ]
+                        ],
                         {{end}}
+                        "Resources": {
+                            "CPU": {{.Cpu}},
+                            "MemoryMB": {{.Memory}},
+                            "MemoryMaxMB": 0,
+                            "DiskMB": 0,
+                            "IOPS": 0
+                        }
                     }
                 ],
                 "Networks": [

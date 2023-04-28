@@ -8,6 +8,8 @@ export function MakeJob(formData: FormData) {
 	const envStr = formData.get('env') as string;
 	const port = formData.get('port') as string;
 	const exposeStr = formData.get('expose') as string;
+	const cpu = formData.get('cpu') as string;
+	const memory = formData.get('memory') as string;
 
 	const volumes: [string, string][] = [];
 	for (const volume of volumeStr.split(',')) {
@@ -35,7 +37,9 @@ export function MakeJob(formData: FormData) {
 		volumes: volumes,
 		env: envs,
 		port: Number(port),
-		expose: expose
+		expose: expose,
+		cpu: Number(cpu),
+		memory: Number(memory)
 	};
 
 	return job;
