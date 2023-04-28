@@ -80,6 +80,7 @@
 						class="mb-4 w-1/4"
 						label={key}
 						id={key}
+						name={key}
 						min="100"
 						max="1000"
 						step="50"
@@ -92,6 +93,7 @@
 						class="mb-4 w-1/4"
 						label={key}
 						id={key}
+						name={key}
 						min="300"
 						max="2000"
 						step="50"
