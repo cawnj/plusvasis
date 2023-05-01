@@ -18,6 +18,9 @@ export class ExecSocketAdapter {
 		if (!this.terminal) {
 			throw new Error('Terminal is not defined.');
 		}
+		this.terminal.onData((data) => {
+			this.handleData(data);
+		});
 		this.connect();
 	}
 
@@ -26,11 +29,7 @@ export class ExecSocketAdapter {
 			this.sendWsHandshake();
 			this.sendTtySize();
 			this.startHeartbeat();
-
-			this.terminal.clear();
-			this.terminal.onData((data) => {
-				this.handleData(data);
-			});
+			this.terminal.reset();
 		};
 
 		this.socket.onmessage = (e) => {
@@ -50,7 +49,7 @@ export class ExecSocketAdapter {
 					this.reconnect();
 				}, 1000);
 			} else {
-				this.terminal.clear();
+				this.terminal.reset();
 				this.terminal.write('Failed to connect to server');
 			}
 		};
