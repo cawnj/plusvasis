@@ -44,7 +44,7 @@
 				{$page.data.job.containerName}
 			</Heading>
 			{#if $page.data.job.expose}
-				<A aClass="ml-2" href="https://{$page.data.job.ID}.plusvasis.xyz">
+				<A aClass="ml-2" href="https://{$page.params.id}.plusvasis.xyz">
 					<Fa icon={faExternalLink} color="white" size="xs" />
 				</A>
 			{/if}
