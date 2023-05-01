@@ -37,7 +37,7 @@ export class ExecSocketAdapter {
 			const json = JSON.parse(e.data);
 
 			if (json.stdout && json.stdout.data) {
-				this.retries = 0;
+				this.retries = 0; // reset retries on successful message
 				this.terminal.write(b64decode(json.stdout.data));
 			}
 		};
@@ -49,6 +49,9 @@ export class ExecSocketAdapter {
 				setTimeout(() => {
 					this.reconnect();
 				}, 1000);
+			} else {
+				this.terminal.clear();
+				this.terminal.write('Failed to connect to server');
 			}
 		};
 
