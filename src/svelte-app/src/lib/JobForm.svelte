@@ -6,6 +6,8 @@
 	import { MakeJob } from '$lib/MakeJob';
 	import { fetchJobCreate, fetchJobUpdate } from '$lib/NomadClient';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 
 	export let type: string;
 	let loading = false;
@@ -13,6 +15,13 @@
 	let job: Job;
 	currJob.subscribe((value) => {
 		job = value;
+	});
+
+	let cpu: number;
+	let memory: number;
+	onMount(() => {
+		cpu = get(currJob).cpu;
+		memory = get(currJob).memory;
 	});
 
 	function handleSubmit(event: Event) {
@@ -85,9 +94,9 @@
 						max="1000"
 						step="50"
 						size="lg"
-						bind:value={job.cpu}
+						bind:value={cpu}
 					/>
-					<Label class="block mb-2">Value: {job.cpu}</Label>
+					<Label class="block mb-2">Value: {cpu}</Label>
 				{:else if value.type === 'memoryRange'}
 					<Range
 						class="mb-4 w-1/4"
@@ -98,9 +107,9 @@
 						max="2000"
 						step="50"
 						size="lg"
-						bind:value={job.memory}
+						bind:value={memory}
 					/>
-					<Label class="block mb-2">Value: {job.memory}</Label>
+					<Label class="block mb-2">Value: {memory}</Label>
 				{/if}
 				<Helper class="text-sm mt-2 whitespace-pre-line">{value.info}</Helper>
 			</div>
