@@ -37,9 +37,9 @@
 	});
 </script>
 
-<div class="px-4 md:px-16 mb-4">
+<div class="px-4 pb-4 md:px-16">
 	{#if $page.data.job}
-		<div class="flex justify-between mb-4">
+		<div class="mb-4 flex justify-between">
 			<div class="flex items-center font-sans font-bold">
 				<Heading tag="h1" customSize="text-2xl md:text-4xl">
 					{$page.data.job.containerName}
@@ -55,9 +55,9 @@
 		<Tabs {tabs} />
 	{:else}
 		<Modal title="Error" open={true}>
-			<div class="grid justify-center w-40">
+			<div class="grid w-40 justify-center">
 				<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">{$page.data.error}</p>
-				<div class="flex justify-center mt-4">
+				<div class="mt-4 flex justify-center">
 					<Button color="blue" href="/">Return</Button>
 				</div>
 			</div>

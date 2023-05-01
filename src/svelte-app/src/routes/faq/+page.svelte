@@ -40,9 +40,9 @@
 
 <Nav />
 <Heading tag="h1" class="text-8xl font-bold text-center mb-8 text-white">FAQ</Heading>
-<div class="px-4 md:px-16 mb-4">
+<div class="px-4 md:px-16 pb-4">
 	{#each faqContent as { question, answer }}
-		<div class="my-4 space-y-2">
+		<div class="my-4 space-y-1">
 			<Heading tag="h1" class="text-white text-xl font-semibold flex items-center">
 				<Fa icon={faQuestionCircle} class="mr-2" />
 				<span>{question}</span>

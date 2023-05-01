@@ -7,7 +7,7 @@
 	export let data: PageData;
 </script>
 
-<div class="px-4 md:px-16">
+<div class="px-4 md:px-16 pb-4">
 	<Button color="blue" href="/create">Create Container</Button>
 	{#if !data.jobs}
 		<Alert class="my-4 max-w-md">

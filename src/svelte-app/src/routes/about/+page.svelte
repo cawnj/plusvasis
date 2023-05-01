@@ -41,7 +41,7 @@
 <Heading tag="h1" class="text-4xl md:text-8xl font-bold text-center mb-4 md:mb-8 text-white"
 	>What is PlusVasis?</Heading
 >
-<div class="px-4 md:px-16 space-y-8 text-white flex justify-center">
+<div class="px-4 md:px-16 pb-4 space-y-8 text-white flex justify-center">
 	<div class="grid grid-cols-2 gap-8">
 		{#each cards as card}
 			<Card horizontal>
