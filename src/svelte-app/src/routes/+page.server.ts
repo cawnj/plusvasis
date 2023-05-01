@@ -17,6 +17,13 @@ export async function load({ fetch, cookies }: PageServerLoadEvent) {
 			return [];
 		}
 	};
-	const jobs = await fetchJobs();
-	return { jobs };
+	try {
+		const jobs = await fetchJobs();
+		return { jobs, error: null };
+	} catch (e: unknown) {
+		if (e instanceof Error) {
+			console.log(e);
+			return { jobs: [], error: e.message };
+		}
+	}
 }

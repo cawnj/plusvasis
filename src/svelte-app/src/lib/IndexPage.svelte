@@ -1,8 +1,10 @@
 <script lang="ts">
 	import Fa from 'svelte-fa';
 	import { faInfoCircle, faTerminal } from '@fortawesome/free-solid-svg-icons';
-	import { Button, Card, Alert } from 'flowbite-svelte';
+	import { Button, Card, Alert, Modal } from 'flowbite-svelte';
 	import { page } from '$app/stores';
+
+	console.log($page);
 </script>
 
 <div class="px-4 md:px-16">
@@ -23,5 +25,19 @@
 				</Card>
 			{/each}
 		</div>
+	{/if}
+	{#if $page.data.error}
+		<Modal title="Error" open={true}>
+			<div class="grid justify-center w-40">
+				<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+					{$page.data.error}
+				</p>
+				<div class="flex justify-center mt-4">
+					<Button color="blue" href="javascript:window.location.href=window.location.href"
+						>Retry</Button
+					>
+				</div>
+			</div>
+		</Modal>
 	{/if}
 </div>
