@@ -2,15 +2,18 @@ import type * as xterm from 'xterm';
 import { b64encode, b64decode } from './Base64Util.js';
 
 export const HEARTBEAT_INTERVAL = 10000;
+export const MAX_RETRIES = 10;
 
 export class ExecSocketAdapter {
 	terminal: xterm.Terminal;
 	socket: WebSocket;
 	heartbeatTimer: NodeJS.Timer | undefined;
+	retries: number;
 
 	constructor(terminal: xterm.Terminal, url: string) {
 		this.terminal = terminal;
 		this.socket = new WebSocket(url);
+		this.retries = 0;
 
 		if (!this.terminal) {
 			throw new Error('Terminal is not defined.');
@@ -34,13 +37,19 @@ export class ExecSocketAdapter {
 			const json = JSON.parse(e.data);
 
 			if (json.stdout && json.stdout.data) {
+				this.retries = 0;
 				this.terminal.write(b64decode(json.stdout.data));
 			}
 		};
 
 		this.socket.onclose = () => {
 			this.stopHeartbeat();
-			this.reconnect();
+			if (this.retries < MAX_RETRIES) {
+				this.retries++;
+				setTimeout(() => {
+					this.reconnect();
+				}, 1000);
+			}
 		};
 
 		this.terminal.onResize(() => {
