@@ -2,14 +2,19 @@ import { currJob, currJobId } from '../stores/nomadStore';
 import { hostname } from '../stores/environmentStore';
 import type { Job } from './Types';
 import { b64decode } from './Base64Util';
+import { token } from '../stores/auth';
 
 let job: Job;
 let jobId: string;
+let authToken: string | undefined;
 currJob.subscribe((value) => {
 	job = value;
 });
 currJobId.subscribe((value) => {
 	jobId = value;
+});
+token.subscribe((value) => {
+	authToken = value;
 });
 
 // https://github.com/hashicorp/nomad/blob/main/ui/app/utils/stream-frames.js
@@ -37,7 +42,7 @@ export async function getStream(type: string, abortController: AbortController) 
 	const response = await fetch(url, {
 		signal: abortController.signal,
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('token')}`
+			Authorization: `Bearer ${authToken}`
 		}
 	});
 	if (!response.ok) {

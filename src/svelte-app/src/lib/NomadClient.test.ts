@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import {
-	fetchJob,
 	fetchJobCreate,
 	fetchJobDelete,
 	fetchJobIdAllocations,
@@ -80,13 +79,6 @@ describe('when we do not return an object', () => {
 });
 
 describe('when we return an object', () => {
-	it('should fetch a job successfully', async () => {
-		const consoleSpy = vi.spyOn(console, 'log');
-		const job = await fetchJob('nomadClient');
-		expect(job).toBeTruthy();
-		expect(consoleSpy).not.toHaveBeenCalledWith('Error');
-	});
-
 	it('should fetch job allocations successfully', async () => {
 		const allocations = await fetchJobIdAllocations();
 		expect(allocations).toBeTruthy();

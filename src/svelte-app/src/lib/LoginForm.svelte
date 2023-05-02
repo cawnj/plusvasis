@@ -1,71 +1,60 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { Card, Button, Label, Input, Alert, Hr, A } from 'flowbite-svelte';
-	import {
-		getAuth,
-		signInWithEmailAndPassword,
-		createUserWithEmailAndPassword,
-		GithubAuthProvider,
-		signInWithPopup
-	} from 'firebase/auth';
+	import { signInWithGithub, signInWithEmail, createUserWithEmail } from '../stores/auth';
 	import logo from '$lib/assets/logo.png';
-	import app from '$lib/fb';
 	import { faArrowLeft, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { LoginButton } from 'svelte-auth-ui';
+	import { goto } from '$app/navigation';
+	import { FirebaseError } from 'firebase/app';
 
 	export let title: string;
-	let email: string;
-	let password: string;
 	let errorCode: string | null = null;
 	let loading = false;
 
-	const auth = getAuth(app);
-	const githubProvider = new GithubAuthProvider();
-
-	async function oauthLogin(provider: GithubAuthProvider) {
-		loading = true;
-		signInWithPopup(auth, provider)
-			.then(() => {
-				loading = false;
-				goto('/');
-			})
-			.catch((error) => {
-				loading = false;
-				errorCode = error.code;
-			});
-	}
-	function login(event: Event) {
+	async function handleFormSubmit(event: Event) {
+		let email: string;
+		let password: string;
 		if (event.target instanceof HTMLFormElement) {
 			const formData = new FormData(event.target);
 			email = formData.get('email') as string;
 			password = formData.get('password') as string;
 		} else {
+			errorCode = 'auth/invalid-form-input';
 			return;
 		}
 
-		if (title === 'Login') {
-			signInWithEmailAndPassword(auth, email, password)
-				.then(() => {
-					goto('/');
-				})
-				.catch((error) => {
-					errorCode = error.code;
-				});
-		} else {
-			createUserWithEmailAndPassword(auth, email, password)
-				.then(() => {
-					goto('/');
-				})
-				.catch((error) => {
-					errorCode = error.code;
-				});
+		try {
+			if (title === 'Login') {
+				await signInWithEmail(email, password);
+			} else {
+				await createUserWithEmail(email, password);
+			}
+			goto('/');
+		} catch (error: unknown) {
+			if (error instanceof FirebaseError) {
+				errorCode = error.code;
+			}
+		}
+	}
+
+	async function handleGithubLogin() {
+		loading = true;
+		try {
+			await signInWithGithub();
+			goto('/');
+		} catch (error: unknown) {
+			if (error instanceof FirebaseError) {
+				errorCode = error.code;
+			}
+		} finally {
+			loading = false;
 		}
 	}
 </script>
 
 <Card>
-	<form class="flex flex-col space-y-6" on:submit|preventDefault={login}>
+	<form class="flex flex-col space-y-6" on:submit|preventDefault={handleFormSubmit}>
 		<div class="flex items-center">
 			{#if title === 'Login'}
 				<img alt="The project logo" src={logo} class="mr-3 h-8 w-8" />
@@ -84,7 +73,7 @@
 			<span>Your password</span>
 			<Input type="password" name="password" placeholder="••••••••••••" required />
 		</Label>
-		<div class="space-y-6 py-2">
+		<div class="flex flex-col space-y-6 py-2">
 			{#if errorCode}
 				<Alert color="none" class="bg-red-100 text-red-600 border-red-800 !py-3">
 					<span slot="icon">
@@ -104,7 +93,7 @@
 						provider="github"
 						{loading}
 						withLoader
-						on:click={() => oauthLogin(githubProvider)}
+						on:click={handleGithubLogin}
 						class="w-full h-full"
 					/>
 				</div>

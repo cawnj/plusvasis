@@ -50,8 +50,9 @@ func FirebaseWithConfig(config Config) echo.MiddlewareFunc {
 			}
 
 			token := ""
-			if c.Request().Header["Authorization"] != nil {
-				token = strings.Split(c.Request().Header["Authorization"][0], "Bearer ")[1]
+			if c.Request().Header.Get("Authorization") != "" {
+				header := c.Request().Header.Get("Authorization")
+				token = strings.Replace(header, "Bearer ", "", 1)
 			} else if c.QueryParam("access_token") != "" {
 				token = c.QueryParam("access_token")
 			} else {

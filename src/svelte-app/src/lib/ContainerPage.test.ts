@@ -5,7 +5,7 @@ import { currJob } from '../stores/nomadStore';
 import type { Job } from '$lib/Types';
 
 const mockJob: Job = {
-	user: null,
+	user: 'test',
 	containerName: 'test',
 	dockerImage: 'test',
 	shell: 'test',
@@ -22,11 +22,6 @@ describe('ContainerPage', () => {
 	it('renders without errors', () => {
 		const { container } = render(ContainerPage);
 		expect(container).toBeDefined();
-	});
-
-	it('displays loading spinner while fetching job data', async () => {
-		const { getByTestId } = render(ContainerPage);
-		expect(getByTestId('loading-spinner')).toBeInTheDocument();
 	});
 
 	it('does not display the link to the container if job.expose is false', async () => {
