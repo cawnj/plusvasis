@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Card, Button, Label, Input, Alert, Hr, A } from 'flowbite-svelte';
-	import { signInWithGithub, signInWithEmail, createUserWithEmail } from '../stores/auth';
-	import logo from '$lib/assets/logo.png';
+	import { signInWithGithub, signInWithEmail, createUserWithEmail } from '../../stores/auth';
+	import logo from '../../assets/logo.png';
 	import { faArrowLeft, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { LoginButton } from 'svelte-auth-ui';

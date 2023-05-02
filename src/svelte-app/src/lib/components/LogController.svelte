@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { Button, Dropdown, Chevron, Radio } from 'flowbite-svelte';
-	import { decode, getStream } from './StreamLogs';
-	import { currJobStopped } from '../stores/nomadStore';
+	import { decode, getStream } from '$lib/utils/StreamLogs';
+	import { currJobStopped } from '../../stores/nomadStore';
 
 	let isStopped: boolean;
 	currJobStopped.subscribe((value) => {

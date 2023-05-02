@@ -1,5 +1,5 @@
 <script>
-	import logo from '$lib/assets/logo.png';
+	import logo from '../../assets/logo.png';
 	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
 </script>
 

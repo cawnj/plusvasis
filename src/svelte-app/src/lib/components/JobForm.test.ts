@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { render, fireEvent } from '@testing-library/svelte';
 import JobForm from './JobForm.svelte';
-import { user } from '../stores/auth';
+import { user } from '../../stores/auth';
 
-import { server } from '../mocks/setup';
+import { server } from '../../mocks/setup';
 import type { User } from '@firebase/auth';
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => server.resetHandlers());

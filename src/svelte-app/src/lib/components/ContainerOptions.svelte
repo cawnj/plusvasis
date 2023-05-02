@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { currJobStopped } from '../stores/nomadStore';
+	import { currJobStopped } from '../../stores/nomadStore';
 	import { Button, ButtonGroup } from 'flowbite-svelte';
 	import { faPlay, faStop, faTrash, faRefresh } from '@fortawesome/free-solid-svg-icons';
-	import { fetchJobStop, fetchJobDelete, fetchJobRestart, fetchJobStart } from '$lib/NomadClient';
+	import { fetchJobStop, fetchJobDelete, fetchJobRestart, fetchJobStart } from '$lib/utils/NomadClient';
 	import Fa from 'svelte-fa';
 	import { goto } from '$app/navigation';
 

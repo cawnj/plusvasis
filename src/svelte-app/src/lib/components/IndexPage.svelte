@@ -2,7 +2,7 @@
 	import Fa from 'svelte-fa';
 	import { faInfoCircle, faTerminal } from '@fortawesome/free-solid-svg-icons';
 	import { Button, Card, Alert, Modal } from 'flowbite-svelte';
-	import type { PageData } from '../routes/$types';
+	import type { PageData } from '../../routes/$types';
 
 	export let data: PageData;
 </script>

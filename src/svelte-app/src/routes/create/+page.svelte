@@ -1,7 +1,7 @@
 <script lang="ts">
-	import NavBar from '$lib/NavBar.svelte';
-	import type { Job } from '$lib/Types';
-	import JobForm from '$lib/JobForm.svelte';
+	import NavBar from '$lib/components/NavBar.svelte';
+	import type { Job } from '$lib/types/Types';
+	import JobForm from '$lib/components/JobForm.svelte';
 	import { currJob } from '../../stores/nomadStore';
 
 	// default job configuration

@@ -1,5 +1,5 @@
 <script>
-	import Nav from '$lib/NavBar.svelte';
+	import Nav from '$lib/components/NavBar.svelte';
 	import Fa from 'svelte-fa';
 	import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 	import { Blockquote, Heading } from 'flowbite-svelte';

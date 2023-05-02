@@ -1,8 +1,8 @@
-import { currJob, currJobId } from '../stores/nomadStore';
-import { hostname } from '../stores/environmentStore';
-import type { Job } from './Types';
+import { currJob, currJobId } from '../../stores/nomadStore';
+import { hostname } from '../../stores/environmentStore';
+import type { Job } from '$lib/types/Types';
 import { b64decode } from './Base64Util';
-import { token } from '../stores/auth';
+import { token } from '../../stores/auth';
 
 let job: Job;
 let jobId: string;

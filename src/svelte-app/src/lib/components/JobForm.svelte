@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { JobFields } from '$lib/Types';
+	import { JobFields } from '$lib/types/Types';
 	import { Label, Input, Helper, Select, Toggle, Button, Spinner, Range } from 'flowbite-svelte';
-	import type { Job } from '$lib/Types';
-	import { currJob } from '../stores/nomadStore';
-	import { MakeJob } from '$lib/MakeJob';
-	import { fetchJobCreate, fetchJobUpdate } from '$lib/NomadClient';
+	import type { Job } from '$lib/types/Types';
+	import { currJob } from '../../stores/nomadStore';
+	import { MakeJob } from '$lib/utils/MakeJob';
+	import { fetchJobCreate, fetchJobUpdate } from '$lib/utils/NomadClient';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';

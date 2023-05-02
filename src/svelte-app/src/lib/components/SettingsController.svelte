@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Job } from '$lib/Types';
-	import { currJobId, currJob } from '../stores/nomadStore';
+	import type { Job } from '$lib/types/Types';
+	import { currJobId, currJob } from '../../stores/nomadStore';
 	import JobForm from './JobForm.svelte';
 
 	let jobId: string;

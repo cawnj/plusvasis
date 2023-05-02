@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Tab } from '$lib/Types';
+	import type { Tab } from '$lib/types/Types';
 	import { Tabs, TabItem } from 'flowbite-svelte';
 	import Fa from 'svelte-fa';
 

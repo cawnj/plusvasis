@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
 import ContainerPage from './ContainerPage.svelte';
-import { currJob } from '../stores/nomadStore';
-import type { Job } from '$lib/Types';
+import { currJob } from '../../stores/nomadStore';
+import type { Job } from '$lib/types/Types';
 
 const mockJob: Job = {
 	user: 'test',
