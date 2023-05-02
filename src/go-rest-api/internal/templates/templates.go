@@ -46,6 +46,7 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 
 	// parse env vars for templating
 	if len(job.Env) != 0 {
+		trimEnv(&job)
 		err = parseEnv(&job)
 		if err != nil {
 			return nil, err
@@ -71,6 +72,21 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 	}
 
 	return buf, err
+}
+
+func trimEnv(job *NomadJob) {
+	for i, env := range job.Env {
+		// trim spaces from key and value
+		job.Env[i][0] = strings.TrimSpace(env[0])
+		job.Env[i][1] = strings.TrimSpace(env[1])
+
+		// trim either single or double quotes from value
+		if strings.HasPrefix(env[1], "'") && strings.HasSuffix(env[1], "'") {
+			job.Env[i][1] = strings.Trim(env[1], "'")
+		} else if strings.HasPrefix(env[1], "\"") && strings.HasSuffix(env[1], "\"") {
+			job.Env[i][1] = strings.Trim(env[1], "\"")
+		}
+	}
 }
 
 func parseEnv(job *NomadJob) error {
