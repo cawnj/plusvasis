@@ -6,6 +6,7 @@
 	import Fa from 'svelte-fa';
 	import { LoginButton } from 'svelte-auth-ui';
 	import { goto } from '$app/navigation';
+	import { FirebaseError } from 'firebase/app';
 
 	export let title: string;
 	let errorCode: string | null = null;
@@ -30,8 +31,10 @@
 				await createUserWithEmail(email, password);
 			}
 			goto('/');
-		} catch (error: any) {
-			errorCode = error.code;
+		} catch (error: unknown) {
+			if (error instanceof FirebaseError) {
+				errorCode = error.code;
+			}
 		}
 	}
 
@@ -40,8 +43,10 @@
 		try {
 			await signInWithGithub();
 			goto('/');
-		} catch (error: any) {
-			errorCode = error.code;
+		} catch (error: unknown) {
+			if (error instanceof FirebaseError) {
+				errorCode = error.code;
+			}
 		} finally {
 			loading = false;
 		}

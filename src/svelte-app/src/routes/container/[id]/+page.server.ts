@@ -44,11 +44,10 @@ export async function load({ params, cookies }: PageServerLoadEvent) {
 		const job = data?.job;
 		const isStopped = data?.isStopped;
 		return { job, isStopped, error: null };
-		} catch (e: unknown) {
+	} catch (e: unknown) {
 		if (e instanceof Error) {
 			console.log(e);
 			return { job: null, isStopped: null, error: e.message };
 		}
 	}
-
 }

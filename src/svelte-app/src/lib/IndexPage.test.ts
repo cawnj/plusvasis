@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, cleanup, waitFor, fireEvent } from '@testing-library/svelte';
 import IndexPage from './IndexPage.svelte';
 import { tick } from 'svelte';
@@ -64,10 +64,12 @@ describe('IndexPage', () => {
 		const data: PageData = {
 			uid: 'test',
 			token: 'test',
-			jobs: [{
-				ID: 'test',
-				Name: 'test',
-			}],
+			jobs: [
+				{
+					ID: 'test',
+					Name: 'test'
+				}
+			],
 			error: null
 		};
 
