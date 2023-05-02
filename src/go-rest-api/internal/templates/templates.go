@@ -11,17 +11,17 @@ import (
 )
 
 type NomadJob struct {
-	Name      string     `json:"containerName"`
-	Image     string     `json:"dockerImage"`
-	User      string     `json:"user"`
-	Shell     string     `json:"shell"`
-	Volumes   [][]string `json:"volumes"`
-	Env       [][]string `json:"env"`
+	Name      string     `json:"containerName" validate:"required"`
+	Image     string     `json:"dockerImage" validate:"required"`
+	User      string     `json:"user" validate:"required"`
+	Shell     string     `json:"shell" validate:"required"`
+	Volumes   [][]string `json:"volumes" validate:"kvPairs"`
+	Env       [][]string `json:"env" validate:"kvPairs"`
 	EnvString string     `json:"envString"`
-	Port      int        `json:"port"`
+	Port      int        `json:"port" validate:"min=0,max=65535"`
 	Expose    bool       `json:"expose"`
-	Cpu       int        `json:"cpu"`
-	Memory    int        `json:"memory"`
+	Cpu       int        `json:"cpu" validate:"min=0,max=1000"`
+	Memory    int        `json:"memory" validate:"min=0,max=2000"`
 }
 
 func last(i int, slice interface{}) bool {
@@ -30,6 +30,7 @@ func last(i int, slice interface{}) bool {
 }
 
 func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
+	// create template
 	t, err := template.New("").Funcs(template.FuncMap{
 		"last": last,
 	}).Parse(JOB_TMPL)
@@ -37,13 +38,22 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 		return nil, err
 	}
 
+	// ensure job is valid
+	err = Validate(job)
+	if err != nil {
+		return nil, err
+	}
+
+	// parse env vars for templating
 	if len(job.Env) != 0 {
+		trimEnv(&job)
 		err = parseEnv(&job)
 		if err != nil {
 			return nil, err
 		}
 	}
 
+	// execute template
 	buf := &bytes.Buffer{}
 	err = t.Execute(buf, job)
 	if err != nil {
@@ -62,6 +72,21 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 	}
 
 	return buf, err
+}
+
+func trimEnv(job *NomadJob) {
+	for i, env := range job.Env {
+		// trim spaces from key and value
+		job.Env[i][0] = strings.TrimSpace(env[0])
+		job.Env[i][1] = strings.TrimSpace(env[1])
+
+		// trim either single or double quotes from value
+		if strings.HasPrefix(env[1], "'") && strings.HasSuffix(env[1], "'") {
+			job.Env[i][1] = strings.Trim(env[1], "'")
+		} else if strings.HasPrefix(env[1], "\"") && strings.HasSuffix(env[1], "\"") {
+			job.Env[i][1] = strings.Trim(env[1], "\"")
+		}
+	}
 }
 
 func parseEnv(job *NomadJob) error {

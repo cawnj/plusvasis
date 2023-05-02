@@ -99,7 +99,10 @@ func TestCreateJob(t *testing.T) {
 
 	// Mocks
 	nomadJob := templates.NomadJob{
-		Name: "test",
+		Name:  "test",
+		Image: "test",
+		User:  "test",
+		Shell: "test",
 	}
 	nomadJobJson, _ := json.Marshal(nomadJob)
 	c.Request().Body = io.NopCloser(bytes.NewBuffer(nomadJobJson))
@@ -131,8 +134,10 @@ func TestUpdateJob(t *testing.T) {
 
 	// Mocks
 	nomadJobReq := templates.NomadJob{
-		Name: "test",
-		User: "test",
+		Name:  "test",
+		Image: "test",
+		User:  "test",
+		Shell: "test",
 	}
 	nomadJobReqJson, _ := json.Marshal(nomadJobReq)
 	c.Request().Body = io.NopCloser(bytes.NewBuffer(nomadJobReqJson))
@@ -403,8 +408,10 @@ func TestStartJob(t *testing.T) {
 	nomadClient.On("Get", "/job/"+jobName).Return(nomadJobJson, nil) // CheckUserAllowed mocking
 
 	nomadJobReq := templates.NomadJob{
-		Name: "test",
-		User: "test",
+		Name:  "test",
+		Image: "test",
+		User:  "test",
+		Shell: "test",
 	}
 	nomadJobReqJson, _ := json.Marshal(nomadJobReq)
 	c.Request().Body = io.NopCloser(bytes.NewBuffer(nomadJobReqJson))
