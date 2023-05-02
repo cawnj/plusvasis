@@ -100,6 +100,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/structs.JobRegisterResponse"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
@@ -524,6 +530,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/structs.JobRegisterResponse"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
@@ -546,9 +558,20 @@ const docTemplate = `{
         },
         "plusvasis_internal_templates.NomadJob": {
             "type": "object",
+            "required": [
+                "containerName",
+                "dockerImage",
+                "shell",
+                "user"
+            ],
             "properties": {
                 "containerName": {
                     "type": "string"
+                },
+                "cpu": {
+                    "type": "integer",
+                    "maximum": 1000,
+                    "minimum": 0
                 },
                 "dockerImage": {
                     "type": "string"
@@ -568,8 +591,15 @@ const docTemplate = `{
                 "expose": {
                     "type": "boolean"
                 },
+                "memory": {
+                    "type": "integer",
+                    "maximum": 2000,
+                    "minimum": 0
+                },
                 "port": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 0
                 },
                 "shell": {
                     "type": "string"
@@ -1449,25 +1479,9 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",

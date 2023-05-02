@@ -7,6 +7,10 @@ definitions:
     properties:
       containerName:
         type: string
+      cpu:
+        maximum: 1000
+        minimum: 0
+        type: integer
       dockerImage:
         type: string
       env:
@@ -19,7 +23,13 @@ definitions:
         type: string
       expose:
         type: boolean
+      memory:
+        maximum: 2000
+        minimum: 0
+        type: integer
       port:
+        maximum: 65535
+        minimum: 0
         type: integer
       shell:
         type: string
@@ -31,6 +41,11 @@ definitions:
             type: string
           type: array
         type: array
+    required:
+    - containerName
+    - dockerImage
+    - shell
+    - user
     type: object
   structs.AllocDeploymentStatus:
     properties:
@@ -702,24 +717,8 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
     - minDuration
     - maxDuration
     - Nanosecond
@@ -815,6 +814,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/structs.JobRegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
         "401":
           description: Unauthorized
           schema:
@@ -1054,6 +1057,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/structs.JobRegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
         "401":
           description: Unauthorized
           schema:
