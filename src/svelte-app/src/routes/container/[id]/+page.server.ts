@@ -18,7 +18,9 @@ export async function load({ params, cookies }: PageServerLoadEvent) {
 		if (res.ok) {
 			const data = await res.json();
 			const job: Job = {
-				user: undefined, // TODO: get user
+				// we don't care about the user here, for fetching jobs, this is handled api-side
+				// we only need the uid client-side when creating a job
+				user: undefined,
 				containerName: data.Name,
 				dockerImage: data.TaskGroups[0].Tasks[0].Config.image,
 				shell: data.Meta.shell,

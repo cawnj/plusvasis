@@ -34,6 +34,9 @@ export function MakeJob(formData: FormData) {
 
 	const expose: boolean = exposeStr != null;
 
+	// When creating a job, we need to make sure we have the user's uid
+	if (!uid) throw new Error('uid is undefined');
+
 	const job: Job = {
 		user: uid,
 		containerName: containerName,
