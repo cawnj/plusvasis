@@ -8,6 +8,7 @@ cache:
 before_script:
   - cd src/svelte-app
   - npm install
+  - cp ${PRODUCTION_ENV_FILE} .env
 
 lint:
   stage: test
