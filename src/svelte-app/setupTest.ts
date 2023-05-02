@@ -37,9 +37,7 @@ vi.mock('$app/stores', (): typeof stores => {
 		const navigating = readable<Navigation | null>(null);
 		const page = readable<Page>({
 			url: new URL('http://localhost'),
-			params: {
-				id: 'job123'
-			},
+			params: {},
 			route: {
 				id: null
 			},
