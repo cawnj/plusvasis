@@ -15,8 +15,8 @@ type NomadJob struct {
 	Image     string     `json:"dockerImage" validate:"required"`
 	User      string     `json:"user" validate:"required"`
 	Shell     string     `json:"shell" validate:"required"`
-	Volumes   [][]string `json:"volumes"`
-	Env       [][]string `json:"env"`
+	Volumes   [][]string `json:"volumes" validate:"kvPairs"`
+	Env       [][]string `json:"env" validate:"kvPairs"`
 	EnvString string     `json:"envString"`
 	Port      int        `json:"port" validate:"min=0,max=65535"`
 	Expose    bool       `json:"expose"`
