@@ -11,17 +11,17 @@ import (
 )
 
 type NomadJob struct {
-	Name      string     `json:"containerName"`
-	Image     string     `json:"dockerImage"`
-	User      string     `json:"user"`
-	Shell     string     `json:"shell"`
+	Name      string     `json:"containerName" validate:"required"`
+	Image     string     `json:"dockerImage" validate:"required"`
+	User      string     `json:"user" validate:"required"`
+	Shell     string     `json:"shell" validate:"required"`
 	Volumes   [][]string `json:"volumes"`
 	Env       [][]string `json:"env"`
 	EnvString string     `json:"envString"`
-	Port      int        `json:"port"`
+	Port      int        `json:"port" validate:"min=0,max=65535"`
 	Expose    bool       `json:"expose"`
-	Cpu       int        `json:"cpu"`
-	Memory    int        `json:"memory"`
+	Cpu       int        `json:"cpu" validate:"min=0,max=1000"`
+	Memory    int        `json:"memory" validate:"min=0,max=2000"`
 }
 
 func last(i int, slice interface{}) bool {
@@ -30,6 +30,7 @@ func last(i int, slice interface{}) bool {
 }
 
 func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
+	// create template
 	t, err := template.New("").Funcs(template.FuncMap{
 		"last": last,
 	}).Parse(JOB_TMPL)
@@ -37,6 +38,13 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 		return nil, err
 	}
 
+	// ensure job is valid
+	err = Validate(job)
+	if err != nil {
+		return nil, err
+	}
+
+	// parse env vars for templating
 	if len(job.Env) != 0 {
 		err = parseEnv(&job)
 		if err != nil {
@@ -44,6 +52,7 @@ func CreateJobJson(job NomadJob) (*bytes.Buffer, error) {
 		}
 	}
 
+	// execute template
 	buf := &bytes.Buffer{}
 	err = t.Execute(buf, job)
 	if err != nil {

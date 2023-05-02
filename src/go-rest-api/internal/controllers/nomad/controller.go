@@ -11,6 +11,7 @@ import (
 
 	nomad "github.com/hashicorp/nomad/nomad/structs"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 type NomadController struct {
@@ -75,7 +76,7 @@ func (n *NomadController) CreateJob(c echo.Context) error {
 
 	body, err := templates.CreateJobJson(job)
 	if err != nil {
-		return echo.ErrInternalServerError
+		return errors.Wrap(echo.ErrInternalServerError, err.Error())
 	}
 
 	data, err := n.Client.Post("/jobs", body)
@@ -115,7 +116,7 @@ func (n *NomadController) UpdateJob(c echo.Context) error {
 
 	body, err := templates.CreateJobJson(job)
 	if err != nil {
-		return echo.ErrInternalServerError
+		return errors.Wrap(echo.ErrInternalServerError, err.Error())
 	}
 
 	uid := c.Get("uid").(string)
