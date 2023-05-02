@@ -61,6 +61,7 @@ func (n *NomadController) GetJobs(c echo.Context) error {
 //	@Produce		json
 //	@Param			job	body		templates.NomadJob	true	"Nomad Job"
 //	@Success		200	{object}	nomad.JobRegisterResponse
+//	@Failure		400	{object}	echo.HTTPError
 //	@Failure		401	{object}	echo.HTTPError
 //	@Failure		500
 //	@Security		BearerAuth
@@ -76,7 +77,7 @@ func (n *NomadController) CreateJob(c echo.Context) error {
 
 	body, err := templates.CreateJobJson(job)
 	if err != nil {
-		return errors.Wrap(echo.ErrInternalServerError, err.Error())
+		return errors.Wrap(echo.ErrBadRequest, err.Error())
 	}
 
 	data, err := n.Client.Post("/jobs", body)
@@ -103,6 +104,7 @@ func (n *NomadController) CreateJob(c echo.Context) error {
 //	@Param			id	path		string				true	"Job ID"
 //	@Param			job	body		templates.NomadJob	true	"Nomad Job"
 //	@Success		200	{object}	nomad.JobRegisterResponse
+//	@Failure		400	{object}	echo.HTTPError
 //	@Failure		401	{object}	echo.HTTPError
 //	@Failure		500
 //	@Security		BearerAuth
@@ -116,7 +118,7 @@ func (n *NomadController) UpdateJob(c echo.Context) error {
 
 	body, err := templates.CreateJobJson(job)
 	if err != nil {
-		return errors.Wrap(echo.ErrInternalServerError, err.Error())
+		return errors.Wrap(echo.ErrBadRequest, err.Error())
 	}
 
 	uid := c.Get("uid").(string)
