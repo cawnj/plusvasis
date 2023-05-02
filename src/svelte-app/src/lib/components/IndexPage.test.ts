@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest';
-import { render, cleanup, waitFor, fireEvent } from '@testing-library/svelte';
-import IndexPage from './IndexPage.svelte';
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
+import { describe, expect, it } from 'vitest';
+
 import type { PageData } from '../../routes/$types';
+import IndexPage from './IndexPage.svelte';
 
 const defaultData: PageData = {
 	uid: 'test',

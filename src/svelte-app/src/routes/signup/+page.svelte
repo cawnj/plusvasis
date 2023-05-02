@@ -2,6 +2,6 @@
 	import Login from '$lib/components/LoginForm.svelte';
 </script>
 
-<div class="px-4 py-4 md:px-16 md:py-16 grid place-items-center">
+<div class="grid place-items-center px-4 py-4 md:px-16 md:py-16">
 	<Login title="Sign Up" />
 </div>

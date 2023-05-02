@@ -1,10 +1,17 @@
 <script lang="ts">
-	import { currJobStopped } from '../../stores/nomadStore';
+	import { faPlay, faRefresh, faStop, faTrash } from '@fortawesome/free-solid-svg-icons';
 	import { Button, ButtonGroup } from 'flowbite-svelte';
-	import { faPlay, faStop, faTrash, faRefresh } from '@fortawesome/free-solid-svg-icons';
-	import { fetchJobStop, fetchJobDelete, fetchJobRestart, fetchJobStart } from '$lib/utils/NomadClient';
 	import Fa from 'svelte-fa';
+
 	import { goto } from '$app/navigation';
+	import {
+		fetchJobDelete,
+		fetchJobRestart,
+		fetchJobStart,
+		fetchJobStop
+	} from '$lib/utils/NomadClient';
+
+	import { currJobStopped } from '../../stores/nomadStore';
 
 	let width: number;
 	let size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined;

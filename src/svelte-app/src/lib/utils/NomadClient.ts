@@ -1,8 +1,10 @@
+import fetch from 'cross-fetch';
+
+import type { Job } from '$lib/types/Types';
+
+import { token } from '../../stores/auth';
 import { hostname } from '../../stores/environmentStore';
 import { currJobId } from '../../stores/nomadStore';
-import type { Job } from '$lib/types/Types';
-import fetch from 'cross-fetch';
-import { token } from '../../stores/auth';
 
 let jobId: string;
 let authToken: string | undefined;

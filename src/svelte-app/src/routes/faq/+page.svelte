@@ -1,8 +1,9 @@
 <script>
-	import Nav from '$lib/components/NavBar.svelte';
-	import Fa from 'svelte-fa';
 	import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 	import { Blockquote, Heading } from 'flowbite-svelte';
+	import Fa from 'svelte-fa';
+
+	import Nav from '$lib/components/NavBar.svelte';
 
 	const faqContent = [
 		{
@@ -39,11 +40,11 @@
 </script>
 
 <Nav />
-<Heading tag="h1" class="text-8xl font-bold text-center mb-8 text-white">FAQ</Heading>
-<div class="px-4 md:px-16 pb-4">
+<Heading tag="h1" class="mb-8 text-center text-8xl font-bold text-white">FAQ</Heading>
+<div class="px-4 pb-4 md:px-16">
 	{#each faqContent as { question, answer }}
 		<div class="my-4 space-y-1">
-			<Heading tag="h1" class="text-white text-xl font-semibold flex items-center">
+			<Heading tag="h1" class="flex items-center text-xl font-semibold text-white">
 				<Fa icon={faQuestionCircle} class="mr-2" />
 				<span>{question}</span>
 			</Heading>

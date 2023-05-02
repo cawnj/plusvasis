@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { Card, Button, Label, Input, Alert, Hr, A } from 'flowbite-svelte';
-	import { signInWithGithub, signInWithEmail, createUserWithEmail } from '../../stores/auth';
-	import logo from '../../assets/logo.png';
 	import { faArrowLeft, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-	import Fa from 'svelte-fa';
-	import { LoginButton } from 'svelte-auth-ui';
-	import { goto } from '$app/navigation';
 	import { FirebaseError } from 'firebase/app';
+	import { A, Alert, Button, Card, Hr, Input, Label } from 'flowbite-svelte';
+	import { LoginButton } from 'svelte-auth-ui';
+	import Fa from 'svelte-fa';
+
+	import { goto } from '$app/navigation';
+
+	import logo from '../../assets/logo.png';
+	import { createUserWithEmail, signInWithEmail, signInWithGithub } from '../../stores/auth';
 
 	export let title: string;
 	let errorCode: string | null = null;
@@ -59,7 +61,7 @@
 			{#if title === 'Login'}
 				<img alt="The project logo" src={logo} class="mr-3 h-8 w-8" />
 			{:else}
-				<Button pill={true} class="!p-2 mr-3 h-8 w-8" on:click={() => history.back()}>
+				<Button pill={true} class="mr-3 h-8 w-8 !p-2" on:click={() => history.back()}>
 					<Fa icon={faArrowLeft} size="lg" />
 				</Button>
 			{/if}
@@ -75,7 +77,7 @@
 		</Label>
 		<div class="flex flex-col space-y-6 py-2">
 			{#if errorCode}
-				<Alert color="none" class="bg-red-100 text-red-600 border-red-800 !py-3">
+				<Alert color="none" class="border-red-800 bg-red-100 !py-3 text-red-600">
 					<span slot="icon">
 						<Fa icon={faExclamationTriangle} class="mr-2" />
 					</span>
@@ -94,7 +96,7 @@
 						{loading}
 						withLoader
 						on:click={handleGithubLogin}
-						class="w-full h-full"
+						class="h-full w-full"
 					/>
 				</div>
 			{:else}

@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
+import { describe, expect, it } from 'vitest';
+
 import SettingsController from './SettingsController.svelte';
 
 describe('SettingsController', () => {

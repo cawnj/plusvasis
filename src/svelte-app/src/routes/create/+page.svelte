@@ -1,7 +1,8 @@
 <script lang="ts">
+	import JobForm from '$lib/components/JobForm.svelte';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import type { Job } from '$lib/types/Types';
-	import JobForm from '$lib/components/JobForm.svelte';
+
 	import { currJob } from '../../stores/nomadStore';
 
 	// default job configuration
@@ -13,6 +14,6 @@
 </script>
 
 <NavBar />
-<div class="px-4 md:px-16 pb-4">
+<div class="px-4 pb-4 md:px-16">
 	<JobForm type="create" />
 </div>

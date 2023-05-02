@@ -1,4 +1,5 @@
 import type { Job } from '$lib/types/Types';
+
 import { user } from '../../stores/auth';
 
 let uid: string | undefined;

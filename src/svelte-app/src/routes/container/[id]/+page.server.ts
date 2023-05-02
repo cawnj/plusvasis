@@ -1,6 +1,7 @@
-import type { PageServerLoadEvent } from './$types';
-import { hostname } from '../../../stores/environmentStore';
 import type { Job } from '$lib/types/Types';
+
+import { hostname } from '../../../stores/environmentStore';
+import type { PageServerLoadEvent } from './$types';
 
 export async function load({ params, cookies }: PageServerLoadEvent) {
 	const token = cookies.get('token');

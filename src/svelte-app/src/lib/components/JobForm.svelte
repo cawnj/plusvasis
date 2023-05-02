@@ -1,13 +1,15 @@
 <script lang="ts">
-	import { JobFields } from '$lib/types/Types';
-	import { Label, Input, Helper, Select, Toggle, Button, Spinner, Range } from 'flowbite-svelte';
-	import type { Job } from '$lib/types/Types';
-	import { currJob } from '../../stores/nomadStore';
-	import { MakeJob } from '$lib/utils/MakeJob';
-	import { fetchJobCreate, fetchJobUpdate } from '$lib/utils/NomadClient';
-	import { goto } from '$app/navigation';
+	import { Button, Helper, Input, Label, Range, Select, Spinner, Toggle } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
+
+	import { goto } from '$app/navigation';
+	import type { Job } from '$lib/types/Types';
+	import { JobFields } from '$lib/types/Types';
+	import { MakeJob } from '$lib/utils/MakeJob';
+	import { fetchJobCreate, fetchJobUpdate } from '$lib/utils/NomadClient';
+
+	import { currJob } from '../../stores/nomadStore';
 
 	export let type: string;
 	let loading = false;
@@ -68,7 +70,7 @@
 		<!-- don't show containerName field on update -->
 		{#if !(key === 'containerName' && type === 'update')}
 			<div class="mb-3 mt-3">
-				<Label class="block mb-2">{value.title}</Label>
+				<Label class="mb-2 block">{value.title}</Label>
 				{#if value.type === 'input'}
 					<Input
 						label={key}
@@ -96,7 +98,7 @@
 						size="lg"
 						bind:value={cpu}
 					/>
-					<Label class="block mb-2">Value: {cpu}</Label>
+					<Label class="mb-2 block">Value: {cpu}</Label>
 				{:else if value.type === 'memoryRange'}
 					<Range
 						class="mb-4 w-1/4"
@@ -109,9 +111,9 @@
 						size="lg"
 						bind:value={memory}
 					/>
-					<Label class="block mb-2">Value: {memory}</Label>
+					<Label class="mb-2 block">Value: {memory}</Label>
 				{/if}
-				<Helper class="text-sm mt-2 whitespace-pre-line">{value.info}</Helper>
+				<Helper class="mt-2 whitespace-pre-line text-sm">{value.info}</Helper>
 			</div>
 		{/if}
 	{/each}

@@ -1,8 +1,10 @@
-import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
-import ContainerPage from './ContainerPage.svelte';
-import { currJob } from '../../stores/nomadStore';
+import { describe, expect, it } from 'vitest';
+
 import type { Job } from '$lib/types/Types';
+
+import { currJob } from '../../stores/nomadStore';
+import ContainerPage from './ContainerPage.svelte';
 
 const mockJob: Job = {
 	user: 'test',

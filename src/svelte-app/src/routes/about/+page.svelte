@@ -1,13 +1,14 @@
 <script>
-	import Nav from '$lib/components/NavBar.svelte';
-	import Fa from 'svelte-fa';
 	import {
+		faBarsProgress,
 		faEarthAmericas,
-		faNetworkWired,
 		faGears,
-		faBarsProgress
+		faNetworkWired
 	} from '@fortawesome/free-solid-svg-icons';
 	import { Card, Heading, Span } from 'flowbite-svelte';
+	import Fa from 'svelte-fa';
+
+	import Nav from '$lib/components/NavBar.svelte';
 
 	const cards = [
 		{
@@ -38,22 +39,22 @@
 </script>
 
 <Nav />
-<Heading tag="h1" class="text-4xl md:text-8xl font-bold text-center mb-4 md:mb-8 text-white"
+<Heading tag="h1" class="mb-4 text-center text-4xl font-bold text-white md:mb-8 md:text-8xl"
 	>What is PlusVasis?</Heading
 >
-<div class="px-4 md:px-16 pb-4 space-y-8 text-white flex justify-center">
+<div class="flex justify-center space-y-8 px-4 pb-4 text-white md:px-16">
 	<div class="grid grid-cols-2 gap-8">
 		{#each cards as card}
 			<Card horizontal>
 				<div class="flex flex-col">
-					<div class="flex items-center justify-center mb-4">
-						<Fa icon={card.icon} class="text-xl md:text-4xl text-sky-400 mr-4" />
-						<Heading tag="h2" class="text-lg md:text-2xl font-semibold">
+					<div class="mb-4 flex items-center justify-center">
+						<Fa icon={card.icon} class="mr-4 text-xl text-sky-400 md:text-4xl" />
+						<Heading tag="h2" class="text-lg font-semibold md:text-2xl">
 							<Span gradient>{card.title}</Span>
 						</Heading>
 					</div>
 					<div>
-						<p class="text-lg md:text-xl text-white">
+						<p class="text-lg text-white md:text-xl">
 							{card.description}
 						</p>
 					</div>

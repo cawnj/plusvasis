@@ -1,5 +1,6 @@
 import type * as xterm from 'xterm';
-import { b64encode, b64decode } from './Base64Util.js';
+
+import { b64decode, b64encode } from './Base64Util.js';
 
 export const HEARTBEAT_INTERVAL = 10000;
 export const MAX_RETRIES = 10;

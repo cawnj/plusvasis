@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/svelte';
-import Tabs from './Tabs.svelte';
 import { fa0 } from '@fortawesome/free-solid-svg-icons';
-import html from 'svelte-htm';
+import { render, screen } from '@testing-library/svelte';
 import type { ComponentProps } from 'svelte';
+import html from 'svelte-htm';
+import { describe, expect, it } from 'vitest';
+
+import Tabs from './Tabs.svelte';
 
 describe('prop test', () => {
 	it("doesn't pass prop", () => {

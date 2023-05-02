@@ -1,4 +1,5 @@
 import { rest } from 'msw';
+
 import { hostname } from '../stores/environmentStore';
 
 // Define handlers that catch the corresponding requests and return the mock data.

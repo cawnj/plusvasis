@@ -1,9 +1,12 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import 'xterm/css/xterm.css';
+
+	import { onDestroy, onMount } from 'svelte';
 	import type { Terminal } from 'xterm';
 	import type { FitAddon } from 'xterm-addon-fit';
+
 	import { ExecSocketAdapter } from '$lib/utils/ExecSocketAdapter';
+
 	import { currJobStopped } from '../../stores/nomadStore';
 
 	let isStopped: boolean;

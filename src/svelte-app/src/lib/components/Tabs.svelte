@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { Tab } from '$lib/types/Types';
-	import { Tabs, TabItem } from 'flowbite-svelte';
+	import { TabItem, Tabs } from 'flowbite-svelte';
 	import Fa from 'svelte-fa';
+
+	import type { Tab } from '$lib/types/Types';
 
 	export let tabs: Tab[];
 </script>
