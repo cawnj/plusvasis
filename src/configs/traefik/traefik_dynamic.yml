@@ -1,0 +1,28 @@
+http:
+  routers:
+    nomad:
+      rule: "Host(`nomad.local.cawnj.dev`)"
+      entryPoints:
+        - "https"
+      middlewares:
+        - "nomadHeaders"
+      service: "nomad"
+    webhook:
+      rule: "Host(`webhook.plusvasis.xyz`)"
+      entryPoints:
+        - "https"
+      service: "webhook"
+  services:
+    nomad:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.1.201:4646"
+    webhook:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.1.201:9000"
+  middlewares:
+    nomadHeaders:
+      headers:
+        customRequestHeaders:
+          Origin: "https://nomad.local.cawnj.dev"

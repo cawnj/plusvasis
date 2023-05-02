@@ -1,0 +1,40 @@
+;;
+;; Domain:     plusvasis.xyz.
+;; Exported:   2023-05-02 04:10:57
+;;
+;; This file is intended for use for informational and archival
+;; purposes ONLY and MUST be edited before use on a production
+;; DNS server.  In particular, you must:
+;;   -- update the SOA record with the correct authoritative name server
+;;   -- update the SOA record with the contact e-mail address information
+;;   -- update the NS record(s) with the authoritative name servers for this domain.
+;;
+;; For further information, please consult the BIND documentation
+;; located on the following website:
+;;
+;; http://www.isc.org/
+;;
+;; And RFC 1035:
+;;
+;; http://www.ietf.org/rfc/rfc1035.txt
+;;
+;; Please note that we do NOT offer technical support for any use
+;; of this zone data, the BIND name server, or any other third-party
+;; DNS software.
+;;
+;; Use at your own risk.
+;; SOA Record
+plusvasis.xyz	3600	IN	SOA	elma.ns.cloudflare.com dns.cloudflare.com 2043466725 10000 2400 604800 3600
+
+;; NS Records
+plusvasis.xyz.	86400	IN	NS	elma.ns.cloudflare.com.
+plusvasis.xyz.	86400	IN	NS	tadeo.ns.cloudflare.com.
+
+;; A Records
+*.local.plusvasis.xyz.	1	IN	A	192.168.1.201
+local.plusvasis.xyz.	1	IN	A	192.168.1.201
+plusvasis.xyz.	1	IN	A	XXX.XXX.X.XXX
+
+;; CNAME Records
+*.plusvasis.xyz.	1	IN	CNAME	plusvasis.xyz.
+

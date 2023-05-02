@@ -1,0 +1,48 @@
+api:
+  dashboard: true
+
+entryPoints:
+  http:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: "https"
+          scheme: "https"
+          permanent: true
+  https:
+    address: ":443"
+    http:
+      tls:
+        certresolver: cloudflare
+        domains:
+          - main: "cawnj.dev"
+            sans: "*.cawnj.dev"
+          - main: "local.cawnj.dev"
+            sans: "*.local.cawnj.dev"
+          - main: "plusvasis.xyz"
+            sans: "*.plusvasis.xyz"
+          - main: "local.plusvasis.xyz"
+            sans: "*.local.plusvasis.xyz"
+
+certificatesResolvers:
+  cloudflare:
+    acme:
+      storage: "acme.json"
+      dnsChallenge:
+        provider: "cloudflare"
+        delayBeforeCheck: 30
+        resolvers:
+          - "1.1.1.1:53"
+
+providers:
+  docker:
+    watch: true
+    network: "proxy"
+    exposedbydefault: false
+    endpoint: "unix:///var/run/docker.sock"
+  file:
+    filename: "traefik_dynamic.yml"
+  nomad:
+    endpoint:
+      address: "http://192.168.1.201:4646"
