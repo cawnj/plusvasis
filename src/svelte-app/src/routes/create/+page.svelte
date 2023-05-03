@@ -13,6 +13,6 @@
 </script>
 
 <NavBar />
-<div class="px-4 md:px-16 mb-4">
+<div class="px-4 md:px-16 pb-4">
 	<JobForm type="create" />
 </div>
