@@ -13,13 +13,19 @@
 		cpu: 100,
 		memory: 300
 	} as Job);
+
+	let yaml: string;
+
+	function handleSubmit() {
+		console.log(yaml);
+	}
 </script>
 
 <NavBar />
 <div class="px-4 pb-4 md:px-16">
 	<Heading tag="h2" class="mb-4 font-semibold text-white">docker-compose</Heading>
 	<div class="relative">
-		<Editor />
-		<Button class="absolute bottom-4 right-4" color="blue">Submit</Button>
+		<Editor bind:value={yaml} />
+		<Button class="absolute bottom-4 right-4" color="blue" on:click={handleSubmit}>Submit</Button>
 	</div>
 </div>

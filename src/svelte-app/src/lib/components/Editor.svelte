@@ -4,7 +4,7 @@
 	import { oneDark } from '@codemirror/theme-one-dark';
 	import CodeMirror from 'svelte-codemirror-editor';
 
-	let value = '';
+	export let value = '';
 	let yaml: LanguageSupport = new LanguageSupport(StreamLanguage.define(yamlMode.yaml));
 </script>
 
