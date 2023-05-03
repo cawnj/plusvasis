@@ -1,10 +1,10 @@
 <script lang="ts">
-	import CodeMirror from 'svelte-codemirror-editor';
-	import { oneDark } from '@codemirror/theme-one-dark';
+	import { LanguageSupport, StreamLanguage } from '@codemirror/language';
 	import * as yamlMode from '@codemirror/legacy-modes/mode/yaml';
-	import { StreamLanguage, LanguageSupport } from '@codemirror/language';
+	import { oneDark } from '@codemirror/theme-one-dark';
+	import CodeMirror from 'svelte-codemirror-editor';
 
-	let value: string = '';
+	let value = '';
 	let yaml: LanguageSupport = new LanguageSupport(StreamLanguage.define(yamlMode.yaml));
 </script>
 
@@ -15,7 +15,7 @@
 	styles={{
 		'&': {
 			width: '100%',
-			height: '40rem'
+			height: '70vh'
 		}
 	}}
 />
