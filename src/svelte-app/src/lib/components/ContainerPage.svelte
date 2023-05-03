@@ -1,16 +1,18 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import NomadController from '$lib/NomadController.svelte';
-	import Tabs from '$lib/Tabs.svelte';
-	import type { Tab } from '$lib/Types';
-	import LogController from '$lib/LogController.svelte';
-	import SettingsController from '$lib/SettingsController.svelte';
-	import { faTerminal, faFileAlt, faCog, faExternalLink } from '@fortawesome/free-solid-svg-icons';
-	import Fa from 'svelte-fa';
-	import ContainerOptions from '$lib/ContainerOptions.svelte';
-	import { Heading, A, Modal, Button } from 'flowbite-svelte';
+	import { faCog, faExternalLink, faFileAlt, faTerminal } from '@fortawesome/free-solid-svg-icons';
+	import { A, Button, Heading, Modal } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
-	import { currJob, currJobId, currJobStopped } from '../stores/nomadStore';
+	import Fa from 'svelte-fa';
+
+	import { page } from '$app/stores';
+	import ContainerOptions from '$lib/components/ContainerOptions.svelte';
+	import LogController from '$lib/components/LogController.svelte';
+	import NomadController from '$lib/components/NomadController.svelte';
+	import SettingsController from '$lib/components/SettingsController.svelte';
+	import Tabs from '$lib/components/Tabs.svelte';
+	import type { Tab } from '$lib/types/Types';
+
+	import { currJob, currJobId, currJobStopped } from '../../stores/nomadStore';
 
 	const tabs: Tab[] = [
 		{

@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { Button, Chevron, Dropdown, Radio } from 'flowbite-svelte';
 	import { onDestroy, onMount } from 'svelte';
-	import { Button, Dropdown, Chevron, Radio } from 'flowbite-svelte';
-	import { decode, getStream } from './StreamLogs';
-	import { currJobStopped } from '../stores/nomadStore';
+
+	import { decode, getStream } from '$lib/utils/StreamLogs';
+
+	import { currJobStopped } from '../../stores/nomadStore';
 
 	let isStopped: boolean;
 	currJobStopped.subscribe((value) => {
@@ -84,7 +86,7 @@
 
 <div class="pb-4">
 	<Button><Chevron>{type}</Chevron></Button>
-	<Dropdown class="w-32 p-3 space-y-3 text-sm">
+	<Dropdown class="w-32 space-y-3 p-3 text-sm">
 		<li>
 			<Radio name="type" bind:group={type} value={'stdout'} on:change={changeType}>stdout</Radio>
 		</li>

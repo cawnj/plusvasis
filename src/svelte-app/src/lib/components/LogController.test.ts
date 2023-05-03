@@ -1,11 +1,13 @@
-import { vi, describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
-import { currJobId, currJob } from '../stores/nomadStore';
-import LogController from './LogController.svelte';
-import type { Job } from '$lib/Types';
+import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('./StreamLogs', () => {
-	const actual = vi.importActual('./StreamLogs');
+import type { Job } from '$lib/types/Types';
+
+import { currJob, currJobId } from '../../stores/nomadStore';
+import LogController from './LogController.svelte';
+
+vi.mock('$lib/utils/StreamLogs', () => {
+	const actual = vi.importActual('$lib/utils/StreamLogs');
 	return {
 		...actual,
 		getStream: vi.fn(() => Promise.resolve(new ReadableStream()))

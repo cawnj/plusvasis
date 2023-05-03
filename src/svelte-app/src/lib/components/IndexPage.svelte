@@ -1,13 +1,14 @@
 <script lang="ts">
-	import Fa from 'svelte-fa';
 	import { faInfoCircle, faTerminal } from '@fortawesome/free-solid-svg-icons';
-	import { Button, Card, Alert, Modal } from 'flowbite-svelte';
-	import type { PageData } from '../routes/$types';
+	import { Alert, Button, Card, Modal } from 'flowbite-svelte';
+	import Fa from 'svelte-fa';
+
+	import type { PageData } from '../../routes/$types';
 
 	export let data: PageData;
 </script>
 
-<div class="px-4 md:px-16 pb-4">
+<div class="px-4 pb-4 md:px-16">
 	<Button color="blue" href="/create">Create Container</Button>
 	{#if !data.jobs}
 		<Alert class="my-4 max-w-md">
@@ -18,7 +19,7 @@
 		<div data-testid="job-list">
 			{#each data.jobs as job}
 				<Card class="my-3" href={`/container/${job.ID}`}>
-					<div class="flex items-center my-1">
+					<div class="my-1 flex items-center">
 						<Fa icon={faTerminal} color="white" class="pr-6" />
 						<span class="text-xl text-white">{job.Name}</span>
 					</div>
@@ -28,11 +29,11 @@
 	{/if}
 	{#if data.error}
 		<Modal title="Error" open={true}>
-			<div class="grid justify-center w-40">
+			<div class="grid w-40 justify-center">
 				<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
 					{data.error}
 				</p>
-				<div class="flex justify-center mt-4">
+				<div class="mt-4 flex justify-center">
 					<Button color="blue" href="javascript:window.location.href=window.location.href"
 						>Retry</Button
 					>

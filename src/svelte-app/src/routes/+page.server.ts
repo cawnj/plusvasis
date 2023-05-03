@@ -1,5 +1,5 @@
-import type { PageServerLoadEvent } from './$types';
 import { hostname } from '../stores/environmentStore';
+import type { PageServerLoadEvent } from './$types';
 
 export async function load({ fetch, cookies }: PageServerLoadEvent) {
 	const token = cookies.get('token');

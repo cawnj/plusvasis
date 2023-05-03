@@ -1,5 +1,7 @@
-import { auth } from '$lib/firebase/admin';
 import { redirect } from '@sveltejs/kit';
+
+import { auth } from '$lib/firebase/admin';
+
 import type { LayoutServerLoadEvent } from './$types';
 
 export async function load({ cookies, url }: LayoutServerLoadEvent) {

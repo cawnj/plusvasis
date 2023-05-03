@@ -1,13 +1,14 @@
 import cookie from 'cookie';
-import { browser } from '$app/environment';
 import {
+	createUserWithEmailAndPassword,
 	GithubAuthProvider,
-	type User,
-	signInWithPopup,
 	signInWithEmailAndPassword,
-	createUserWithEmailAndPassword
+	signInWithPopup,
+	type User
 } from 'firebase/auth';
 import { writable } from 'svelte/store';
+
+import { browser } from '$app/environment';
 import { auth } from '$lib/firebase/client';
 
 export const user = writable<User | null>(null);

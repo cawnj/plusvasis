@@ -1,9 +1,9 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/svelte';
-import LoginForm from './LoginForm.svelte';
-
+import { fireEvent, render, screen } from '@testing-library/svelte';
 // Mock firebase/auth
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { describe, expect, it, vi } from 'vitest';
+
+import LoginForm from './LoginForm.svelte';
 vi.mock('firebase/auth', async () => {
 	const actual = await vi.importActual('firebase/auth');
 	if (!actual) {

@@ -1,9 +1,10 @@
 <script lang="ts">
-	import ExecController from '$lib/ExecController.svelte';
-	import { currJobId, currJob, currJobStopped } from '../stores/nomadStore';
-	import { hostname } from '../stores/environmentStore';
-	import type { Job } from '$lib/Types';
-	import { token } from '../stores/auth';
+	import ExecController from '$lib/components/ExecController.svelte';
+	import type { Job } from '$lib/types/Types';
+
+	import { token } from '../../stores/auth';
+	import { hostname } from '../../stores/environmentStore';
+	import { currJob, currJobId, currJobStopped } from '../../stores/nomadStore';
 
 	let execControllerComponent: ExecController;
 	let wsUrl: string;

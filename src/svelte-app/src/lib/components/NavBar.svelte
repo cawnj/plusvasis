@@ -1,6 +1,7 @@
 <script>
-	import logo from '$lib/assets/logo.png';
-	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
+	import { Navbar, NavBrand, NavHamburger, NavLi, NavUl } from 'flowbite-svelte';
+
+	import logo from '../../assets/logo.png';
 </script>
 
 <div class="mx-1 my-2">
@@ -8,7 +9,7 @@
 		<NavBrand href="/">
 			<img src={logo} class="mr-3 h-6 sm:h-9" alt="PlusVasis Logo" />
 			<span
-				class="self-center whitespace-nowrap text-xl font-bold md:text-2xl dark:text-white hover:text-blue-400"
+				class="self-center whitespace-nowrap text-xl font-bold hover:text-blue-400 dark:text-white md:text-2xl"
 			>
 				PlusVasis
 			</span>

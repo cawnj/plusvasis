@@ -1,4 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+import type { Job } from '$lib/types/Types';
+
+import { currJobId } from '../../stores/nomadStore';
 import {
 	fetchJobCreate,
 	fetchJobDelete,
@@ -8,8 +12,6 @@ import {
 	fetchJobStop,
 	fetchJobUpdate
 } from './NomadClient';
-import type { Job } from './Types';
-import { currJobId } from '../stores/nomadStore';
 
 describe('when we do not return an object', () => {
 	currJobId.set('nomadClient');

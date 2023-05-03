@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { signOut } from '../../stores/auth';
 	import { onMount } from 'svelte';
+
+	import { goto } from '$app/navigation';
+
+	import { signOut } from '../../stores/auth';
 
 	onMount(() => {
 		signOut()

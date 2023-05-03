@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Nav from '$lib/NavBar.svelte';
-	import Container from '$lib/ContainerPage.svelte';
+	import Container from '$lib/components/ContainerPage.svelte';
+	import Nav from '$lib/components/NavBar.svelte';
 </script>
 
 <Nav />

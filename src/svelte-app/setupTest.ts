@@ -1,10 +1,11 @@
 // source: https://github.com/davipon/svelte-component-test-recipes/blob/main/setupTest.ts
 
 /* eslint-disable @typescript-eslint/no-empty-function */
-import matchers from '@testing-library/jest-dom/matchers';
-import { expect, vi } from 'vitest';
 import type { Navigation, Page } from '@sveltejs/kit';
+import matchers from '@testing-library/jest-dom/matchers';
 import { readable } from 'svelte/store';
+import { expect, vi } from 'vitest';
+
 import * as environment from '$app/environment';
 import * as navigation from '$app/navigation';
 import * as stores from '$app/stores';
