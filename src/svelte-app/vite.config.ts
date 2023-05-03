@@ -27,6 +27,14 @@ const config: UserConfig & { test: VitestConfig['test'] } = {
 		},
 		// Exclude playwright tests folder
 		exclude: [...configDefaults.exclude, 'tests']
+	},
+	optimizeDeps: {
+		exclude: [
+			'codemirror',
+			'@codemirror/language',
+			'@codemirror/leagcy-modes',
+			'@codemirror/theme-one-dark'
+		]
 	}
 };
 
