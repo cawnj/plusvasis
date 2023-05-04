@@ -11,10 +11,10 @@ describe('deleteJob spec', () => {
 			'DELETE',
 			'https://api.plusvasis.xyz/job/lK5VKiQIR6UpBXkZ35Ccft5Uyqg1-cypress-test?purge=true'
 		).as('jobDeleted');
-		cy.intercept('GET', 'https://api.plusvasis.xyz/jobs').as('jobs');
+		cy.intercept('GET', '/__data.json?x-sveltekit-invalidated=1_1').as('jobs');
 		cy.visit('https://app.plusvasis.xyz/login');
 
-		cy.wait(2000);
+		cy.wait(1500);
 
 		cy.get('input[name="email"]').type('example@email.com');
 		cy.get('input[name="password"]').type('th1s1sJustATest');
