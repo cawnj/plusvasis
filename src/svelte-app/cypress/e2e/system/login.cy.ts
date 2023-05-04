@@ -2,20 +2,17 @@
 
 describe('login spec', () => {
 	it('logs into testing account', () => {
-		cy.intercept('GET', 'https://api.plusvasis.xyz/jobs').as('jobs');
-		cy.visit('https://app.plusvasis.xyz');
+		cy.intercept('GET', '/__data.json?x-sveltekit-invalidated=1_1').as('jobs');
+		cy.visit('https://app.plusvasis.xyz/login');
 
-		// check if user is logged in
-		if (cy.get('a[href*="/logout"]')) {
-			cy.get('a[href*="/logout"]').click();
-		}
+		cy.wait(1500);
 
 		cy.get('input[name="email"]').type('example@email.com');
 		cy.get('input[name="password"]').type('th1s1sJustATest');
 		cy.get('button[type="submit"]').click();
 
 		// Wait for a few seconds (e.g., 3 seconds) before proceeding
-		cy.wait(3000);
+		cy.wait(1500);
 
 		cy.wait('@jobs');
 		cy.get('body').then(($body) => {
