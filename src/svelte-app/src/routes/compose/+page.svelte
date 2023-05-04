@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { Button, Heading } from 'flowbite-svelte';
+	import * as yaml from 'js-yaml';
 
 	import Editor from '$lib/components/Editor.svelte';
 	import NavBar from '$lib/components/NavBar.svelte';
-	import type { Job } from '$lib/types/Types';
+	import type { DockerCompose, Job } from '$lib/types/Types';
+	import { MakeJobsFromCompose } from '$lib/utils/MakeJob';
 
 	import { currJob } from '../../stores/nomadStore';
 
@@ -14,10 +16,13 @@
 		memory: 300
 	} as Job);
 
-	let yaml: string;
+	let dockerComposeStr: string;
 
 	function handleSubmit() {
-		console.log(yaml);
+		const dockerComposeYaml = yaml.load(dockerComposeStr);
+		const dockerComposeData: DockerCompose = dockerComposeYaml as DockerCompose;
+		const jobs = MakeJobsFromCompose(dockerComposeData);
+		console.log(jobs);
 	}
 </script>
 
@@ -25,7 +30,7 @@
 <div class="px-4 pb-4 md:px-16">
 	<Heading tag="h3" class="mb-4 font-semibold text-white">docker-compose</Heading>
 	<div class="relative">
-		<Editor bind:value={yaml} />
+		<Editor bind:value={dockerComposeStr} />
 		<Button class="absolute bottom-4 right-4" color="blue" on:click={handleSubmit}>Submit</Button>
 	</div>
 </div>

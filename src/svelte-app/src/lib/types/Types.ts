@@ -117,3 +117,18 @@ export type Tab = {
 	component: ComponentType;
 	icon: IconDefinition;
 };
+
+type Service = {
+	container_name: string;
+	image: string;
+	expose: number[];
+	environment: Record<string, string> | string[];
+	volumes: string[];
+	labels: Record<string, string> | string[];
+};
+
+export type DockerCompose = {
+	version: string;
+	services: Record<string, Service>;
+	volumes: Record<string, unknown>;
+};
