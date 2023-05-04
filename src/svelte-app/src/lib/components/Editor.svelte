@@ -2,12 +2,13 @@
 	import { LanguageSupport, StreamLanguage } from '@codemirror/language';
 	import * as yamlMode from '@codemirror/legacy-modes/mode/yaml';
 	import { oneDark } from '@codemirror/theme-one-dark';
+	import { onMount } from 'svelte';
 	import CodeMirror from 'svelte-codemirror-editor';
 
 	export let value = '';
 	const yaml: LanguageSupport = new LanguageSupport(StreamLanguage.define(yamlMode.yaml));
 
-	const placeholder: string = `# example docker-compose
+	const placeholder = `# example docker-compose
 # with custom plusvasis labels
 
 version: "3.8"
@@ -31,6 +32,12 @@ volumes:
   data:
 
 `;
+
+	// disable grammarly
+	onMount(() => {
+		const cmContent = document.getElementsByClassName('cm-content');
+		cmContent[0].setAttribute('data-enable-grammarly', 'false');
+	});
 </script>
 
 <CodeMirror
