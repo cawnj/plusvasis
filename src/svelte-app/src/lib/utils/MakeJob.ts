@@ -104,6 +104,9 @@ export function MakeJobsFromCompose(dockerCompose: DockerCompose): Job[] {
 			if (Array.isArray(env)) {
 				const envRecord: Record<string, string> = {};
 				for (const e of env) {
+					if (e === '') {
+						continue;
+					}
 					const [key, value] = e.split('=');
 					envRecord[key] = value;
 				}
@@ -115,6 +118,9 @@ export function MakeJobsFromCompose(dockerCompose: DockerCompose): Job[] {
 		}
 		if (service.volumes) {
 			for (const vol of service.volumes) {
+				if (vol === '') {
+					continue;
+				}
 				const [host, container] = vol.split(':');
 				volumes.push([host, container]);
 			}
