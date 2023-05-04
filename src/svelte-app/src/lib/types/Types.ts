@@ -128,7 +128,5 @@ type Service = {
 };
 
 export type DockerCompose = {
-	version: string;
 	services: Record<string, Service>;
-	volumes: Record<string, unknown>;
 };

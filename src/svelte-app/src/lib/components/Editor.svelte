@@ -51,4 +51,5 @@ volumes:
 		}
 	}}
 	{placeholder}
+	class="text-white"
 />
