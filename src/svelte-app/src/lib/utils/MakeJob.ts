@@ -1,4 +1,4 @@
-import type { Job } from '$lib/types/Types';
+import type { DockerCompose, Job } from '$lib/types/Types';
 
 import { user } from '../../stores/auth';
 
@@ -52,4 +52,95 @@ export function MakeJob(formData: FormData) {
 	};
 
 	return job;
+}
+
+export function MakeJobsFromCompose(dockerCompose: DockerCompose): Job[] {
+	const jobs: Job[] = [];
+	if (!uid) throw new Error('uid is undefined');
+
+	for (const serviceName in dockerCompose.services) {
+		const service = dockerCompose.services[serviceName];
+
+		// required
+		const containerName = service.container_name;
+		const dockerImage = service.image;
+
+		// optional
+		const volumes: [string, string][] = [];
+		const envs: [string, string][] = [];
+		let port = 0;
+		let expose = false;
+
+		// defaults
+		let shell = '/bin/sh';
+		let cpu = 100;
+		let memory = 300;
+
+		if (service.labels) {
+			let labels = service.labels;
+
+			// if labels string array, convert to record
+			if (Array.isArray(labels)) {
+				const labelsRecord: Record<string, string> = {};
+				for (const label of labels) {
+					const [key, value] = label.split('=');
+					labelsRecord[key] = value;
+				}
+				labels = labelsRecord;
+			}
+
+			shell = labels['shell'] || '/bin/sh';
+			cpu = Number(labels['cpu']) || 100;
+			memory = Number(labels['memory']) || 300;
+		}
+		if (service.expose) {
+			port = service.expose[0] || 0;
+			expose = true;
+		}
+		if (service.environment) {
+			let env = service.environment;
+
+			// if env string array, convert to record
+			if (Array.isArray(env)) {
+				const envRecord: Record<string, string> = {};
+				for (const e of env) {
+					if (e === '') {
+						continue;
+					}
+					const [key, value] = e.split('=');
+					envRecord[key] = value;
+				}
+				env = envRecord;
+			}
+			for (const [key, value] of Object.entries(env)) {
+				envs.push([key, value]);
+			}
+		}
+		if (service.volumes) {
+			for (const vol of service.volumes) {
+				if (vol === '') {
+					continue;
+				}
+				const [host, container] = vol.split(':');
+				volumes.push([host, container]);
+			}
+		}
+
+		const job = {
+			user: uid,
+			containerName: containerName,
+			dockerImage: dockerImage,
+			shell: shell,
+			volumes: volumes,
+			env: envs,
+			port: port,
+			expose: expose,
+			cpu: cpu,
+			memory: memory
+		};
+
+		jobs.push(job);
+	}
+
+	return jobs;
 }

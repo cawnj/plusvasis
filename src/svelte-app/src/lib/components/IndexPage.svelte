@@ -9,7 +9,7 @@
 </script>
 
 <div class="px-4 pb-4 md:px-16">
-	<Button color="blue" href="/create">Create Container</Button>
+	<Button color="blue" href="/create" class="mr-2">Create Container</Button>
 	{#if !data.jobs}
 		<Alert class="my-4 max-w-md">
 			<span slot="icon"><Fa icon={faInfoCircle} /> </span>

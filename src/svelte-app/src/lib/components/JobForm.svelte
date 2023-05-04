@@ -117,11 +117,13 @@
 			</div>
 		{/if}
 	{/each}
-	<Button color="blue" type="submit">
-		{#if loading}
-			<Spinner class="mr-3" size="4" color="white" />Loading ...
-		{:else}
-			{type === 'create' ? 'Create Container' : 'Update Container'}
-		{/if}
-	</Button>
+	<div class="pt-4">
+		<Button color="blue" type="submit">
+			{#if loading}
+				<Spinner class="mr-3" size="4" color="white" />Loading ...
+			{:else}
+				{type === 'create' ? 'Create Container' : 'Update Container'}
+			{/if}
+		</Button>
+	</div>
 </form>

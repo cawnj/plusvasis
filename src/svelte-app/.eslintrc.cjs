@@ -18,6 +18,8 @@ module.exports = {
 		node: true
 	},
 	rules: {
-		'simple-import-sort/imports': 'error'
+		'simple-import-sort/imports': 'error',
+		'no-unused-vars': 'off',
+		'@typescript-eslint/no-unused-vars': ['error']
 	}
 };
