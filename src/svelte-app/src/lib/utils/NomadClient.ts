@@ -112,19 +112,3 @@ export async function fetchJobStart() {
 		console.log('Error');
 	}
 }
-
-export async function fetchJobIdAllocations() {
-	const url = `${hostname}/job/${jobId}/alloc`;
-	const res = await fetch(url, {
-		headers: {
-			Authorization: `Bearer ${authToken}`
-		}
-	});
-
-	if (res.ok) {
-		const json = await res.json();
-		return json;
-	} else {
-		throw new Error('Failed to fetch allocations');
-	}
-}

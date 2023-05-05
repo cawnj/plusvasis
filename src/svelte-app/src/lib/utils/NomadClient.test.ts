@@ -6,7 +6,6 @@ import { currJobId } from '../../stores/nomadStore';
 import {
 	fetchJobCreate,
 	fetchJobDelete,
-	fetchJobIdAllocations,
 	fetchJobRestart,
 	fetchJobStart,
 	fetchJobStop,
@@ -77,12 +76,5 @@ describe('when we do not return an object', () => {
 		const consoleSpy = vi.spyOn(console, 'log');
 		await fetchJobStart();
 		expect(consoleSpy).toHaveBeenCalledWith('Container Started');
-	});
-});
-
-describe('when we return an object', () => {
-	it('should fetch job allocations successfully', async () => {
-		const allocations = await fetchJobIdAllocations();
-		expect(allocations).toBeTruthy();
 	});
 });
