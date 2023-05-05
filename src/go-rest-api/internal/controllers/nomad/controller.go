@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"plusvasis/internal/templates"
@@ -72,8 +71,6 @@ func (n *NomadController) CreateJob(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-
-	// TODO: Check if job already exists before continuing
 
 	body, err := templates.CreateJobJson(job)
 	if err != nil {
@@ -216,68 +213,6 @@ func (n *NomadController) StopJob(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-// ReadJobAllocs godoc
-//
-//	@Summary		ReadJobAllocs
-//	@Description	Get all allocations of a Nomad job
-//	@Tags			nomad
-//	@Produce		json
-//	@Param			id	path		string	true	"Job ID"
-//	@Success		200	{object}	[]nomad.AllocListStub
-//	@Failure		401	{object}	echo.HTTPError
-//	@Failure		500
-//	@Security		BearerAuth
-//	@Router			/job/{id}/allocations [get]
-func (n *NomadController) ReadJobAllocs(c echo.Context) error {
-	uid := c.Get("uid").(string)
-	jobId := c.Param("id")
-
-	if err := n.CheckUserAllowed(uid, jobId); err != nil {
-		return err
-	}
-
-	data, err := n.Client.Get(fmt.Sprintf("/job/%s/allocations", jobId))
-	if err != nil {
-		return err
-	}
-
-	var allocs []nomad.AllocListStub
-	err = json.Unmarshal(data, &allocs)
-	if err != nil {
-		return echo.ErrInternalServerError
-	}
-
-	return c.JSON(http.StatusOK, allocs)
-}
-
-// ReadJobAlloc godoc
-//
-//	@Summary		ReadJobAlloc
-//	@Description	Get the running allocation of a Nomad job
-//	@Tags			nomad
-//	@Produce		json
-//	@Param			id	path		string	true	"Job ID"
-//	@Success		200	{object}	nomad.AllocListStub
-//	@Failure		401	{object}	echo.HTTPError
-//	@Failure		404
-//	@Failure		500
-//	@Security		BearerAuth
-//	@Router			/job/{id}/alloc [get]
-func (n *NomadController) ReadJobAlloc(c echo.Context) error {
-	uid := c.Get("uid").(string)
-	jobId := c.Param("id")
-
-	if err := n.CheckUserAllowed(uid, jobId); err != nil {
-		return err
-	}
-
-	alloc, err := n.ParseRunningAlloc(jobId)
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, alloc)
-}
-
 // RestartJob godoc
 //
 //	@Summary		RestartJob
@@ -343,7 +278,6 @@ func (n *NomadController) StartJob(c echo.Context) error {
 	var job nomad.Job
 	err = json.Unmarshal(data, &job)
 	if err != nil {
-		log.Println("[nomad/StartJob]", err)
 		return err
 	}
 
@@ -414,26 +348,4 @@ func (n *NomadController) ParseRunningAlloc(jobId string) (*nomad.AllocListStub,
 	}
 
 	return nil, echo.ErrNotFound
-}
-
-func (n *NomadController) GetExistingJobNames(uid string) ([]string, error) {
-	data, err := n.Client.Get("/jobs?meta=true")
-	if err != nil {
-		return nil, err
-	}
-
-	var jobs []*nomad.JobListStub
-	err = json.Unmarshal(data, &jobs)
-	if err != nil {
-		return nil, err
-	}
-
-	var jobNames []string
-	for _, job := range jobs {
-		if job.Meta["user"] == uid {
-			jobNames = append(jobNames, job.Name)
-		}
-	}
-
-	return jobNames, nil
 }
