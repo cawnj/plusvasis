@@ -1,16 +1,10 @@
-import type { Job } from '$lib/types/Types';
-
 import { token } from '../../stores/auth';
 import { hostname } from '../../stores/environmentStore';
-import { currJob, currJobId } from '../../stores/nomadStore';
+import { currJobId } from '../../stores/nomadStore';
 import { b64decode } from './Base64Util';
 
-let job: Job;
 let jobId: string;
 let authToken: string | undefined;
-currJob.subscribe((value) => {
-	job = value;
-});
 currJobId.subscribe((value) => {
 	jobId = value;
 });
@@ -36,7 +30,6 @@ export function decode(chunk: string): { offset: number; message: string } | nul
 
 export async function getStream(type: string, abortController: AbortController) {
 	const urlBuilder = new URL(`${hostname}/job/${jobId}/logs`);
-	urlBuilder.searchParams.append('task', job.containerName);
 	urlBuilder.searchParams.append('type', type);
 	const url = urlBuilder.toString();
 

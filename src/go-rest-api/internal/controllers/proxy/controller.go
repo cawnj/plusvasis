@@ -203,9 +203,8 @@ func (n *NomadProxyController) checkUserAllowed(uid, jobId string) error {
 //	@Router			/job/{id}/logs [get]
 func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 	jobId := c.Param("id")
-	task := c.QueryParam("task")
 	logType := c.QueryParam("type")
-	if task == "" || logType == "" {
+	if logType == "" {
 		return echo.ErrBadRequest
 	}
 
@@ -222,7 +221,7 @@ func (n *NomadProxyController) StreamLogs(c echo.Context) error {
 	baseURL := "https://nomad.local.cawnj.dev/"
 	path := "v1/client/fs/logs/" + alloc.ID
 	queryParams := url.Values{}
-	queryParams.Add("task", task)
+	queryParams.Add("task", alloc.TaskGroup)
 	queryParams.Add("type", logType)
 	queryParams.Add("follow", "true")
 	queryParams.Add("offset", "50000")
