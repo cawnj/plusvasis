@@ -1,9 +1,11 @@
 Technical guide:
 - ./technical-guide.pdf
+- ./techincal-guide.md
 - https://hedgedoc.plusvasis.xyz/s/5ZfVvs3LV  
 
 User manual:
 - ./user-manual.pdf
+- ./user-manual.md
 - https://hedgedoc.plusvasis.xyz/s/ppofnTlsK
 
 ---
