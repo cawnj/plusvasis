@@ -1,3 +1,13 @@
+Technical guide:
+- ./technical-guide.pdf
+- https://hedgedoc.plusvasis.xyz/s/5ZfVvs3LV  
+
+User manual:
+- ./user-manual.pdf
+- https://hedgedoc.plusvasis.xyz/s/ppofnTlsK
+
+---
+
 Place your user manual and technical documentation in this directory.
 
 PDF is the preferred format.
